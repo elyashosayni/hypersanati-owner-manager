@@ -35,6 +35,9 @@ final class HOM_Plugin {
 
         HOM_Capabilities::maybe_sync();
 
+        HOM_Router::register();
+        HOM_Auth::register();
+
         /**
          * Fires after Owner Manager dependencies
          * and core services are ready.
