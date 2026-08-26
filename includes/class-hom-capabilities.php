@@ -6,9 +6,32 @@ if (!defined('ABSPATH')) {
 
 class HOM_Capabilities {
 
-    public const ROLE = 'hypersanati_owner';
+    /*
+     * Permanent dedicated business-panel role.
+     *
+     * IMPORTANT:
+     * This role is intentionally kept in WordPress even if
+     * the plugin is deactivated or uninstalled, so users
+     * never lose their assigned role.
+     */
+    public const ROLE =
+        'olfatbearing_shop_owner';
 
-    public const ROLE_VERSION = '1';
+    public const ROLE_LABEL =
+        'مدیر پنل فروشگاه الفت';
+
+
+    /*
+     * Previous role used by versions <= 0.2.0.
+     * Existing users are automatically migrated.
+     */
+    public const LEGACY_ROLE =
+        'hypersanati_owner';
+
+
+    public const ROLE_VERSION =
+        '2';
+
 
     public const CAP_ACCESS_PANEL =
         'hom_access_owner_panel';
@@ -19,9 +42,11 @@ class HOM_Capabilities {
     public const CAP_MANAGE_PRODUCT_IMAGES =
         'hom_manage_product_images';
 
+
     /*
      * Reserved capabilities for future modules.
-     * They are intentionally NOT granted to the Owner role yet.
+     * They are intentionally NOT granted to the
+     * shop-owner role yet.
      */
     public const CAP_MANAGE_PRODUCT_PRICES =
         'hom_manage_product_prices';
@@ -31,6 +56,7 @@ class HOM_Capabilities {
 
     public const CAP_MANAGE_PRODUCT_STOCK =
         'hom_manage_product_stock';
+
 
 
     public static function owner_capabilities() {
@@ -45,6 +71,7 @@ class HOM_Capabilities {
             self::CAP_MANAGE_PRODUCT_IMAGES => true,
         ];
     }
+
 
 
     public static function all_plugin_capabilities() {
@@ -65,40 +92,145 @@ class HOM_Capabilities {
     }
 
 
-    public static function sync_roles() {
 
-        $role = get_role(self::ROLE);
+    private static function ensure_owner_role() {
+
+        $role =
+            get_role(
+                self::ROLE
+            );
+
 
         if (!$role) {
 
             add_role(
                 self::ROLE,
-                'مدیر کسب‌وکار',
+                self::ROLE_LABEL,
                 self::owner_capabilities()
             );
 
-            $role = get_role(self::ROLE);
+            $role =
+                get_role(
+                    self::ROLE
+                );
         }
 
-        if ($role) {
 
-            foreach (
-                self::owner_capabilities()
-                as $capability => $grant
-            ) {
-                $role->add_cap(
-                    $capability,
-                    $grant
-                );
-            }
+        if (!$role) {
+            return;
         }
 
 
         /*
-         * Administrators receive all plugin capabilities so that
-         * the system can always be tested and managed safely.
+         * Always make sure the dedicated role contains
+         * exactly the currently enabled Owner permissions.
          */
-        $administrator = get_role('administrator');
+        foreach (
+            self::owner_capabilities()
+            as $capability => $grant
+        ) {
+
+            $role->add_cap(
+                $capability,
+                $grant
+            );
+        }
+
+
+        /*
+         * Future capabilities must not accidentally become
+         * available before their modules are released.
+         */
+        foreach (
+            [
+                self::CAP_MANAGE_PRODUCT_PRICES,
+                self::CAP_MANAGE_PRODUCT_CONTENT,
+                self::CAP_MANAGE_PRODUCT_STOCK,
+            ]
+            as $capability
+        ) {
+
+            $role->remove_cap(
+                $capability
+            );
+        }
+    }
+
+
+
+    private static function migrate_legacy_role() {
+
+        $legacy_role =
+            get_role(
+                self::LEGACY_ROLE
+            );
+
+
+        if (!$legacy_role) {
+            return;
+        }
+
+
+        $users =
+            get_users(
+                [
+                    'role' =>
+                        self::LEGACY_ROLE,
+
+                    'fields' =>
+                        'all',
+                ]
+            );
+
+
+        foreach ($users as $user) {
+
+            if (
+                !in_array(
+                    self::ROLE,
+                    (array) $user->roles,
+                    true
+                )
+            ) {
+
+                $user->add_role(
+                    self::ROLE
+                );
+            }
+
+
+            $user->remove_role(
+                self::LEGACY_ROLE
+            );
+        }
+
+
+        /*
+         * Only remove the obsolete role AFTER every
+         * assigned user has been migrated.
+         */
+        remove_role(
+            self::LEGACY_ROLE
+        );
+    }
+
+
+
+    public static function sync_roles() {
+
+        self::ensure_owner_role();
+
+        self::migrate_legacy_role();
+
+
+        /*
+         * Administrators retain all plugin capabilities.
+         */
+        $administrator =
+            get_role(
+                'administrator'
+            );
+
 
         if ($administrator) {
 
@@ -106,6 +238,7 @@ class HOM_Capabilities {
                 self::all_plugin_capabilities()
                 as $capability
             ) {
+
                 $administrator->add_cap(
                     $capability
                 );
@@ -121,16 +254,23 @@ class HOM_Capabilities {
     }
 
 
+
     public static function maybe_sync() {
 
-        $current = (string) get_option(
-            'hom_role_version',
-            ''
-        );
+        $current =
+            (string) get_option(
+                'hom_role_version',
+                ''
+            );
 
-        if ($current === self::ROLE_VERSION) {
+
+        if (
+            $current ===
+            self::ROLE_VERSION
+        ) {
             return;
         }
+
 
         self::sync_roles();
     }

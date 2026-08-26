@@ -4,13 +4,27 @@ if (!defined('WP_UNINSTALL_PLUGIN')) {
     exit;
 }
 
-$role = get_role('hypersanati_owner');
 
-if ($role) {
-    remove_role('hypersanati_owner');
-}
+/*
+ * IMPORTANT:
+ *
+ * The dedicated olfatbearing_shop_owner role is deliberately
+ * NOT removed during uninstall.
+ *
+ * WordPress roles are persisted in the database, therefore
+ * users assigned to this role remain valid even when the
+ * plugin is deactivated or removed.
+ *
+ * If the plugin is installed again, its capabilities will
+ * be synchronized automatically.
+ */
 
-$administrator = get_role('administrator');
+
+$administrator =
+    get_role(
+        'administrator'
+    );
+
 
 if ($administrator) {
 
@@ -23,10 +37,23 @@ if ($administrator) {
         'hom_manage_product_stock',
     ];
 
-    foreach ($capabilities as $capability) {
-        $administrator->remove_cap($capability);
+
+    foreach (
+        $capabilities
+        as $capability
+    ) {
+
+        $administrator->remove_cap(
+            $capability
+        );
     }
 }
 
-delete_option('hom_version');
-delete_option('hom_role_version');
+
+delete_option(
+    'hom_version'
+);
+
+delete_option(
+    'hom_role_version'
+);

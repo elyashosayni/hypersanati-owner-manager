@@ -114,7 +114,7 @@ class HOM_View {
     private static function render_login() {
 
         self::document_start(
-            'ورود به پنل مدیریت'
+            'ورود به پنل مدیریت فروشگاه'
         );
 
         $error = HOM_Auth::get_error();
@@ -134,7 +134,7 @@ class HOM_View {
             </div>
 
             <div class="hom-brand-subtitle">
-                پنل مدیریت کسب‌وکار
+                پنل مدیریت فروشگاه
             </div>
         </div>
 
@@ -152,7 +152,7 @@ class HOM_View {
                 </span>
 
                 <h1>
-                    ورود به پنل مدیریت
+                    ورود به پنل مدیریت فروشگاه
                 </h1>
 
                 <p>
@@ -278,6 +278,7 @@ class HOM_View {
             'dashboard',
             'products',
             'product-images',
+            'help',
         ];
 
         return in_array(
@@ -300,7 +301,7 @@ class HOM_View {
 
 
         self::document_start(
-            'پنل مدیریت کسب‌وکار'
+            'پنل مدیریت فروشگاه'
         );
 
         ?>
@@ -320,7 +321,7 @@ class HOM_View {
                 </strong>
 
                 <span>
-                    مدیریت کسب‌وکار
+                    مدیریت فروشگاه
                 </span>
             </div>
 
@@ -344,7 +345,10 @@ class HOM_View {
                     : '';
                 ?>"
             >
-                <span class="hom-nav-icon">
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
                     ⌂
                 </span>
 
@@ -365,17 +369,77 @@ class HOM_View {
                 );
                 ?>"
                 class="hom-nav-item <?php
-                echo 'products' === $current_view
+                echo in_array(
+                    $current_view,
+                    [
+                        'products',
+                        'product-images',
+                    ],
+                    true
+                )
                     ? 'is-active'
                     : '';
                 ?>"
             >
-                <span class="hom-nav-icon">
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
                     ▦
                 </span>
 
                 <span>
                     محصولات
+                </span>
+            </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
+                        'help',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo 'help' === $current_view
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ?
+                </span>
+
+                <span>
+                    راهنمای پنل
+                </span>
+            </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    HOM_Auth::account_url()
+                );
+                ?>"
+                class="hom-nav-item hom-nav-account-return"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ←
+                </span>
+
+                <span>
+                    بازگشت به پنل کاربری
                 </span>
             </a>
 
@@ -391,7 +455,7 @@ class HOM_View {
             <div>
 
                 <span class="hom-topbar-label">
-                    پنل مدیریت
+                    مدیریت فروشگاه
                 </span>
 
                 <strong>
@@ -405,6 +469,22 @@ class HOM_View {
 
             </div>
 
+
+            <a
+                href="<?php echo esc_url(HOM_Auth::account_url()); ?>"
+                class="hom-account-return"
+            >
+                <span
+                    class="hom-account-return__icon"
+                    aria-hidden="true"
+                >
+                    ←
+                </span>
+
+                <span>
+                    بازگشت به پنل کاربری
+                </span>
+            </a>
 
             <form
                 method="post"
@@ -444,7 +524,11 @@ class HOM_View {
 
             <?php
 
-            if ('product-images' === $current_view) {
+            if ('help' === $current_view) {
+
+                self::render_help_content();
+
+            } elseif ('product-images' === $current_view) {
 
                 self::render_product_images_content();
 
@@ -483,7 +567,7 @@ class HOM_View {
                 </span>
 
                 <h1>
-                    پنل مدیریت کسب‌وکار
+                    پنل مدیریت فروشگاه
                 </h1>
 
                 <p>
@@ -505,7 +589,7 @@ class HOM_View {
                 </div>
 
                 <h2>
-                    پنل مدیریت آماده استفاده است
+                    پنل مدیریت فروشگاه آماده استفاده است
                 </h2>
 
                 <p>
@@ -552,6 +636,557 @@ class HOM_View {
 
         <?php
     }
+
+
+    private static function render_help_content() {
+
+        $user =
+            wp_get_current_user();
+
+        $display_name =
+            $user->display_name
+                ?: $user->user_login;
+
+        $products_url =
+            add_query_arg(
+                'view',
+                'products',
+                HOM_Router::panel_url()
+            );
+
+        ?>
+
+        <div class="hom-help-page">
+
+            <section class="hom-help-hero">
+
+                <div class="hom-help-hero__icon">
+                    👋
+                </div>
+
+                <div class="hom-help-hero__content">
+
+                    <span class="hom-help-kicker">
+                        راهنمای مدیر فروشگاه
+                    </span>
+
+                    <h1>
+                        <?php
+                        echo esc_html(
+                            $display_name
+                        );
+                        ?> عزیز، خوش آمدید
+                    </h1>
+
+                    <p>
+                        از اینکه در مدیریت بهتر اطلاعات و تصاویر
+                        محصولات فروشگاه همکاری می‌کنید سپاسگزاریم.
+                        شناخت شما از محصولات، برندها و کدهای فنی
+                        باعث می‌شود تصاویر دقیق‌تر و مناسب‌تری
+                        برای هر محصول انتخاب شود.
+                    </p>
+
+                    <div class="hom-help-hero__actions">
+
+                        <a
+                            href="<?php
+                            echo esc_url(
+                                $products_url
+                            );
+                            ?>"
+                            class="hom-help-action hom-help-action-primary"
+                        >
+                            <span>▦</span>
+                            رفتن به محصولات
+                        </a>
+
+                        <a
+                            href="<?php
+                            echo esc_url(
+                                HOM_Auth::account_url()
+                            );
+                            ?>"
+                            class="hom-help-action hom-help-action-secondary"
+                        >
+                            <span>←</span>
+                            پنل کاربری
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-important">
+
+                <div class="hom-help-important__icon">
+                    ✓
+                </div>
+
+                <div>
+                    <strong>
+                        چرا همکاری شما مهم است؟
+                    </strong>
+
+                    <p>
+                        بهترین فرد برای تشخیص اینکه تصویر واقعاً
+                        متعلق به کدام محصول، برند و مدل است کسی است
+                        که با خود کالاها آشنایی دارد. کمک شما باعث
+                        افزایش دقت کاتالوگ، اعتماد مشتری و مدیریت
+                        بهتر وب‌سایت خواهد شد.
+                    </p>
+                </div>
+
+            </section>
+
+
+            <div class="hom-help-section-heading">
+
+                <span>
+                    راهنمای سریع
+                </span>
+
+                <h2>
+                    روش صحیح کار در پنل
+                </h2>
+
+                <p>
+                    مراحل زیر را به‌ترتیب انجام دهید.
+                </p>
+
+            </div>
+
+
+            <section class="hom-help-steps">
+
+                <article class="hom-help-step">
+
+                    <div class="hom-help-step__number">
+                        ۱
+                    </div>
+
+                    <div class="hom-help-step__icon">
+                        🔎
+                    </div>
+
+                    <h3>
+                        محصول را پیدا کنید
+                    </h3>
+
+                    <p>
+                        وارد بخش «محصولات» شوید و با نام محصول،
+                        ID، SKU، Part Number یا برند جستجو کنید.
+                    </p>
+
+                </article>
+
+
+                <article class="hom-help-step">
+
+                    <div class="hom-help-step__number">
+                        ۲
+                    </div>
+
+                    <div class="hom-help-step__icon">
+                        🏷️
+                    </div>
+
+                    <h3>
+                        مشخصات را کنترل کنید
+                    </h3>
+
+                    <p>
+                        قبل از تغییر تصویر، نام محصول، شناسه،
+                        SKU، Part Number و برند را بررسی کنید
+                        تا تصویر روی محصول اشتباه قرار نگیرد.
+                    </p>
+
+                </article>
+
+
+                <article class="hom-help-step">
+
+                    <div class="hom-help-step__number">
+                        ۳
+                    </div>
+
+                    <div class="hom-help-step__icon">
+                        🖼️
+                    </div>
+
+                    <h3>
+                        تصویر اصلی را انتخاب کنید
+                    </h3>
+
+                    <p>
+                        تصویر اصلی باید واضح، مرتبط با همان
+                        محصول و تا حد امکان بهترین نمای محصول
+                        برای مشتری باشد.
+                    </p>
+
+                </article>
+
+
+                <article class="hom-help-step">
+
+                    <div class="hom-help-step__number">
+                        ۴
+                    </div>
+
+                    <div class="hom-help-step__icon">
+                        🗂️
+                    </div>
+
+                    <h3>
+                        گالری را تکمیل کنید
+                    </h3>
+
+                    <p>
+                        تصاویر تکمیلی، زوایای دیگر محصول،
+                        بسته‌بندی، نقشه یا ابعاد فنی مناسب را
+                        در گالری قرار دهید.
+                    </p>
+
+                </article>
+
+
+                <article class="hom-help-step">
+
+                    <div class="hom-help-step__number">
+                        ۵
+                    </div>
+
+                    <div class="hom-help-step__icon">
+                        ⬆️
+                    </div>
+
+                    <h3>
+                        آپلود را کامل کنید
+                    </h3>
+
+                    <p>
+                        اگر تصاویر را از دستگاه یا دوربین
+                        انتخاب کرده‌اید، صبر کنید فرآیند آپلود
+                        کاملاً تمام شود.
+                    </p>
+
+                </article>
+
+
+                <article class="hom-help-step">
+
+                    <div class="hom-help-step__number">
+                        ۶
+                    </div>
+
+                    <div class="hom-help-step__icon">
+                        ✅
+                    </div>
+
+                    <h3>
+                        ذخیره نهایی را بزنید
+                    </h3>
+
+                    <p>
+                        تغییرات زمانی نهایی می‌شوند که دکمه
+                        «ذخیره تغییرات» را بزنید. قبل از آن
+                        یک بار همه تصاویر را کنترل کنید.
+                    </p>
+
+                </article>
+
+            </section>
+
+
+            <div class="hom-help-section-heading">
+
+                <span>
+                    ابزارهای پنل
+                </span>
+
+                <h2>
+                    هر ابزار چه کاری انجام می‌دهد؟
+                </h2>
+
+            </div>
+
+
+            <section class="hom-help-tools">
+
+                <article class="hom-help-tool">
+                    <span class="hom-help-tool__icon">📁</span>
+
+                    <div>
+                        <h3>انتخاب از دستگاه</h3>
+                        <p>
+                            انتخاب عکس از کامپیوتر، لپ‌تاپ یا
+                            حافظه موبایل.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="hom-help-tool">
+                    <span class="hom-help-tool__icon">📷</span>
+
+                    <div>
+                        <h3>دوربین موبایل</h3>
+                        <p>
+                            گرفتن عکس مستقیم از محصول با دوربین
+                            دستگاه در صورت پشتیبانی مرورگر.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="hom-help-tool">
+                    <span class="hom-help-tool__icon">▦</span>
+
+                    <div>
+                        <h3>رسانه‌های سایت</h3>
+                        <p>
+                            استفاده از تصویری که قبلاً در سایت
+                            وجود دارد، بدون نیاز به آپلود دوباره.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="hom-help-tool">
+                    <span class="hom-help-tool__icon">⬆️</span>
+
+                    <div>
+                        <h3>آپلود همه تصاویر</h3>
+                        <p>
+                            تصاویر آماده‌شده برای گالری را
+                            به سایت منتقل می‌کند.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="hom-help-tool">
+                    <span class="hom-help-tool__icon">↺</span>
+
+                    <div>
+                        <h3>بازنشانی</h3>
+                        <p>
+                            اگر هنوز ذخیره نهایی نکرده‌اید،
+                            تغییرات صفحه را به وضعیت اولیه
+                            برمی‌گرداند.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article class="hom-help-tool">
+                    <span class="hom-help-tool__icon">✓</span>
+
+                    <div>
+                        <h3>ذخیره تغییرات</h3>
+                        <p>
+                            مرحله نهایی اتصال تصویر اصلی و
+                            تصاویر گالری به محصول است.
+                        </p>
+                    </div>
+                </article>
+
+            </section>
+
+
+            <section class="hom-help-warning">
+
+                <div class="hom-help-warning__head">
+
+                    <span class="hom-help-warning__icon">
+                        ⚠️
+                    </span>
+
+                    <div>
+                        <span>
+                            قبل از هر تغییر
+                        </span>
+
+                        <h2>
+                            چند نکته بسیار مهم
+                        </h2>
+                    </div>
+
+                </div>
+
+                <ul>
+                    <li>
+                        قبل از انتخاب تصویر، حتماً کد و برند
+                        محصول را با تصویر تطبیق دهید.
+                    </li>
+
+                    <li>
+                        اگر درباره تصویر یا محصول مطمئن نیستید،
+                        تغییر را ذخیره نکنید.
+                    </li>
+
+                    <li>
+                        هنگام آپلود، صفحه را نبندید و تا پایان
+                        کامل انتقال تصاویر صبر کنید.
+                    </li>
+
+                    <li>
+                        از قرار دادن تصویر نامرتبط، تصویر محصول
+                        برند دیگر یا عکس بی‌کیفیت خودداری کنید.
+                    </li>
+
+                    <li>
+                        قبل از «ذخیره تغییرات» پیش‌نمایش تصویر
+                        اصلی و گالری را یک بار دیگر بررسی کنید.
+                    </li>
+
+                    <li>
+                        تصاویر موجود در «رسانه‌های سایت» ممکن است
+                        در بخش‌های دیگری نیز استفاده شده باشند؛
+                        فقط تصویر مناسب را انتخاب کنید و از
+                        ایجاد نسخه‌های تکراری غیرضروری بپرهیزید.
+                    </li>
+                </ul>
+
+            </section>
+
+
+            <section class="hom-help-security">
+
+                <div class="hom-help-security__icon">
+                    🔐
+                </div>
+
+                <div class="hom-help-security__content">
+
+                    <span class="hom-help-kicker">
+                        امنیت حساب مدیریت
+                    </span>
+
+                    <h2>
+                        اطلاعات دسترسی شما محرمانه است
+                    </h2>
+
+                    <p>
+                        این حساب امکان انجام تغییرات واقعی در
+                        محصولات فروشگاه را دارد. نام کاربری،
+                        رمز عبور و اطلاعات یا لینک‌های دسترسی
+                        مدیریتی را در اختیار افراد غیرمجاز
+                        قرار ندهید.
+                    </p>
+
+                    <div class="hom-help-security__rules">
+
+                        <div>
+                            <strong>رمز عبور</strong>
+                            <span>
+                                آن را برای دیگران ارسال نکنید.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>دستگاه مشترک</strong>
+                            <span>
+                                پس از پایان کار حتماً از حساب
+                                خارج شوید.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>لینک مدیریتی</strong>
+                            <span>
+                                آن را عمومی منتشر نکنید و فقط
+                                با افراد مجاز به اشتراک بگذارید.
+                            </span>
+                        </div>
+
+                        <div>
+                            <strong>فعالیت مشکوک</strong>
+                            <span>
+                                در صورت مشاهده مورد غیرعادی،
+                                موضوع را سریعاً به مدیر اصلی
+                                سایت اطلاع دهید.
+                            </span>
+                        </div>
+
+                    </div>
+
+                    <div class="hom-help-security__note">
+                        توجه: محرمانه نگه‌داشتن آدرس پنل به‌تنهایی
+                        جایگزین رمز عبور قوی و حفاظت از حساب
+                        کاربری نیست.
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-navigation">
+
+                <article>
+                    <span>←</span>
+
+                    <div>
+                        <strong>
+                            بازگشت به پنل کاربری
+                        </strong>
+
+                        <p>
+                            شما را به My Account برمی‌گرداند
+                            و همچنان وارد حساب باقی می‌مانید.
+                        </p>
+                    </div>
+                </article>
+
+
+                <article>
+                    <span>↪</span>
+
+                    <div>
+                        <strong>
+                            خروج از حساب
+                        </strong>
+
+                        <p>
+                            نشست کاربری را کاملاً پایان می‌دهد.
+                            روی دستگاه‌های مشترک حتماً از این
+                            گزینه استفاده کنید.
+                        </p>
+                    </div>
+                </article>
+
+            </section>
+
+
+            <section class="hom-help-thanks">
+
+                <div class="hom-help-thanks__icon">
+                    ★
+                </div>
+
+                <div>
+                    <h2>
+                        از همکاری شما سپاسگزاریم
+                    </h2>
+
+                    <p>
+                        مشارکت شما در تکمیل و کنترل تصاویر
+                        محصولات، بخش مهمی از مدیریت حرفه‌ای
+                        فروشگاه است و به ارائه اطلاعات دقیق‌تر
+                        و تجربه بهتر مشتریان کمک می‌کند.
+                    </p>
+                </div>
+
+            </section>
+
+        </div>
+
+        <?php
+    }
+
 
 
     private static function render_products_content() {
