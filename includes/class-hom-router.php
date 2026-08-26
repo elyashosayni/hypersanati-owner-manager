@@ -86,6 +86,7 @@ class HOM_Router {
 
         HOM_Auth::handle_request();
 
+
         HOM_View::render();
 
         exit;

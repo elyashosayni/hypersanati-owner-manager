@@ -3,14 +3,14 @@
 }
 
 :root {
-    --hom-bg: #f4f6f8;
+    --hom-bg: #f5f5f5;
     --hom-surface: #ffffff;
-    --hom-text: #172033;
-    --hom-muted: #70798b;
-    --hom-border: #e4e8ee;
-    --hom-primary: #172a46;
-    --hom-primary-hover: #0e1e34;
-    --hom-accent: #f3b31a;
+    --hom-text: #212529;
+    --hom-muted: #6c757d;
+    --hom-border: #dee2e6;
+    --hom-primary: #5e4420;
+    --hom-primary-hover: #8a7353;
+    --hom-accent: #ffa800;
     --hom-danger-bg: #fff0f0;
     --hom-danger: #a82828;
     --hom-success: #1c8751;
@@ -29,8 +29,7 @@ body.hom-page {
     background: var(--hom-bg);
     color: var(--hom-text);
     font-family:
-        Tahoma,
-        Arial,
+        "AnjomanMax",
         sans-serif;
     direction: rtl;
     line-height: 1.7;
@@ -74,7 +73,7 @@ button {
     flex: 0 0 46px;
     border-radius: 14px;
     background: var(--hom-accent);
-    color: #172033;
+    color: #212529;
     display: grid;
     place-items: center;
     font-size: 22px;
@@ -208,7 +207,7 @@ button {
 }
 
 .hom-button-secondary {
-    background: #eef1f5;
+    background: #f4f1eb;
     color: var(--hom-text);
 }
 
@@ -241,7 +240,7 @@ button {
 }
 
 .hom-sidebar {
-    background: #14243b;
+    background: #5e4420;
     color: #fff;
     padding: 24px 16px;
 }
@@ -929,4 +928,2090 @@ button {
         flex: 1 1 0;
         justify-content: center;
     }
+}
+
+/* Product Image Manager
+   Theme UI palette:
+   #9f8561 primary
+   #5e4420 secondary
+   #ffa800 accent
+*/
+
+.hom-product-images-screen {
+    --hom-site-primary: #9f8561;
+    --hom-site-primary-hover: #8a7353;
+    --hom-site-secondary: #5e4420;
+    --hom-site-secondary-dark: #493416;
+    --hom-site-accent: #ffa800;
+    --hom-site-soft: #f4f1eb;
+    --hom-site-border: rgba(159, 133, 97, 0.28);
+}
+
+.hom-product-images-screen .hom-sidebar {
+    background: var(--hom-site-secondary);
+}
+
+.hom-product-images-screen .hom-brand-mark {
+    background: var(--hom-site-accent);
+    color: var(--hom-site-secondary);
+}
+
+.hom-product-images-screen .hom-nav-link.is-active {
+    background: var(--hom-site-primary);
+}
+
+.hom-image-manager {
+    padding-bottom: 32px;
+}
+
+.hom-image-manager .hom-eyebrow {
+    color: var(--hom-site-primary);
+}
+
+.hom-back-link {
+    display: inline-flex;
+    align-items: center;
+    margin-bottom: 12px;
+    color: var(--hom-site-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.hom-back-link:hover {
+    color: var(--hom-site-primary);
+}
+
+.hom-product-image-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin-bottom: 18px;
+    overflow: hidden;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 15px;
+    background: var(--hom-site-border);
+    box-shadow: 0 8px 26px rgba(94, 68, 32, 0.05);
+}
+
+.hom-product-image-summary > div {
+    min-width: 0;
+    padding: 15px;
+    background: #fff;
+}
+
+.hom-product-image-summary span,
+.hom-product-image-summary strong {
+    display: block;
+}
+
+.hom-product-image-summary span {
+    margin-bottom: 6px;
+    color: var(--hom-muted);
+    font-size: 10px;
+}
+
+.hom-product-image-summary strong {
+    overflow-wrap: anywhere;
+    color: var(--hom-site-secondary);
+    font-size: 12px;
+}
+
+.hom-image-notice {
+    margin: 16px 0;
+    padding: 13px 16px;
+    border-radius: 12px;
+    font-size: 11px;
+    line-height: 1.9;
+}
+
+.hom-image-notice.is-success {
+    border: 1px solid rgba(159, 133, 97, 0.3);
+    background: #f7f3ed;
+    color: var(--hom-site-secondary);
+}
+
+.hom-image-notice.is-error {
+    border: 1px solid #efcaca;
+    background: #fff3f3;
+    color: #9d2929;
+}
+
+.hom-image-section {
+    margin-top: 18px;
+    padding: 20px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 8px 30px rgba(94, 68, 32, 0.045);
+}
+
+.hom-image-section-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+    margin-bottom: 18px;
+}
+
+.hom-image-section-heading h2 {
+    margin: 0;
+    color: var(--hom-site-secondary);
+    font-size: 19px;
+}
+
+.hom-image-section-heading p {
+    margin: 6px 0 0;
+    color: var(--hom-muted);
+    font-size: 11px;
+    line-height: 1.9;
+}
+
+.hom-gallery-counter {
+    flex: none;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: var(--hom-site-soft);
+    color: var(--hom-site-secondary);
+    font-size: 11px;
+}
+
+.hom-current-main-workspace {
+    margin-bottom: 16px;
+}
+
+.hom-main-empty {
+    min-height: 210px;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    border: 1.5px dashed var(--hom-site-border);
+    border-radius: 14px;
+    background: var(--hom-site-soft);
+}
+
+.hom-main-empty strong,
+.hom-main-empty span {
+    display: block;
+}
+
+.hom-main-empty strong {
+    color: var(--hom-site-secondary);
+    font-size: 17px;
+}
+
+.hom-main-empty span {
+    margin-top: 7px;
+    color: var(--hom-muted);
+    font-size: 11px;
+}
+
+.hom-main-current-card {
+    max-width: 340px;
+}
+
+.hom-ready-image-card {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 13px;
+    background: #fff;
+}
+
+.hom-ready-image-card > a {
+    display: block;
+    padding: 8px;
+    background: var(--hom-site-soft);
+}
+
+.hom-ready-image-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    border-radius: 9px;
+    background: #fff;
+}
+
+.hom-ready-image-card__meta {
+    padding: 9px 10px;
+}
+
+.hom-ready-image-card__meta strong,
+.hom-ready-image-card__meta span {
+    display: block;
+}
+
+.hom-ready-image-card__meta strong {
+    overflow: hidden;
+    color: var(--hom-site-secondary);
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hom-ready-image-card__meta span {
+    margin-top: 4px;
+    color: var(--hom-muted);
+    font-size: 8px;
+}
+
+.hom-remove-ready {
+    width: calc(100% - 18px);
+    margin: 0 9px 9px;
+    padding: 8px;
+    border: 1px solid #edd2d2;
+    border-radius: 8px;
+    background: #fff5f5;
+    color: #9b3030;
+    cursor: pointer;
+    font: inherit;
+    font-size: 9px;
+}
+
+.hom-source-panel {
+    padding: 17px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 14px;
+    background: var(--hom-site-soft);
+}
+
+.hom-source-panel__heading {
+    margin-bottom: 13px;
+}
+
+.hom-source-panel__heading strong,
+.hom-source-panel__heading span {
+    display: block;
+}
+
+.hom-source-panel__heading strong {
+    color: var(--hom-site-secondary);
+    font-size: 14px;
+}
+
+.hom-source-panel__heading span {
+    margin-top: 5px;
+    color: var(--hom-muted);
+    font-size: 10px;
+}
+
+.hom-source-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.hom-source-button {
+    min-width: 0;
+    min-height: 82px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 7px;
+    padding: 12px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--hom-site-secondary);
+    cursor: pointer;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 700;
+    text-align: center;
+    transition:
+        border-color 150ms ease,
+        background 150ms ease,
+        transform 150ms ease;
+}
+
+.hom-source-button:hover {
+    border-color: var(--hom-site-primary);
+    background: #fffdf9;
+    transform: translateY(-1px);
+}
+
+.hom-source-button input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hom-source-icon {
+    width: 32px;
+    height: 32px;
+    display: grid;
+    place-items: center;
+    border-radius: 9px;
+    background: var(--hom-site-soft);
+    color: var(--hom-site-secondary);
+    font-size: 17px;
+}
+
+.hom-pending-main {
+    margin-top: 14px;
+}
+
+.hom-pending-main-title {
+    margin-bottom: 8px;
+    color: var(--hom-site-secondary);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.hom-pending-card {
+    display: grid;
+    grid-template-columns: 105px minmax(0, 1fr);
+    gap: 13px;
+    padding: 11px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 13px;
+    background: #fff;
+}
+
+.hom-pending-card > img {
+    width: 105px;
+    height: 105px;
+    object-fit: contain;
+    border-radius: 9px;
+    background: var(--hom-site-soft);
+}
+
+.hom-pending-card__body {
+    min-width: 0;
+}
+
+.hom-pending-card__name {
+    overflow: hidden;
+    margin-bottom: 10px;
+    color: var(--hom-site-secondary);
+    font-size: 10px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hom-progress {
+    margin-bottom: 10px;
+}
+
+.hom-progress__track {
+    height: 7px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #e8e2da;
+}
+
+.hom-progress__bar {
+    width: 0;
+    height: 100%;
+    border-radius: inherit;
+    background:
+        linear-gradient(
+            90deg,
+            var(--hom-site-primary),
+            var(--hom-site-accent)
+        );
+    transition: width 120ms linear;
+}
+
+.hom-progress > span {
+    display: block;
+    margin-top: 5px;
+    color: var(--hom-muted);
+    font-size: 8px;
+}
+
+.hom-pending-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+}
+
+.hom-upload-one {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 13px;
+    border: 0;
+    border-radius: 9px;
+    background: var(--hom-site-secondary);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 10px;
+    font-weight: 700;
+}
+
+.hom-upload-one:hover {
+    background: var(--hom-site-secondary-dark);
+}
+
+.hom-upload-one:disabled {
+    cursor: wait;
+    opacity: 0.7;
+}
+
+.hom-upload-one svg {
+    width: 15px;
+    height: 15px;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 2;
+}
+
+.hom-remove-pending {
+    min-height: 38px;
+    padding: 8px 12px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--hom-muted);
+    cursor: pointer;
+    font: inherit;
+    font-size: 9px;
+}
+
+.hom-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 11px;
+    margin-bottom: 17px;
+}
+
+.hom-gallery-empty {
+    grid-column: 1 / -1;
+    padding: 28px;
+    border: 1px dashed var(--hom-site-border);
+    border-radius: 12px;
+    background: var(--hom-site-soft);
+    color: var(--hom-muted);
+    text-align: center;
+    font-size: 11px;
+}
+
+.hom-gallery-pending-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 17px;
+    margin-bottom: 10px;
+}
+
+.hom-gallery-pending-toolbar strong {
+    color: var(--hom-site-secondary);
+    font-size: 11px;
+}
+
+.hom-upload-all-button {
+    border-color: var(--hom-site-primary);
+    background: var(--hom-site-primary);
+    color: #fff;
+}
+
+.hom-upload-all-button:hover {
+    background: var(--hom-site-primary-hover);
+}
+
+.hom-pending-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.hom-media-safety-note {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.hom-media-safety-note > div {
+    padding: 14px 16px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 13px;
+    background: #fff;
+}
+
+.hom-media-safety-note strong {
+    color: var(--hom-site-secondary);
+    font-size: 11px;
+}
+
+.hom-media-safety-note p {
+    margin: 5px 0 0;
+    color: var(--hom-muted);
+    font-size: 9px;
+    line-height: 1.9;
+}
+
+.hom-final-action-bar {
+    position: sticky;
+    bottom: 12px;
+    z-index: 30;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 13px;
+    margin-top: 22px;
+    padding: 11px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 12px 35px rgba(94, 68, 32, 0.16);
+    backdrop-filter: blur(10px);
+}
+
+.hom-final-back {
+    border: 1px solid var(--hom-site-border);
+    background: #fff;
+    color: var(--hom-site-secondary);
+}
+
+.hom-final-status {
+    color: var(--hom-muted);
+    font-size: 9px;
+    text-align: center;
+}
+
+.hom-final-save {
+    min-width: 205px;
+    border-color: var(--hom-site-secondary);
+    background: var(--hom-site-secondary);
+    color: #fff;
+}
+
+.hom-final-save:hover:not(:disabled) {
+    background: var(--hom-site-secondary-dark);
+}
+
+.hom-final-save:disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+}
+
+.hom-media-open {
+    overflow: hidden;
+}
+
+.hom-media-modal[hidden] {
+    display: none !important;
+}
+
+.hom-media-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+}
+
+.hom-media-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(33, 37, 41, 0.62);
+    backdrop-filter: blur(3px);
+}
+
+.hom-media-modal__dialog {
+    position: relative;
+    width: min(1050px, 100%);
+    max-height: min(760px, calc(100vh - 44px));
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 17px;
+    background: #fff;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+}
+
+.hom-media-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 17px 19px;
+    border-bottom: 1px solid var(--hom-site-border);
+}
+
+.hom-media-modal__header strong,
+.hom-media-modal__header span {
+    display: block;
+}
+
+.hom-media-modal__header strong {
+    color: var(--hom-site-secondary);
+    font-size: 16px;
+}
+
+.hom-media-modal__header span {
+    margin-top: 4px;
+    color: var(--hom-muted);
+    font-size: 9px;
+}
+
+.hom-media-close {
+    width: 37px;
+    height: 37px;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 10px;
+    background: #fff;
+    color: var(--hom-site-secondary);
+    cursor: pointer;
+    font-size: 22px;
+}
+
+.hom-media-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--hom-site-border);
+    background: var(--hom-site-soft);
+}
+
+.hom-media-search input {
+    min-width: 0;
+    height: 42px;
+    padding: 0 12px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 9px;
+    outline: 0;
+    background: #fff;
+    color: var(--hom-text);
+    font: inherit;
+}
+
+.hom-media-search input:focus {
+    border-color: var(--hom-site-primary);
+}
+
+.hom-media-search .hom-button {
+    background: var(--hom-site-secondary);
+    color: #fff;
+}
+
+.hom-media-grid {
+    flex: 1;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    align-content: start;
+    gap: 9px;
+    padding: 15px 18px;
+}
+
+.hom-media-loading,
+.hom-media-empty {
+    padding: 30px;
+    color: var(--hom-muted);
+    text-align: center;
+    font-size: 11px;
+}
+
+.hom-media-loading {
+    grid-column: 1 / -1;
+}
+
+.hom-media-item {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    padding: 6px;
+    border: 2px solid transparent;
+    border-radius: 11px;
+    background: var(--hom-site-soft);
+    cursor: pointer;
+    font: inherit;
+    text-align: right;
+}
+
+.hom-media-item.is-selected {
+    border-color: var(--hom-site-accent);
+    box-shadow:
+        0 0 0 2px
+        rgba(255, 168, 0, 0.18);
+}
+
+.hom-media-item img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    border-radius: 7px;
+    background: #fff;
+}
+
+.hom-media-item__title {
+    display: block;
+    overflow: hidden;
+    margin-top: 6px;
+    color: var(--hom-site-secondary);
+    font-size: 8px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hom-media-item__safe {
+    display: inline-block;
+    margin-top: 5px;
+    padding: 3px 5px;
+    border-radius: 999px;
+    background: #fff;
+    color: var(--hom-site-primary);
+    font-size: 7px;
+}
+
+.hom-media-more {
+    margin: 0 18px 13px;
+    padding: 10px;
+    border: 1px solid var(--hom-site-border);
+    border-radius: 9px;
+    background: #fff;
+    color: var(--hom-site-secondary);
+    cursor: pointer;
+    font: inherit;
+    font-size: 10px;
+}
+
+.hom-media-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 13px;
+    padding: 13px 18px;
+    border-top: 1px solid var(--hom-site-border);
+    background: #fff;
+}
+
+.hom-media-modal__footer > span {
+    color: var(--hom-muted);
+    font-size: 9px;
+}
+
+.hom-media-confirm {
+    background: var(--hom-site-secondary);
+    color: #fff;
+}
+
+.hom-media-confirm:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+
+@media (max-width: 1100px) {
+
+    .hom-gallery-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .hom-media-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+}
+
+
+@media (max-width: 820px) {
+
+    .hom-product-image-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hom-gallery-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .hom-pending-gallery-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-media-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .hom-final-action-bar {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .hom-final-status {
+        grid-column: 1 / -1;
+        grid-row: 1;
+    }
+}
+
+
+@media (max-width: 720px) {
+
+    .hom-image-section {
+        padding: 15px;
+    }
+
+    .hom-image-section-heading {
+        display: block;
+    }
+
+    .hom-gallery-counter {
+        display: inline-block;
+        margin-top: 8px;
+    }
+
+    .hom-source-actions {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-source-button {
+        min-height: 62px;
+        flex-direction: row;
+    }
+
+    .hom-gallery-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .hom-media-safety-note {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-media-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .hom-media-modal {
+        padding: 10px;
+    }
+
+    .hom-media-modal__dialog {
+        max-height: calc(100vh - 20px);
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .hom-product-image-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-pending-card {
+        grid-template-columns: 82px minmax(0, 1fr);
+    }
+
+    .hom-pending-card > img {
+        width: 82px;
+        height: 82px;
+    }
+
+    .hom-pending-card__actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .hom-gallery-pending-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .hom-media-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        padding: 10px;
+    }
+
+    .hom-media-search {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-media-modal__footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .hom-media-confirm {
+        width: 100%;
+    }
+
+    .hom-final-action-bar {
+        grid-template-columns: 1fr;
+        bottom: 7px;
+    }
+
+    .hom-final-status {
+        grid-column: auto;
+        grid-row: auto;
+        order: -1;
+    }
+
+    .hom-final-save,
+    .hom-final-back {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+
+/* Owner Panel Official Font */
+html,
+body,
+button,
+input,
+select,
+textarea {
+    font-family:
+        "AnjomanMax",
+        sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+
+/* HOM FINAL FONT + MEDIA GRID FIX */
+
+/*
+ * Use the exact official HyperSanati font.
+ * Font files remain inside the active theme;
+ * the plugin does not contain its own font files.
+ */
+html,
+body,
+.hom-shell,
+.hom-sidebar,
+.hom-main,
+.hom-main-content,
+.hom-image-manager,
+.hom-media-modal,
+.hom-media-modal__dialog,
+.hom-final-action-bar,
+button,
+input,
+select,
+textarea {
+    font-family:
+        "AnjomanMax",
+        sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+
+/*
+ * Media Library modal:
+ *
+ * Keep the dialog at a stable viewport height.
+ * More images must create an internal scrollbar,
+ * never compress existing image cards.
+ */
+.hom-media-modal__dialog {
+    height: min(
+        760px,
+        calc(100vh - 44px)
+    );
+    max-height: calc(100vh - 44px);
+    min-height: 0;
+}
+
+
+.hom-media-grid {
+    flex:
+        1 1 auto;
+
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    grid-auto-flow: row;
+    grid-auto-rows: max-content;
+
+    align-content: start;
+
+    overscroll-behavior: contain;
+
+    scrollbar-gutter: stable;
+}
+
+
+.hom-media-item {
+    align-self: start;
+    height: auto;
+    min-height: 0;
+}
+
+
+.hom-media-item img {
+    display: block;
+
+    width: 100%;
+    height: auto;
+
+    aspect-ratio: 1 / 1;
+
+    object-fit: contain;
+}
+
+
+.hom-media-more {
+    flex: none;
+}
+
+
+.hom-media-modal__header,
+.hom-media-search,
+.hom-media-modal__footer {
+    flex: none;
+}
+
+
+@media (max-width: 720px) {
+
+    .hom-media-modal__dialog {
+        height: calc(100dvh - 20px);
+        max-height: calc(100dvh - 20px);
+    }
+
+}
+
+
+@supports not (height: 100dvh) {
+
+    @media (max-width: 720px) {
+
+        .hom-media-modal__dialog {
+            height: calc(100vh - 20px);
+            max-height: calc(100vh - 20px);
+        }
+
+    }
+
+}
+
+/* HOM GLOBAL WEBSITE UI KIT */
+
+:root {
+    --hom-bg: #f5f5f5;
+    --hom-surface: #ffffff;
+
+    --hom-text: #212529;
+    --hom-muted: #6c757d;
+
+    --hom-border: #dee2e6;
+
+    --hom-primary: #5e4420;
+    --hom-primary-hover: #8a7353;
+
+    --hom-accent: #ffa800;
+
+    --hom-site-primary: #9f8561;
+    --hom-site-primary-hover: #8a7353;
+
+    --hom-site-secondary: #5e4420;
+    --hom-site-secondary-dark: #493416;
+
+    --hom-site-accent: #ffa800;
+    --hom-site-soft: #f4f1eb;
+
+    --hom-site-border:
+        rgba(159, 133, 97, 0.28);
+}
+
+
+/*
+ * Official HyperSanati typography.
+ * The actual @font-face is loaded from
+ * the active site's assets/css/font.css.
+ */
+
+html,
+body {
+    font-family:
+        "AnjomanMax",
+        sans-serif !important;
+}
+
+
+body,
+.hom-shell,
+.hom-sidebar,
+.hom-main,
+.hom-main-content,
+.hom-topbar,
+.hom-login-card,
+.hom-image-manager,
+.hom-media-modal,
+.hom-media-modal__dialog {
+    font-family:
+        "AnjomanMax",
+        sans-serif !important;
+}
+
+
+button,
+input,
+textarea,
+select,
+option {
+    font-family:
+        "AnjomanMax",
+        sans-serif !important;
+}
+
+
+/*
+ * Global Owner Panel brand colors.
+ * These rules apply to Dashboard, Products
+ * and Product Images alike.
+ */
+
+.hom-sidebar {
+    background:
+        #5e4420 !important;
+}
+
+
+.hom-brand-mark {
+    background:
+        #ffa800 !important;
+
+    color:
+        #5e4420 !important;
+}
+
+
+.hom-nav-link.is-active {
+    background:
+        #9f8561 !important;
+
+    color:
+        #ffffff !important;
+}
+
+
+.hom-nav-link:hover {
+    background:
+        rgba(159, 133, 97, 0.42);
+}
+
+
+.hom-eyebrow {
+    color:
+        #9f8561 !important;
+}
+
+
+.hom-button-primary {
+    border-color:
+        #5e4420 !important;
+
+    background:
+        #5e4420 !important;
+
+    color:
+        #ffffff !important;
+}
+
+
+.hom-button-primary:hover {
+    border-color:
+        #8a7353 !important;
+
+    background:
+        #8a7353 !important;
+}
+
+
+a {
+    text-decoration-thickness:
+        from-font;
+}
+
+
+/*
+ * Make sure the Product Images screen does not
+ * need a separate blue-to-brown override anymore.
+ */
+
+.hom-product-images-screen .hom-sidebar {
+    background:
+        #5e4420 !important;
+}
+
+
+.hom-product-images-screen .hom-brand-mark {
+    background:
+        #ffa800 !important;
+
+    color:
+        #5e4420 !important;
+}
+
+/* ==================================================
+   Definitive Owner Panel typography
+   Official HyperSanati font: AnjomanMax
+   ================================================== */
+
+body.hom-page,
+body.hom-page *:not(.fa):not(.fas):not(.far):not(.fab),
+body.hom-page *::before,
+body.hom-page *::after {
+    font-family:
+        "AnjomanMax",
+        sans-serif !important;
+}
+
+body.hom-page {
+    font-family:
+        "AnjomanMax",
+        sans-serif !important;
+
+    font-synthesis: none;
+}
+
+body.hom-page button,
+body.hom-page input,
+body.hom-page textarea,
+body.hom-page select,
+body.hom-page option {
+    font-family:
+        "AnjomanMax",
+        sans-serif !important;
+}
+
+/* HOM PRODUCT EDIT + COMPACT FINAL ACTIONS */
+
+
+/* ------------------------------------------
+   Product list: Edit Product action
+   ------------------------------------------ */
+
+.hom-edit-product-button {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+
+    padding: 8px 14px;
+
+    border:
+        1px solid #9f8561 !important;
+
+    border-radius: 9px;
+
+    background:
+        #f4f1eb !important;
+
+    color:
+        #5e4420 !important;
+
+    font-weight: 800;
+    line-height: 1.4;
+    text-decoration: none !important;
+
+    box-shadow:
+        0 3px 10px
+        rgba(94, 68, 32, 0.08);
+
+    transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        transform 150ms ease,
+        box-shadow 150ms ease;
+}
+
+
+.hom-edit-product-button::before {
+    content: "✎";
+
+    flex: none;
+
+    color:
+        #9f8561;
+
+    font-family:
+        Arial,
+        sans-serif !important;
+
+    font-size: 15px;
+    line-height: 1;
+}
+
+
+.hom-edit-product-button:hover {
+    border-color:
+        #5e4420 !important;
+
+    background:
+        #ffffff !important;
+
+    color:
+        #5e4420 !important;
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 5px 14px
+        rgba(94, 68, 32, 0.12);
+}
+
+
+/* ------------------------------------------
+   Final action bar
+   ------------------------------------------ */
+
+.hom-final-action-bar {
+    grid-template-columns:
+        210px
+        155px
+        minmax(0, 1fr) !important;
+
+    grid-template-areas:
+        "save back status";
+
+    gap:
+        8px !important;
+
+    margin-top:
+        14px !important;
+
+    padding:
+        8px 9px !important;
+
+    border-radius:
+        13px !important;
+}
+
+
+.hom-final-status {
+    grid-area:
+        status;
+
+    min-width: 0;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 4px !important;
+
+    color:
+        #6c757d;
+
+    font-size:
+        9px !important;
+
+    line-height:
+        1.45 !important;
+
+    text-align:
+        right !important;
+}
+
+
+.hom-final-back {
+    grid-area:
+        back;
+
+    min-height:
+        42px;
+
+    display:
+        inline-flex !important;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        8px 12px !important;
+
+    border:
+        1px solid #9f8561 !important;
+
+    border-radius:
+        9px !important;
+
+    background:
+        #f4f1eb !important;
+
+    color:
+        #5e4420 !important;
+
+    font-weight:
+        800;
+
+    text-decoration:
+        none !important;
+
+    white-space:
+        nowrap;
+}
+
+
+.hom-final-back:hover {
+    border-color:
+        #5e4420 !important;
+
+    background:
+        #ffffff !important;
+
+    color:
+        #5e4420 !important;
+}
+
+
+.hom-final-save {
+    grid-area:
+        save;
+
+    min-width:
+        0 !important;
+
+    min-height:
+        42px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        8px 14px !important;
+
+    border-radius:
+        9px !important;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+}
+
+
+/* ------------------------------------------
+   Mobile optimization
+   ------------------------------------------ */
+
+@media (max-width: 720px) {
+
+    .hom-edit-product-button {
+        width:
+            100%;
+
+        min-height:
+            42px;
+    }
+
+
+    /*
+     * Bottom sticky control:
+     *
+     * small status on top,
+     * both actions on a single row.
+     */
+    .hom-final-action-bar {
+        grid-template-columns:
+            minmax(0, 1fr)
+            minmax(0, 1fr) !important;
+
+        grid-template-areas:
+            "status status"
+            "back save";
+
+        gap:
+            6px 7px !important;
+
+        bottom:
+            6px !important;
+
+        margin-top:
+            10px !important;
+
+        padding:
+            7px !important;
+
+        border-radius:
+            12px !important;
+    }
+
+
+    .hom-final-status {
+        min-height:
+            0;
+
+        padding:
+            0 3px 2px !important;
+
+        font-size:
+            8px !important;
+
+        line-height:
+            1.3 !important;
+
+        text-align:
+            right !important;
+    }
+
+
+    .hom-final-back,
+    .hom-final-save {
+        width:
+            100% !important;
+
+        min-width:
+            0 !important;
+
+        min-height:
+            40px;
+
+        padding:
+            7px 6px !important;
+
+        font-size:
+            10px;
+    }
+
+
+    /*
+     * The sticky back button already exists,
+     * so remove the duplicate top back link
+     * on small screens to save vertical space.
+     */
+    .hom-page-heading .hom-back-link {
+        display:
+            none !important;
+    }
+
+}
+
+
+@media (max-width: 390px) {
+
+    .hom-final-action-bar {
+        gap:
+            5px !important;
+
+        padding:
+            6px !important;
+    }
+
+
+    .hom-final-back,
+    .hom-final-save {
+        min-height:
+            38px;
+
+        font-size:
+            9px;
+    }
+
+}
+
+/* HOM STRONG EDIT PRODUCT CTA */
+
+.hom-edit-product-button {
+    width: auto !important;
+    min-width: 150px;
+    min-height: 46px;
+
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    padding: 6px 13px 6px 15px !important;
+
+    border:
+        1px solid #5e4420 !important;
+
+    border-radius:
+        10px !important;
+
+    background:
+        #5e4420 !important;
+
+    color:
+        #ffffff !important;
+
+    font-size:
+        11px !important;
+
+    font-weight:
+        800 !important;
+
+    line-height:
+        1.4;
+
+    text-decoration:
+        none !important;
+
+    white-space:
+        nowrap;
+
+    box-shadow:
+        0 5px 14px
+        rgba(94, 68, 32, 0.18) !important;
+
+    cursor:
+        pointer;
+
+    transition:
+        transform 150ms ease,
+        background 150ms ease,
+        border-color 150ms ease,
+        box-shadow 150ms ease !important;
+}
+
+
+.hom-edit-product-button::before {
+    content:
+        "✎";
+
+    width:
+        31px;
+
+    height:
+        31px;
+
+    flex:
+        0 0 31px;
+
+    display:
+        grid;
+
+    place-items:
+        center;
+
+    border-radius:
+        8px;
+
+    background:
+        #ffa800;
+
+    color:
+        #5e4420;
+
+    font-family:
+        Arial,
+        sans-serif !important;
+
+    font-size:
+        17px;
+
+    font-weight:
+        900;
+
+    line-height:
+        1;
+
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(255, 255, 255, 0.24);
+}
+
+
+.hom-edit-product-button:hover,
+.hom-edit-product-button:focus-visible {
+    border-color:
+        #493416 !important;
+
+    background:
+        #493416 !important;
+
+    color:
+        #ffffff !important;
+
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 8px 19px
+        rgba(94, 68, 32, 0.25) !important;
+
+    outline:
+        none;
+}
+
+
+.hom-edit-product-button:active {
+    transform:
+        translateY(0);
+
+    box-shadow:
+        0 3px 8px
+        rgba(94, 68, 32, 0.18) !important;
+}
+
+
+/*
+ * Keep the action visually separated
+ * from surrounding product metadata.
+ */
+.hom-products-table td:last-child {
+    text-align:
+        center;
+}
+
+
+@media (max-width: 720px) {
+
+    .hom-edit-product-button {
+        width:
+            100% !important;
+
+        min-width:
+            0;
+
+        min-height:
+            48px;
+
+        justify-content:
+            center;
+
+        font-size:
+            12px !important;
+    }
+
+}
+
+/* HOM FINAL RESET ACTION */
+
+.hom-final-action-bar {
+    grid-template-columns:
+        205px
+        145px
+        155px
+        minmax(0, 1fr) !important;
+
+    grid-template-areas:
+        "save reset back status" !important;
+}
+
+
+.hom-final-reset {
+    grid-area:
+        reset;
+
+    min-width:
+        0;
+
+    min-height:
+        42px;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+
+    padding:
+        8px 11px;
+
+    border:
+        1px solid #d5c3aa !important;
+
+    border-radius:
+        9px !important;
+
+    background:
+        #fffaf2 !important;
+
+    color:
+        #7a5b32 !important;
+
+    font-weight:
+        800;
+
+    white-space:
+        nowrap;
+
+    cursor:
+        pointer;
+
+    transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        color 150ms ease;
+}
+
+
+.hom-final-reset:hover:not(:disabled) {
+    border-color:
+        #9f8561 !important;
+
+    background:
+        #f4f1eb !important;
+
+    color:
+        #5e4420 !important;
+}
+
+
+.hom-final-reset:disabled {
+    cursor:
+        not-allowed;
+
+    opacity:
+        0.42;
+}
+
+
+@media (max-width: 720px) {
+
+    .hom-final-action-bar {
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            ) !important;
+
+        grid-template-areas:
+            "status status status"
+            "back reset save" !important;
+
+        gap:
+            5px !important;
+    }
+
+
+    .hom-final-back,
+    .hom-final-reset,
+    .hom-final-save {
+        min-width:
+            0 !important;
+
+        width:
+            100% !important;
+
+        min-height:
+            39px;
+
+        padding:
+            6px 4px !important;
+
+        font-size:
+            9px !important;
+
+        line-height:
+            1.25;
+    }
+
+
+    .hom-final-status {
+        margin:
+            0 !important;
+
+        padding:
+            0 3px 1px !important;
+
+        font-size:
+            8px !important;
+
+        line-height:
+            1.25 !important;
+    }
+
+}
+
+
+@media (max-width: 360px) {
+
+    .hom-final-back,
+    .hom-final-reset,
+    .hom-final-save {
+        font-size:
+            8px !important;
+    }
+
+}
+
+/* HOM EDIT PRODUCT NO UNDERLINE */
+
+a.hom-edit-product-button,
+a.hom-edit-product-button:link,
+a.hom-edit-product-button:visited,
+a.hom-edit-product-button:hover,
+a.hom-edit-product-button:focus,
+a.hom-edit-product-button:focus-visible,
+a.hom-edit-product-button:active {
+    text-decoration:
+        none !important;
+
+    text-decoration-line:
+        none !important;
+
+    text-decoration-thickness:
+        0 !important;
+
+    border-bottom:
+        none !important;
+
+    background-image:
+        none !important;
+}
+
+
+a.hom-edit-product-button *,
+a.hom-edit-product-button span {
+    text-decoration:
+        none !important;
+
+    border-bottom:
+        none !important;
+}
+
+
+a.hom-edit-product-button::after {
+    display:
+        none !important;
+
+    content:
+        none !important;
+}
+
+/* ==================================================
+   Definitive Edit Product link decoration reset
+   ================================================== */
+
+body.hom-page a.hom-edit-product-button,
+body.hom-page a.hom-edit-product-button:link,
+body.hom-page a.hom-edit-product-button:visited,
+body.hom-page a.hom-edit-product-button:hover,
+body.hom-page a.hom-edit-product-button:focus,
+body.hom-page a.hom-edit-product-button:active,
+body.hom-page a[href*="view=product-images"],
+body.hom-page a[href*="view=product-images"]:link,
+body.hom-page a[href*="view=product-images"]:visited,
+body.hom-page a[href*="view=product-images"]:hover,
+body.hom-page a[href*="view=product-images"]:focus,
+body.hom-page a[href*="view=product-images"]:active {
+    text-decoration: none !important;
+    text-decoration-line: none !important;
+    text-decoration-style: solid !important;
+    text-decoration-color: transparent !important;
+
+    border-bottom: 0 !important;
+
+    background-image: none !important;
+
+    -webkit-text-decoration: none !important;
+}
+
+
+body.hom-page a.hom-edit-product-button > *,
+body.hom-page a[href*="view=product-images"] > * {
+    text-decoration: none !important;
+    text-decoration-line: none !important;
+    border-bottom: 0 !important;
+}
+
+
+body.hom-page a.hom-edit-product-button::after,
+body.hom-page a[href*="view=product-images"]::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* HOM DESKTOP FINAL ACTION ORDER */
+
+/*
+ * RTL visual order on desktop:
+ * بازگشت | لغو تغییرات | ذخیره تغییرات | وضعیت
+ */
+
+@media (min-width: 721px) {
+
+    .hom-final-action-bar {
+        grid-template-columns:
+            175px
+            150px
+            190px
+            minmax(220px, 1fr) !important;
+
+        grid-template-areas:
+            "back reset save status" !important;
+
+        align-items:
+            center;
+
+        gap:
+            8px !important;
+
+        padding:
+            8px 10px !important;
+    }
+
+
+    .hom-final-back,
+    .hom-final-reset,
+    .hom-final-save {
+        width:
+            100% !important;
+
+        min-width:
+            0 !important;
+
+        min-height:
+            42px;
+
+        padding:
+            7px 10px !important;
+
+        margin:
+            0 !important;
+    }
+
+
+    .hom-final-status {
+        align-self:
+            center;
+
+        min-width:
+            0;
+
+        padding:
+            0 8px !important;
+
+        margin:
+            0 !important;
+
+        text-align:
+            right !important;
+
+        white-space:
+            normal;
+    }
+
 }
