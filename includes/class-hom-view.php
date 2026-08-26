@@ -43,6 +43,59 @@ class HOM_View {
         rel="stylesheet"
         href="<?php echo esc_url($css_url); ?>"
     >
+
+
+        <style id="hom-official-anjomanmax">
+
+        @font-face {
+            font-family: "AnjomanMax";
+
+            src:
+                url("<?php
+                echo esc_url(
+                    get_stylesheet_directory_uri()
+                    . '/assets/fonts/AnjomanMaxVF.woff2'
+                );
+                ?>")
+                format("woff2"),
+
+                url("<?php
+                echo esc_url(
+                    get_stylesheet_directory_uri()
+                    . '/assets/fonts/AnjomanMaxVF.woff'
+                );
+                ?>")
+                format("woff");
+
+            font-weight: 100 900;
+            font-style: normal;
+            font-display: swap;
+        }
+
+
+        body.hom-page,
+        .hom-app,
+        .hom-shell,
+        .hom-sidebar,
+        .hom-main,
+        .hom-main-content,
+        .hom-topbar,
+        .hom-login-card,
+        .hom-image-manager,
+        .hom-media-modal,
+        .hom-media-modal__dialog,
+        .hom-final-action-bar,
+        button,
+        input,
+        select,
+        textarea {
+            font-family:
+                "AnjomanMax",
+                sans-serif !important;
+        }
+
+        </style>
+
 </head>
 
 <body class="hom-page">
@@ -224,6 +277,7 @@ class HOM_View {
         $allowed = [
             'dashboard',
             'products',
+            'product-images',
         ];
 
         return in_array(
@@ -390,7 +444,11 @@ class HOM_View {
 
             <?php
 
-            if ('products' === $current_view) {
+            if ('product-images' === $current_view) {
+
+                self::render_product_images_content();
+
+            } elseif ('products' === $current_view) {
 
                 self::render_products_content();
 
@@ -877,14 +935,25 @@ class HOM_View {
                                 class="hom-product-actions"
                             >
 
-                                <button
-                                    type="button"
+                                <a
                                     class="hom-button hom-button-secondary"
-                                    disabled
-                                    title="در مرحله بعد فعال می‌شود"
+                                    href="<?php
+                                    echo esc_url(
+                                        add_query_arg(
+                                            [
+                                                'view' =>
+                                                    'product-images',
+
+                                                'product_id' =>
+                                                    $item['id'],
+                                            ],
+                                            HOM_Router::panel_url()
+                                        )
+                                    );
+                                    ?>"
                                 >
-                                    مدیریت تصاویر
-                                </button>
+                                    ویرایش محصول
+                                </a>
 
                             </td>
 
@@ -996,6 +1065,730 @@ class HOM_View {
 
 
         <?php endif;
+    }
+
+
+    private static function render_product_images_content() {
+
+        if (
+            !current_user_can(
+                HOM_Capabilities::CAP_MANAGE_PRODUCT_IMAGES
+            )
+        ) {
+
+            ?>
+            <div class="hom-alert hom-alert-error">
+                شما اجازه ویرایش محصول محصولات را ندارید.
+            </div>
+            <?php
+
+            return;
+        }
+
+
+        $product_id =
+            isset($_GET['product_id'])
+                ? absint(
+                    $_GET['product_id']
+                )
+                : 0;
+
+
+        $product =
+            HOM_Product_Images::get_product(
+                $product_id
+            );
+
+
+        if (!$product) {
+
+            ?>
+            <div class="hom-alert hom-alert-error">
+                محصول موردنظر پیدا نشد.
+            </div>
+            <?php
+
+            return;
+        }
+
+
+        $images =
+            HOM_Product_Images::get_product_images(
+                $product
+            );
+
+
+        $part_number =
+            trim(
+                (string) get_post_meta(
+                    $product_id,
+                    '_mpn_part_number',
+                    true
+                )
+            );
+
+
+        $brands =
+            wp_get_post_terms(
+                $product_id,
+                'product_brand',
+                [
+                    'fields' => 'names',
+                ]
+            );
+
+        if (is_wp_error($brands)) {
+            $brands = [];
+        }
+
+
+        $products_url =
+            add_query_arg(
+                'view',
+                'products',
+                HOM_Router::panel_url()
+            );
+
+
+        ?>
+
+        <script>
+        document.body.classList.add(
+            'hom-product-images-screen'
+        );
+        </script>
+
+
+        <div
+            class="hom-image-manager"
+            data-hom-image-manager
+        >
+
+            <div class="hom-page-heading">
+
+                <div>
+
+                    <a
+                        class="hom-back-link"
+                        data-hom-back
+                        href="<?php
+                        echo esc_url(
+                            $products_url
+                        );
+                        ?>"
+                    >
+                        ← بازگشت به لیست محصولات
+                    </a>
+
+                    <span class="hom-eyebrow">
+                        PRODUCT MANAGEMENT
+                    </span>
+
+                    <h1>
+                        مدیریت محصول
+                    </h1>
+
+                    <p>
+                        <?php
+                        echo esc_html(
+                            $product->get_name()
+                        );
+                        ?>
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <section class="hom-product-image-summary">
+
+                <div>
+                    <span>شناسه محصول</span>
+
+                    <strong class="hom-ltr">
+                        <?php
+                        echo esc_html(
+                            $product_id
+                        );
+                        ?>
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>SKU</span>
+
+                    <strong class="hom-ltr">
+                        <?php
+                        echo esc_html(
+                            $product->get_sku()
+                                ?: '—'
+                        );
+                        ?>
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>Part Number</span>
+
+                    <strong class="hom-ltr">
+                        <?php
+                        echo esc_html(
+                            $part_number
+                                ?: '—'
+                        );
+                        ?>
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>برند</span>
+
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $brands
+                                ? implode(
+                                    '، ',
+                                    $brands
+                                )
+                                : '—'
+                        );
+                        ?>
+                    </strong>
+                </div>
+
+            </section>
+
+
+            <div
+                class="hom-image-notice"
+                data-hom-notice
+                hidden
+            ></div>
+
+
+            <!-- MAIN IMAGE -->
+            <section class="hom-image-section">
+
+                <div class="hom-image-section-heading">
+
+                    <div>
+                        <h2>
+                            تصویر اصلی محصول
+                        </h2>
+
+                        <p>
+                            تصویر نهایی فقط پس از زدن
+                            «ذخیره تغییرات»
+                            به محصول متصل می‌شود.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="hom-current-main-workspace"
+                    data-hom-main-current
+                ></div>
+
+
+                <div
+                    class="hom-source-panel"
+                >
+
+                    <div class="hom-source-panel__heading">
+
+                        <strong>
+                            انتخاب تصویر اصلی جدید
+                        </strong>
+
+                        <span>
+                            یکی از روش‌های زیر را انتخاب کنید.
+                        </span>
+
+                    </div>
+
+
+                    <div class="hom-source-actions">
+
+                        <label
+                            class="hom-source-button"
+                        >
+
+                            <span class="hom-source-icon">
+                                📁
+                            </span>
+
+                            <span>
+                                انتخاب از دستگاه
+                            </span>
+
+                            <input
+                                type="file"
+                                data-hom-main-device
+                                accept=".jpg,.jpeg,.png,.webp,.avif,.heic,.heif,image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif"
+                            >
+
+                        </label>
+
+
+                        <label
+                            class="hom-source-button"
+                        >
+
+                            <span class="hom-source-icon">
+                                📷
+                            </span>
+
+                            <span>
+                                دوربین موبایل
+                            </span>
+
+                            <input
+                                type="file"
+                                data-hom-main-camera
+                                accept="image/*"
+                                capture="environment"
+                            >
+
+                        </label>
+
+
+                        <button
+                            type="button"
+                            class="hom-source-button"
+                            data-hom-open-media="main"
+                        >
+
+                            <span class="hom-source-icon">
+                                ▦
+                            </span>
+
+                            <span>
+                                رسانه‌های سایت
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="hom-pending-main"
+                        data-hom-main-pending
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <!-- GALLERY -->
+            <section class="hom-image-section">
+
+                <div class="hom-image-section-heading">
+
+                    <div>
+                        <h2>
+                            گالری محصول
+                        </h2>
+
+                        <p>
+                            تصاویر را می‌توانید جداگانه یا یکجا آپلود کنید.
+                        </p>
+                    </div>
+
+                    <strong
+                        class="hom-gallery-counter"
+                        data-hom-gallery-count
+                    ></strong>
+
+                </div>
+
+
+                <div
+                    class="hom-gallery-grid"
+                    data-hom-gallery-ready
+                ></div>
+
+
+                <div class="hom-source-panel">
+
+                    <div class="hom-source-panel__heading">
+
+                        <strong>
+                            افزودن تصاویر گالری
+                        </strong>
+
+                        <span>
+                            دوربین، دستگاه یا Media Library سایت
+                        </span>
+
+                    </div>
+
+
+                    <div class="hom-source-actions">
+
+                        <label
+                            class="hom-source-button"
+                        >
+
+                            <span class="hom-source-icon">
+                                📁
+                            </span>
+
+                            <span>
+                                انتخاب از دستگاه
+                            </span>
+
+                            <input
+                                type="file"
+                                data-hom-gallery-device
+                                accept=".jpg,.jpeg,.png,.webp,.avif,.heic,.heif,image/jpeg,image/png,image/webp,image/avif,image/heic,image/heif"
+                                multiple
+                            >
+
+                        </label>
+
+
+                        <label
+                            class="hom-source-button"
+                        >
+
+                            <span class="hom-source-icon">
+                                📷
+                            </span>
+
+                            <span>
+                                دوربین موبایل
+                            </span>
+
+                            <input
+                                type="file"
+                                data-hom-gallery-camera
+                                accept="image/*"
+                                capture="environment"
+                                multiple
+                            >
+
+                        </label>
+
+
+                        <button
+                            type="button"
+                            class="hom-source-button"
+                            data-hom-open-media="gallery"
+                        >
+
+                            <span class="hom-source-icon">
+                                ▦
+                            </span>
+
+                            <span>
+                                رسانه‌های سایت
+                            </span>
+
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="hom-gallery-pending-toolbar"
+                        data-hom-gallery-pending-toolbar
+                        hidden
+                    >
+
+                        <strong>
+                            تصاویر آماده آپلود
+                        </strong>
+
+                        <button
+                            type="button"
+                            class="hom-button hom-upload-all-button"
+                            data-hom-upload-all
+                        >
+                            ↑ آپلود همه تصاویر
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="hom-pending-gallery-grid"
+                        data-hom-gallery-pending
+                    ></div>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-media-safety-note">
+
+                <div>
+                    <strong>
+                        تصاویر جدید
+                    </strong>
+
+                    <p>
+                        تصاویر آپلودشده از دستگاه یا دوربین،
+                        با نام مرتبط با محصول و Alt و Title مناسب
+                        به‌صورت خودکار ساخته می‌شوند.
+                    </p>
+                </div>
+
+
+                <div>
+                    <strong>
+                        تصاویر موجود در Media Library
+                    </strong>
+
+                    <p>
+                        تصاویر انتخاب‌شده از رسانه‌های سایت
+                        هرگز Rename نمی‌شوند و Title، Alt و Parent
+                        آن‌ها نیز تغییر نمی‌کند؛ چون ممکن است
+                        در بخش دیگری از سایت استفاده شده باشند.
+                    </p>
+                </div>
+
+            </section>
+
+
+            <!-- STICKY FINAL ACTION -->
+            <div
+                class="hom-final-action-bar"
+                data-hom-final-bar
+            >
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $products_url
+                    );
+                    ?>"
+                    class="hom-button hom-final-back"
+                    data-hom-back
+                >
+                    ← بازگشت به محصولات
+                </a>
+
+
+                <button
+                    type="button"
+                    class="hom-button hom-final-reset"
+                    data-hom-final-reset
+                    title="بازگشت تصاویر به وضعیت اولیه"
+                    disabled
+                >
+                    ↺ لغو تغییرات
+                </button>
+
+
+                <div
+                    class="hom-final-status"
+                    data-hom-final-status
+                >
+                    تغییری برای ذخیره وجود ندارد.
+                </div>
+
+
+                <button
+                    type="button"
+                    class="hom-button hom-final-save"
+                    data-hom-final-save
+                    disabled
+                >
+                    ✓ ذخیره تغییرات
+                </button>
+
+            </div>
+
+
+            <!-- MEDIA LIBRARY MODAL -->
+            <div
+                class="hom-media-modal"
+                data-hom-media-modal
+                hidden
+            >
+
+                <div
+                    class="hom-media-modal__backdrop"
+                    data-hom-media-close
+                ></div>
+
+
+                <div
+                    class="hom-media-modal__dialog"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="رسانه‌های سایت"
+                >
+
+                    <div class="hom-media-modal__header">
+
+                        <div>
+                            <strong>
+                                رسانه‌های سایت
+                            </strong>
+
+                            <span>
+                                انتخاب تصویر بدون تغییر نام یا اطلاعات فایل
+                            </span>
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="hom-media-close"
+                            data-hom-media-close
+                            aria-label="بستن"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <div class="hom-media-search">
+
+                        <input
+                            type="search"
+                            data-hom-media-search
+                            placeholder="جستجو در تصاویر..."
+                        >
+
+                        <button
+                            type="button"
+                            class="hom-button"
+                            data-hom-media-search-button
+                        >
+                            جستجو
+                        </button>
+
+                    </div>
+
+
+                    <div
+                        class="hom-media-grid"
+                        data-hom-media-grid
+                    ></div>
+
+
+                    <div
+                        class="hom-media-empty"
+                        data-hom-media-empty
+                        hidden
+                    >
+                        تصویری پیدا نشد.
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="hom-media-more"
+                        data-hom-media-more
+                        hidden
+                    >
+                        نمایش تصاویر بیشتر
+                    </button>
+
+
+                    <div class="hom-media-modal__footer">
+
+                        <span
+                            data-hom-media-selected-count
+                        >
+                            تصویری انتخاب نشده است.
+                        </span>
+
+
+                        <button
+                            type="button"
+                            class="hom-button hom-media-confirm"
+                            data-hom-media-confirm
+                            disabled
+                        >
+                            افزودن تصویر انتخاب‌شده
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <script>
+        window.HOMProductImages = <?php
+        echo wp_json_encode(
+            [
+                'ajaxUrl' =>
+                    admin_url(
+                        'admin-ajax.php'
+                    ),
+
+                'nonce' =>
+                    wp_create_nonce(
+                        'hom_product_images_ajax'
+                    ),
+
+                'productId' =>
+                    $product_id,
+
+                'productsUrl' =>
+                    $products_url,
+
+                'maxUploadBytes' =>
+                    wp_max_upload_size(),
+
+                'maxUploadLabel' =>
+                    size_format(
+                        wp_max_upload_size()
+                    ),
+
+                'initialMain' =>
+                    $images['main'],
+
+                'initialGallery' =>
+                    $images['gallery'],
+            ],
+            JSON_UNESCAPED_UNICODE
+            | JSON_UNESCAPED_SLASHES
+        );
+        ?>;
+        </script>
+
+
+        <script
+            src="<?php
+            echo esc_url(
+                HOM_URL .
+                'assets/js/product-images.js?ver=' .
+                (
+                    file_exists(
+                        HOM_PATH .
+                        'assets/js/product-images.js'
+                    )
+                        ? filemtime(
+                            HOM_PATH .
+                            'assets/js/product-images.js'
+                        )
+                        : HOM_VERSION
+                )
+            );
+            ?>"
+            defer
+        ></script>
+
+        <?php
     }
 
 }
