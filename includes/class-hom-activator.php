@@ -32,6 +32,9 @@ class HOM_Activator {
 
         HOM_Capabilities::sync_roles();
 
+        HOM_Router::register_rewrite_rule();
+        flush_rewrite_rules();
+
         update_option(
             'hom_version',
             HOM_VERSION,

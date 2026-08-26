@@ -21,6 +21,9 @@ define('HOM_BASENAME', plugin_basename(__FILE__));
 
 require_once HOM_PATH . 'includes/class-hom-dependencies.php';
 require_once HOM_PATH . 'includes/class-hom-capabilities.php';
+require_once HOM_PATH . 'includes/class-hom-router.php';
+require_once HOM_PATH . 'includes/class-hom-auth.php';
+require_once HOM_PATH . 'includes/class-hom-view.php';
 require_once HOM_PATH . 'includes/class-hom-activator.php';
 require_once HOM_PATH . 'includes/class-hom-plugin.php';
 
