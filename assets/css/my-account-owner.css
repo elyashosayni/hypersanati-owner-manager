@@ -1,0 +1,503 @@
+/* HyperSanati Owner entry inside custom My Account */
+
+.hom-owner-account-entry {
+    display: grid;
+    grid-template-columns: 70px minmax(0, 1fr);
+    align-items: center;
+    gap: 18px;
+
+    margin: 0 0 22px;
+    padding: 20px 22px;
+
+    border: 1px solid rgba(159, 133, 97, 0.32);
+    border-radius: 15px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f7f4ef 100%
+        );
+
+    box-shadow:
+        0 8px 24px
+        rgba(94, 68, 32, 0.08);
+}
+
+
+.hom-owner-account-entry__icon {
+    width: 64px;
+    height: 64px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 14px;
+
+    background: #5e4420;
+    color: #ffa800;
+
+    font-size: 30px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+
+.hom-owner-account-entry__content {
+    min-width: 0;
+}
+
+
+.hom-owner-account-entry__title {
+    margin: 0 0 6px;
+
+    color: #212529;
+
+    font-family:
+        "AnjomanMax",
+        sans-serif;
+
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.5;
+}
+
+
+.hom-owner-account-entry__description {
+    margin: 0 0 14px;
+
+    color: #6c757d;
+
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+.hom-owner-account-entry__button,
+.hom-owner-account-entry__button:link,
+.hom-owner-account-entry__button:visited {
+    min-height: 43px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+
+    padding: 8px 16px;
+
+    border: 1px solid #5e4420;
+    border-radius: 9px;
+
+    background: #5e4420;
+    color: #ffffff;
+
+    font-family:
+        "AnjomanMax",
+        sans-serif;
+
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.4;
+
+    text-decoration: none !important;
+
+    box-shadow:
+        0 5px 14px
+        rgba(94, 68, 32, 0.16);
+
+    transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        transform 150ms ease,
+        box-shadow 150ms ease;
+}
+
+
+.hom-owner-account-entry__button:hover,
+.hom-owner-account-entry__button:focus-visible {
+    border-color: #493416;
+
+    background: #493416;
+    color: #ffffff;
+
+    text-decoration: none !important;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 7px 17px
+        rgba(94, 68, 32, 0.22);
+
+    outline: none;
+}
+
+
+.hom-owner-account-entry__arrow {
+    color: #ffa800;
+
+    font-size: 15px;
+    line-height: 1;
+}
+
+
+@media (max-width: 767px) {
+
+    .hom-owner-account-entry {
+        grid-template-columns: 50px minmax(0, 1fr);
+
+        gap: 12px;
+
+        margin-bottom: 16px;
+        padding: 14px;
+
+        border-radius: 12px;
+    }
+
+
+    .hom-owner-account-entry__icon {
+        width: 48px;
+        height: 48px;
+
+        border-radius: 11px;
+
+        font-size: 23px;
+    }
+
+
+    .hom-owner-account-entry__title {
+        margin-bottom: 3px;
+
+        font-size: 15px;
+    }
+
+
+    .hom-owner-account-entry__description {
+        margin-bottom: 10px;
+
+        font-size: 11px;
+        line-height: 1.65;
+    }
+
+
+    .hom-owner-account-entry__button {
+        width: 100%;
+
+        min-height: 40px;
+
+        padding: 7px 10px;
+
+        font-size: 11px;
+    }
+
+}
+
+
+@media (max-width: 390px) {
+
+    .hom-owner-account-entry {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-owner-account-entry__icon {
+        display: none;
+    }
+
+}
+
+
+/* HOM OWNER SIDEBAR ENTRY */
+
+.dashboard-nav .hom-owner-sidebar-link,
+.dashboard-nav .hom-owner-sidebar-link:link,
+.dashboard-nav .hom-owner-sidebar-link:visited {
+    margin-top: 8px;
+
+    border: 1px solid rgba(159, 133, 97, 0.32);
+
+    background:
+        rgba(159, 133, 97, 0.10);
+
+    color: #5e4420;
+
+    text-decoration: none !important;
+}
+
+
+.dashboard-nav .hom-owner-sidebar-link i {
+    color: #9f8561;
+}
+
+
+.dashboard-nav .hom-owner-sidebar-link:hover,
+.dashboard-nav .hom-owner-sidebar-link:focus-visible {
+    border-color: #9f8561;
+
+    background: #5e4420;
+    color: #ffffff;
+
+    text-decoration: none !important;
+}
+
+
+.dashboard-nav .hom-owner-sidebar-link:hover i,
+.dashboard-nav .hom-owner-sidebar-link:focus-visible i {
+    color: #ffa800;
+}
+
+
+/* HOM OWNER MANAGER GUIDANCE */
+
+.hom-owner-guidance {
+    margin-top: 16px;
+    padding: 20px;
+
+    border:
+        1px solid
+        rgba(159, 133, 97, 0.30);
+
+    border-radius: 16px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #f8f5f0 100%
+        );
+
+    box-shadow:
+        0 8px 24px
+        rgba(94, 68, 32, 0.07);
+}
+
+
+.hom-owner-guidance__header {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+}
+
+
+.hom-owner-guidance__shield {
+    width: 50px;
+    height: 50px;
+
+    flex: 0 0 50px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5e4420 0%,
+            #493416 100%
+        );
+
+    color: #ffa800;
+
+    font-size: 20px;
+    font-weight: 900;
+}
+
+
+.hom-owner-guidance__badge {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #9f8561;
+
+    font-size: 10px;
+    font-weight: 850;
+}
+
+
+.hom-owner-guidance__title {
+    display: block;
+
+    color: #493416;
+
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+
+.hom-owner-guidance__text {
+    margin:
+        14px
+        0
+        0;
+
+    color: #70665c;
+
+    font-size: 12px;
+    line-height: 2;
+}
+
+
+.hom-owner-guidance__warning {
+    display: grid;
+    grid-template-columns:
+        42px
+        minmax(0, 1fr);
+
+    gap: 12px;
+    align-items: start;
+
+    margin-top: 15px;
+    padding: 14px;
+
+    border:
+        1px solid
+        rgba(255, 168, 0, 0.34);
+
+    border-radius: 12px;
+
+    background:
+        rgba(255, 168, 0, 0.07);
+}
+
+
+.hom-owner-guidance__warning-icon {
+    width: 40px;
+    height: 40px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 11px;
+
+    background: #ffa800;
+    color: #5e4420;
+
+    font-size: 18px;
+    font-weight: 900;
+}
+
+
+.hom-owner-guidance__warning strong {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #624719;
+
+    font-size: 12px;
+}
+
+
+.hom-owner-guidance__warning p {
+    margin: 0;
+
+    color: #76654a;
+
+    font-size: 11px;
+    line-height: 1.9;
+}
+
+
+.hom-owner-guidance__footer {
+    display: flex;
+    justify-content: flex-start;
+
+    margin-top: 15px;
+}
+
+
+.hom-owner-guidance__help,
+.hom-owner-guidance__help:link,
+.hom-owner-guidance__help:visited {
+    min-height: 42px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    padding: 8px 15px;
+
+    border:
+        1px solid #5e4420;
+
+    border-radius: 10px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #5e4420 0%,
+            #493416 100%
+        );
+
+    color: #ffffff !important;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-decoration: none !important;
+
+    transition:
+        transform 150ms ease,
+        box-shadow 150ms ease,
+        border-color 150ms ease;
+}
+
+
+.hom-owner-guidance__help > span:first-child {
+    width: 22px;
+    height: 22px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 168, 0, 0.18);
+
+    color: #ffa800;
+
+    font-weight: 900;
+}
+
+
+.hom-owner-guidance__help:hover,
+.hom-owner-guidance__help:focus-visible {
+    border-color: #9f8561;
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 6px 16px
+        rgba(94, 68, 32, 0.20);
+
+    outline: none;
+}
+
+
+@media (max-width: 640px) {
+
+    .hom-owner-guidance {
+        padding: 16px;
+    }
+
+
+    .hom-owner-guidance__warning {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-owner-guidance__warning-icon {
+        width: 36px;
+        height: 36px;
+    }
+
+
+    .hom-owner-guidance__help {
+        width: 100%;
+    }
+
+}

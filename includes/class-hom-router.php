@@ -84,6 +84,8 @@ class HOM_Router {
             true
         );
 
+        HOM_Auth::guard_owner_panel();
+
         HOM_Auth::handle_request();
 
 

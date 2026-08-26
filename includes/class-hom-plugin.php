@@ -38,6 +38,7 @@ final class HOM_Plugin {
         HOM_Router::register();
         HOM_Auth::register();
         HOM_Product_Images::register();
+        HOM_My_Account::register();
 
         /**
          * Fires after Owner Manager dependencies
