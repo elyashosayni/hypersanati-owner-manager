@@ -75,6 +75,22 @@
     );
 
 
+    var imageEditor =
+        window.HOMImageEditor &&
+        typeof window.HOMImageEditor.create === 'function'
+            ? window.HOMImageEditor.create(
+                root,
+                {
+                    outputSize:
+                        Number(
+                            config.editorOutputSize ||
+                            1800
+                        )
+                }
+            )
+            : null;
+
+
     function escapeHtml(value) {
         return String(value == null ? '' : value)
             .replace(/&/g, '&amp;')
@@ -290,7 +306,7 @@
                     ' class="hom-remove-ready"' +
                     ' data-hom-remove-ready="' + id + '"' +
                     ' data-hom-ready-role="' + role + '">' +
-                    'حذف از انتخاب' +
+                    'جدا کردن از محصول' +
                 '</button>' +
             '</article>'
         );
@@ -935,7 +951,7 @@
     }
 
 
-    async function discardStagedUploads(ids) {
+    async function releaseStagedUploads(ids) {
 
         ids =
             Array.from(
@@ -983,16 +999,17 @@
                 json.data &&
                 json.data.message
                     ? json.data.message
-                    : 'پاکسازی تصاویر موقت انجام نشد.'
+                    : 'آزادسازی تصاویر موقت انجام نشد.'
             );
         }
 
 
         return (
-            json.data.deleted_ids ||
+            json.data.released_ids ||
             []
         );
     }
+
 
 
     function clearPendingLocalFiles() {
@@ -1079,7 +1096,7 @@
 
             if (stagedIds.length) {
 
-                await discardStagedUploads(
+                await releaseStagedUploads(
                     stagedIds
                 );
             }
@@ -1135,7 +1152,7 @@
             showNotice(
                 (
                     error.message ||
-                    'بازنشانی انجام شد اما پاکسازی فایل‌های موقت کامل نشد.'
+                    'بازنشانی انجام شد اما آزادسازی تصاویر موقت کامل نشد.'
                 ),
                 'error'
             );
@@ -1257,14 +1274,14 @@
 
                 try {
 
-                    await discardStagedUploads(
+                    await releaseStagedUploads(
                         unusedStagedIds
                     );
 
                 } catch (cleanupError) {
 
                     console.warn(
-                        'HOM staged image cleanup:',
+                        'HOM staged image release:',
                         cleanupError
                     );
                 }
@@ -1529,92 +1546,212 @@
     }
 
 
+    async function processEditorSources(
+        sources,
+        mode
+    ) {
+
+        sources =
+            Array.from(
+                sources || []
+            );
+
+
+        if (!sources.length) {
+            return;
+        }
+
+
+        if (!imageEditor) {
+
+            showNotice(
+                'ویرایشگر تصویر بارگذاری نشده است. صفحه را تازه‌سازی کنید.',
+                'error'
+            );
+
+            return;
+        }
+
+
+        /*
+         * Every image, even an already-square image,
+         * MUST be explicitly reviewed and confirmed
+         * in the 1:1 editor.
+         */
+        for (
+            var i = 0;
+            i < sources.length;
+            i++
+        ) {
+
+            var source =
+                sources[i];
+
+            var result =
+                null;
+
+
+            try {
+
+                result =
+                    await imageEditor.open(
+                        source
+                    );
+
+            } catch (error) {
+
+                showNotice(
+                    error.message ||
+                    'باز کردن ویرایشگر تصویر انجام نشد.',
+                    'error'
+                );
+
+                return;
+            }
+
+
+            /*
+             * Cancel stops the rest of the current queue.
+             */
+            if (
+                !result ||
+                !result.file
+            ) {
+                break;
+            }
+
+
+            if (
+                mode ===
+                'main'
+            ) {
+
+                addMainFile(
+                    result.file
+                );
+
+                break;
+            }
+
+
+            addGalleryFiles(
+                [
+                    result.file
+                ]
+            );
+        }
+
+
+        updateFinalState();
+    }
+
+
+
     function confirmMediaSelection() {
+
         var selected =
             Array.from(
                 media.selected.values()
             );
 
+
         if (!selected.length) {
             return;
         }
 
-        if (media.mode === 'main') {
-            state.main =
-                selected[0];
 
-            if (
-                state.pendingMain &&
-                state.pendingMain.previewUrl
-            ) {
-                URL.revokeObjectURL(
-                    state.pendingMain.previewUrl
-                );
-            }
+        var mode =
+            media.mode;
 
-            state.pendingMain = null;
-
-            renderMain();
-
-        } else {
-            selected.forEach(function (item) {
-                var id = Number(item.id);
-
-                if (
-                    state.main &&
-                    Number(state.main.id) === id
-                ) {
-                    return;
-                }
-
-                var exists =
-                    state.gallery.some(
-                        function (galleryItem) {
-                            return (
-                                Number(galleryItem.id) ===
-                                id
-                            );
-                        }
-                    );
-
-                if (!exists) {
-                    state.gallery.push(item);
-                }
-            });
-
-            renderGallery();
-        }
 
         closeMedia();
-        updateFinalState();
+
+
+        processEditorSources(
+            selected.map(
+                function (item) {
+
+                    return {
+                        url:
+                            item.full,
+
+                        name:
+                            item.filename ||
+                            item.title ||
+                            'media-image.jpg',
+
+                        attachmentId:
+                            Number(
+                                item.id
+                            )
+                    };
+                }
+            ),
+            mode
+        );
+
 
         showNotice(
-            'تصویر از Media Library انتخاب شد و فایل اصلی آن تغییری نکرد.',
+            'فایل اصلی رسانه بدون تغییر می‌ماند؛ نسخه ویرایش‌شده جدید ساخته خواهد شد.',
             'success'
         );
     }
 
 
+
     function handleDeviceInput(input, mode) {
+
         var files =
-            input.files || [];
+            Array.from(
+                input.files ||
+                []
+            );
+
 
         if (!files.length) {
             return;
         }
 
-        if (mode === 'main') {
-            addMainFile(
-                files[0]
+
+        input.value =
+            '';
+
+
+        var sources =
+            files.map(
+                function (file) {
+
+                    return {
+                        file:
+                            file,
+
+                        name:
+                            file.name ||
+                            'product-image'
+                    };
+                }
             );
-        } else {
-            addGalleryFiles(
-                files
-            );
+
+
+        if (
+            mode ===
+            'main'
+        ) {
+
+            sources =
+                sources.slice(
+                    0,
+                    1
+                );
         }
 
-        input.value = '';
+
+        processEditorSources(
+            sources,
+            mode
+        );
     }
+
 
 
     root.addEventListener(
