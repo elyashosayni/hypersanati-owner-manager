@@ -70,60 +70,36 @@ final class HOM_Order_Documents {
 
     private static function seller_data() {
 
-        $country_state =
-            (string)
-            get_option(
-                'woocommerce_default_country',
-                ''
-            );
-
-
-        [$country, $state] =
-            array_pad(
-                explode(
-                    ':',
-                    $country_state,
-                    2
-                ),
-                2,
-                ''
-            );
-
-
-        unset($country);
+        $data =
+            HOM_Seller_Settings::data();
 
 
         return [
+
             'name' =>
-                get_bloginfo('name'),
+                $data['legal_name']
+                    ?: get_bloginfo('name'),
+
+            'legal_name' =>
+                $data['legal_name'],
+
+            'national_id' =>
+                $data['national_id'],
+
+            'economic_code' =>
+                $data['economic_code'],
+
+            'registration_no' =>
+                $data['registration_no'],
+
+            'postcode' =>
+                $data['postcode'],
+
+            'phone' =>
+                $data['phone'],
 
             'address' =>
-                trim(
-                    implode(
-                        '، ',
-                        array_filter(
-                            [
-                                get_option(
-                                    'woocommerce_store_address'
-                                ),
-
-                                get_option(
-                                    'woocommerce_store_address_2'
-                                ),
-
-                                get_option(
-                                    'woocommerce_store_city'
-                                ),
-
-                                $state,
-
-                                get_option(
-                                    'woocommerce_store_postcode'
-                                ),
-                            ]
-                        )
-                    )
-                ),
+                $data['address'],
 
             'url' =>
                 home_url('/'),
@@ -410,6 +386,82 @@ final class HOM_Order_Documents {
 
                 <div>
                     <?php echo esc_html($seller['address']); ?>
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if ($seller['phone']) : ?>
+
+                <div>
+                    تلفن:
+                    <span dir="ltr">
+                        <?php echo esc_html($seller['phone']); ?>
+                    </span>
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if ($seller['national_id']) : ?>
+
+                <div>
+                    شناسه ملی:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $seller['national_id']
+                        );
+                        ?>
+                    </span>
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if ($seller['economic_code']) : ?>
+
+                <div>
+                    کد اقتصادی:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $seller['economic_code']
+                        );
+                        ?>
+                    </span>
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if ($seller['registration_no']) : ?>
+
+                <div>
+                    شماره ثبت:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $seller['registration_no']
+                        );
+                        ?>
+                    </span>
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if ($seller['postcode']) : ?>
+
+                <div>
+                    کدپستی:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $seller['postcode']
+                        );
+                        ?>
+                    </span>
                 </div>
 
             <?php endif; ?>
