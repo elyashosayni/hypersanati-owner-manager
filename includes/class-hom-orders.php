@@ -1056,7 +1056,8 @@ final class HOM_Orders {
         $order_id,
         array $prices,
         $actor_user_id = 0,
-        $shipping_cost = null
+        $shipping_cost = null,
+        $correction_reason = ''
     ) {
 
         $order =
@@ -1087,7 +1088,31 @@ final class HOM_Orders {
         }
 
 
-        $changed = 0;
+        $already_priced =
+            '' !==
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_preinvoice_priced_at',
+                    true
+                )
+            );
+
+
+        $correction_reason =
+            sanitize_textarea_field(
+                (string)
+                $correction_reason
+            );
+
+
+        /*
+         * Stage every requested change first.
+         * Nothing is persisted before validation completes.
+         */
+        $item_updates = [];
+
+        $changes = [];
 
 
         foreach (
@@ -1134,39 +1159,159 @@ final class HOM_Orders {
                 );
 
 
-            $line_total =
-                $unit_price *
+            $old_unit_price =
+                (float)
+                $item->get_total()
+                /
                 $quantity;
 
 
-            $item->set_subtotal(
-                $line_total
-            );
+            if (
+                abs(
+                    $old_unit_price
+                    -
+                    $unit_price
+                ) < 0.00001
+            ) {
+                continue;
+            }
 
-            $item->set_total(
-                $line_total
-            );
 
-            $item->save();
+            $item_updates[] = [
 
-            $changed++;
+                'item' =>
+                    $item,
+
+                'line_total' =>
+                    $unit_price
+                    *
+                    $quantity,
+            ];
+
+
+            $changes[] = [
+
+                'field' =>
+                    'قیمت واحد: ' .
+                    $item->get_name(),
+
+                'before' =>
+                    wc_format_decimal(
+                        $old_unit_price
+                    ),
+
+                'after' =>
+                    wc_format_decimal(
+                        $unit_price
+                    ),
+            ];
         }
 
 
-        if ($changed < 1) {
+        $shipping_update =
+            false;
 
-            return new WP_Error(
-                'no_prices',
-                'هیچ قیمت معتبری برای ذخیره ارسال نشده است.'
-            );
-        }
+        $new_shipping_cost =
+            null;
 
 
         if (null !== $shipping_cost) {
 
+            $old_shipping_cost =
+                (float)
+                self::preinvoice_shipping_cost(
+                    $order
+                );
+
+
+            $new_shipping_cost =
+                self::normalize_decimal(
+                    $shipping_cost
+                );
+
+
+            if (
+                abs(
+                    $old_shipping_cost
+                    -
+                    $new_shipping_cost
+                ) >= 0.00001
+            ) {
+
+                $shipping_update =
+                    true;
+
+
+                $changes[] = [
+
+                    'field' =>
+                        'هزینه ارسال',
+
+                    'before' =>
+                        wc_format_decimal(
+                            $old_shipping_cost
+                        ),
+
+                    'after' =>
+                        wc_format_decimal(
+                            $new_shipping_cost
+                        ),
+                ];
+            }
+        }
+
+
+        if (!$changes) {
+
+            return new WP_Error(
+                'no_changes',
+                'هیچ تغییری در قیمت‌ها یا هزینه ارسال ایجاد نشده است.'
+            );
+        }
+
+
+        /*
+         * An existing pricing record is financially sensitive.
+         * Require the reason BEFORE writing any order data.
+         */
+        if (
+            $already_priced &&
+            '' === $correction_reason
+        ) {
+
+            return new WP_Error(
+                'correction_reason_required',
+                'برای اصلاح قیمت‌های ثبت‌شده، دلیل اصلاح را وارد کنید.'
+            );
+        }
+
+
+        /*
+         * Validation passed. Persist all staged changes.
+         */
+        foreach ($item_updates as $update) {
+
+            $item =
+                $update['item'];
+
+
+            $item->set_subtotal(
+                $update['line_total']
+            );
+
+            $item->set_total(
+                $update['line_total']
+            );
+
+            $item->save();
+        }
+
+
+        if ($shipping_update) {
+
             self::set_preinvoice_shipping_cost(
                 $order,
-                $shipping_cost
+                $new_shipping_cost
             );
         }
 
@@ -1201,15 +1346,34 @@ final class HOM_Orders {
 
         HOM_Order_Audit::record(
             $order,
-            'price_updated',
+            $already_priced
+                ? 'price_corrected'
+                : 'price_updated',
             $actor_user_id,
-            'قیمت اقلام پیش‌فاکتور به‌روزرسانی شد.'
+            $already_priced
+                ? 'قیمت‌های پیش‌فاکتور اصلاح شد.'
+                : 'قیمت اقلام پیش‌فاکتور ثبت شد.',
+            [
+                'source' =>
+                    'owner-panel',
+
+                'reason' =>
+                    $already_priced
+                        ? $correction_reason
+                        : '',
+
+                'changes' =>
+                    $changes,
+            ]
         );
 
 
         $order->add_order_note(
-            'قیمت اقلام پیش‌فاکتور توسط مدیر فروشگاه به‌روزرسانی شد.'
+            $already_priced
+                ? 'قیمت پیش‌فاکتور توسط مدیر فروش اصلاح شد.'
+                : 'قیمت اقلام پیش‌فاکتور توسط مدیر فروشگاه ثبت شد.'
         );
+
 
         $order->save();
 
@@ -1372,7 +1536,12 @@ final class HOM_Orders {
                     ? wp_unslash(
                         $_POST['shipping_cost']
                     )
-                    : null
+                    : null,
+                isset($_POST['correction_reason'])
+                    ? wp_unslash(
+                        $_POST['correction_reason']
+                    )
+                    : ''
             );
 
 

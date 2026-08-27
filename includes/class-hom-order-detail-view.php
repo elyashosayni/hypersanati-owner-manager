@@ -618,6 +618,48 @@ final class HOM_Order_Detail_View {
 
             </div>
 
+            <?php
+            $already_priced =
+                '' !==
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_preinvoice_priced_at',
+                        true
+                    )
+                );
+            ?>
+
+
+            <?php if ($already_priced) : ?>
+
+                <div style="margin-top:16px">
+
+                    <label class="hom-field">
+
+                        <span>
+                            دلیل اصلاح قیمت
+                        </span>
+
+                        <textarea
+                            name="correction_reason"
+                            rows="3"
+                            required
+                            placeholder="علت تغییر قیمت یا هزینه ارسال را بنویسید..."
+                        ></textarea>
+
+                    </label>
+
+                    <small>
+                        این پیش‌فاکتور قبلاً قیمت‌گذاری شده است؛
+                        برای هر اصلاح، ثبت دلیل الزامی است.
+                    </small>
+
+                </div>
+
+            <?php endif; ?>
+
+
             <p style="margin-top:16px">
 
                 <button
