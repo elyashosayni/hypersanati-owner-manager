@@ -45,6 +45,20 @@ class HOM_Auth {
             10,
             3
         );
+
+        /*
+         * Optional integration with HSB Auth.
+         *
+         * HSB Auth remains fully independent and only
+         * exposes a generic WordPress filter. This plugin
+         * decides where its dedicated owner role lands.
+         */
+        add_filter(
+            'hsb_staff_login_redirect',
+            [self::class, 'filter_hsb_staff_login_redirect'],
+            10,
+            2
+        );
     }
 
 
@@ -155,6 +169,24 @@ class HOM_Auth {
         ) {
 
             return self::account_url();
+        }
+
+        return $redirect;
+    }
+
+
+
+    public static function filter_hsb_staff_login_redirect(
+        $redirect,
+        $user
+    ) {
+
+        if (
+            self::is_restricted_owner_user(
+                $user
+            )
+        ) {
+            return HOM_Router::panel_url();
         }
 
         return $redirect;
