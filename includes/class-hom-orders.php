@@ -1793,7 +1793,8 @@ final class HOM_Orders {
         $order_id,
         array $data,
         $transition = 'save',
-        $actor_user_id = 0
+        $actor_user_id = 0,
+        $correction_reason = ''
     ) {
 
         $order =
@@ -1834,9 +1835,43 @@ final class HOM_Orders {
         }
 
 
+        if (
+            !in_array(
+                $transition,
+                [
+                    'save',
+                    'ready',
+                    'shipped',
+                    'delivered',
+                ],
+                true
+            )
+        ) {
+
+            return new WP_Error(
+                'invalid_fulfillment_transition',
+                'عملیات ارسال معتبر نیست.'
+            );
+        }
+
+
+        $actor_user_id =
+            absint(
+                $actor_user_id
+            );
+
+
+        $correction_reason =
+            sanitize_textarea_field(
+                (string)
+                $correction_reason
+            );
+
+
         $method =
             sanitize_key(
-                $data['method'] ?? ''
+                $data['method']
+                ?? ''
             );
 
 
@@ -1899,60 +1934,203 @@ final class HOM_Orders {
             );
 
 
-        $order->update_meta_data(
-            '_hom_shipping_method',
-            $method
-        );
-
-        $order->update_meta_data(
-            '_hom_shipping_company',
-            $company
-        );
-
-        $order->update_meta_data(
-            '_hom_shipping_tracking_code',
-            $tracking
-        );
-
-        $order->update_meta_data(
-            '_hom_shipping_freight_payment',
-            $freight_payment
-        );
-
-        $order->update_meta_data(
-            '_hom_shipping_notes',
-            $notes
-        );
+        /*
+         * Read the persisted state before doing anything.
+         */
+        $before =
+            self::fulfillment_data(
+                $order
+            );
 
 
+        $already_saved =
+            '' !==
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_shipping_updated_at',
+                    true
+                )
+            );
+
+
+        if (!$already_saved) {
+
+            foreach ($before as $value) {
+
+                if (
+                    '' !==
+                    trim(
+                        (string)
+                        $value
+                    )
+                ) {
+
+                    $already_saved =
+                        true;
+
+                    break;
+                }
+            }
+        }
+
+
+        $after = [
+
+            'method' =>
+                $method,
+
+            'company' =>
+                $company,
+
+            'tracking_code' =>
+                $tracking,
+
+            'freight_payment' =>
+                $freight_payment,
+
+            'notes' =>
+                $notes,
+        ];
+
+
+        $field_labels = [
+
+            'method' =>
+                'روش ارسال',
+
+            'company' =>
+                'شرکت / باربری / شعبه',
+
+            'tracking_code' =>
+                'کد رهگیری / شماره بارنامه',
+
+            'freight_payment' =>
+                'وضعیت کرایه',
+
+            'notes' =>
+                'توضیحات ارسال',
+        ];
+
+
+        $freight_labels = [
+
+            '' =>
+                'تعیین نشده',
+
+            'prepaid' =>
+                'پرداخت شده',
+
+            'collect' =>
+                'پس‌کرایه',
+        ];
+
+
+        $changes = [];
+
+
+        foreach (
+            $field_labels
+            as $field => $label
+        ) {
+
+            $old_value =
+                trim(
+                    (string)
+                    ($before[$field] ?? '')
+                );
+
+
+            $new_value =
+                trim(
+                    (string)
+                    ($after[$field] ?? '')
+                );
+
+
+            if ($old_value === $new_value) {
+                continue;
+            }
+
+
+            $old_display =
+                $old_value;
+
+            $new_display =
+                $new_value;
+
+
+            if ('method' === $field) {
+
+                $old_display =
+                    '' === $old_value
+                        ? 'تعیین نشده'
+                        : (
+                            $methods[$old_value]
+                            ?? $old_value
+                        );
+
+
+                $new_display =
+                    '' === $new_value
+                        ? 'تعیین نشده'
+                        : (
+                            $methods[$new_value]
+                            ?? $new_value
+                        );
+            }
+
+
+            if (
+                'freight_payment'
+                ===
+                $field
+            ) {
+
+                $old_display =
+                    $freight_labels[
+                        $old_value
+                    ]
+                    ?? $old_value;
+
+
+                $new_display =
+                    $freight_labels[
+                        $new_value
+                    ]
+                    ?? $new_value;
+            }
+
+
+            $changes[] = [
+
+                'field' =>
+                    $label,
+
+                'before' =>
+                    $old_display,
+
+                'after' =>
+                    $new_display,
+            ];
+        }
+
+
+        /*
+         * Validate lifecycle transition BEFORE any write.
+         */
         $current =
             $order->get_status();
 
 
-        if ('ready' === $transition) {
+        if (
+            'ready' === $transition &&
+            'processing' !== $current
+        ) {
 
-            if ('processing' !== $current) {
-
-                return new WP_Error(
-                    'ready_transition_invalid',
-                    'فقط سفارش در حال آماده‌سازی را می‌توان آماده ارسال کرد.'
-                );
-            }
-
-
-            $order->update_meta_data(
-                '_hom_ready_at',
-                current_time('mysql')
-            );
-
-            $order->update_meta_data(
-                '_hom_ready_by',
-                absint($actor_user_id)
-            );
-
-            $order->set_status(
-                'hom-ready',
-                'سفارش آماده ارسال شد.'
+            return new WP_Error(
+                'ready_transition_invalid',
+                'فقط سفارش در حال آماده‌سازی را می‌توان آماده ارسال کرد.'
             );
         }
 
@@ -1975,7 +2153,156 @@ final class HOM_Orders {
                     'برای ثبت ارسال، روش ارسال را انتخاب کنید.'
                 );
             }
+        }
 
+
+        if (
+            'delivered' === $transition &&
+            'hom-shipped' !== $current
+        ) {
+
+            return new WP_Error(
+                'delivered_transition_invalid',
+                'فقط سفارش ارسال‌شده را می‌توان تحویل‌شده ثبت کرد.'
+            );
+        }
+
+
+        /*
+         * Saving the same shipping data alone is not an action.
+         */
+        if (
+            'save' === $transition &&
+            !$changes
+        ) {
+
+            return new WP_Error(
+                'shipping_no_changes',
+                'هیچ تغییری در اطلاعات ارسال ایجاد نشده است.'
+            );
+        }
+
+
+        /*
+         * Existing shipping data is sensitive.
+         * Require reason before any meta/status mutation.
+         */
+        if (
+            $already_saved &&
+            $changes &&
+            '' === $correction_reason
+        ) {
+
+            return new WP_Error(
+                'shipping_correction_reason_required',
+                'برای اصلاح اطلاعات ارسال ثبت‌شده، دلیل اصلاح را وارد کنید.'
+            );
+        }
+
+
+        /*
+         * All validation passed.
+         * Persist shipping information only when changed.
+         */
+        if ($changes) {
+
+            $order->update_meta_data(
+                '_hom_shipping_method',
+                $method
+            );
+
+            $order->update_meta_data(
+                '_hom_shipping_company',
+                $company
+            );
+
+            $order->update_meta_data(
+                '_hom_shipping_tracking_code',
+                $tracking
+            );
+
+            $order->update_meta_data(
+                '_hom_shipping_freight_payment',
+                $freight_payment
+            );
+
+            $order->update_meta_data(
+                '_hom_shipping_notes',
+                $notes
+            );
+
+            $order->update_meta_data(
+                '_hom_shipping_updated_at',
+                current_time('mysql')
+            );
+
+            $order->update_meta_data(
+                '_hom_shipping_updated_by',
+                $actor_user_id
+            );
+
+
+            HOM_Order_Audit::record(
+                $order,
+                $already_saved
+                    ? 'shipping_corrected'
+                    : 'shipping_updated',
+                $actor_user_id,
+                $already_saved
+                    ? 'اطلاعات ارسال سفارش اصلاح شد.'
+                    : 'اطلاعات ارسال سفارش ثبت شد.',
+                [
+                    'source' =>
+                        'owner-panel',
+
+                    'reason' =>
+                        $already_saved
+                            ? $correction_reason
+                            : '',
+
+                    'changes' =>
+                        $changes,
+                ]
+            );
+        }
+
+
+        /*
+         * Lifecycle transitions stay independent
+         * from shipping metadata changes.
+         */
+        if ('ready' === $transition) {
+
+            $order->update_meta_data(
+                '_hom_ready_at',
+                current_time('mysql')
+            );
+
+            $order->update_meta_data(
+                '_hom_ready_by',
+                $actor_user_id
+            );
+
+            $order->set_status(
+                'hom-ready',
+                'سفارش آماده ارسال شد.'
+            );
+
+
+            HOM_Order_Audit::record(
+                $order,
+                'order_ready',
+                $actor_user_id,
+                'سفارش آماده ارسال اعلام شد.',
+                [
+                    'source' =>
+                        'owner-panel',
+                ]
+            );
+        }
+
+
+        if ('shipped' === $transition) {
 
             $order->update_meta_data(
                 '_hom_shipped_at',
@@ -1984,26 +2311,29 @@ final class HOM_Orders {
 
             $order->update_meta_data(
                 '_hom_shipped_by',
-                absint($actor_user_id)
+                $actor_user_id
             );
 
             $order->set_status(
                 'hom-shipped',
                 'سفارش ارسال شد.'
             );
+
+
+            HOM_Order_Audit::record(
+                $order,
+                'order_shipped',
+                $actor_user_id,
+                'ارسال سفارش ثبت شد.',
+                [
+                    'source' =>
+                        'owner-panel',
+                ]
+            );
         }
 
 
         if ('delivered' === $transition) {
-
-            if ('hom-shipped' !== $current) {
-
-                return new WP_Error(
-                    'delivered_transition_invalid',
-                    'فقط سفارش ارسال‌شده را می‌توان تحویل‌شده ثبت کرد.'
-                );
-            }
-
 
             $order->update_meta_data(
                 '_hom_delivered_at',
@@ -2012,56 +2342,26 @@ final class HOM_Orders {
 
             $order->update_meta_data(
                 '_hom_delivered_by',
-                absint($actor_user_id)
+                $actor_user_id
             );
 
             $order->set_status(
                 'completed',
                 'تحویل سفارش به مشتری ثبت شد.'
             );
-        }
 
 
-        $audit_event = [
-
-            'save' =>
-                'shipping_updated',
-
-            'ready' =>
-                'order_ready',
-
-            'shipped' =>
-                'order_shipped',
-
-            'delivered' =>
+            HOM_Order_Audit::record(
+                $order,
                 'order_delivered',
-
-        ][$transition] ?? 'shipping_updated';
-
-
-        $audit_description = [
-
-            'save' =>
-                'اطلاعات ارسال سفارش ویرایش شد.',
-
-            'ready' =>
-                'سفارش آماده ارسال اعلام شد.',
-
-            'shipped' =>
-                'ارسال سفارش ثبت شد.',
-
-            'delivered' =>
+                $actor_user_id,
                 'تحویل سفارش به مشتری ثبت شد.',
-
-        ][$transition] ?? '';
-
-
-        HOM_Order_Audit::record(
-            $order,
-            $audit_event,
-            $actor_user_id,
-            $audit_description
-        );
+                [
+                    'source' =>
+                        'owner-panel',
+                ]
+            );
+        }
 
 
         $order->save();
@@ -2170,7 +2470,12 @@ final class HOM_Orders {
                             : '',
                 ],
                 $transition,
-                get_current_user_id()
+                get_current_user_id(),
+                isset($_POST['correction_reason'])
+                    ? wp_unslash(
+                        $_POST['correction_reason']
+                    )
+                    : ''
             );
 
 

@@ -406,7 +406,7 @@ final class HOM_Order_Audit {
                 'تأیید پیش‌فاکتور',
 
             'shipping_updated' =>
-                'ویرایش اطلاعات ارسال',
+                'ثبت اطلاعات ارسال',
 
             'order_ready' =>
                 'آماده ارسال',

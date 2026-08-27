@@ -49,6 +49,38 @@ final class HOM_Order_Fulfillment_View {
         $methods =
             HOM_Orders::shipping_methods();
 
+
+        $shipping_already_saved =
+            '' !==
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_shipping_updated_at',
+                    true
+                )
+            );
+
+
+        if (!$shipping_already_saved) {
+
+            foreach ($data as $value) {
+
+                if (
+                    '' !==
+                    trim(
+                        (string)
+                        $value
+                    )
+                ) {
+
+                    $shipping_already_saved =
+                        true;
+
+                    break;
+                }
+            }
+        }
+
         ?>
 
         <section
@@ -249,6 +281,34 @@ final class HOM_Order_Fulfillment_View {
                     ?></textarea>
 
                 </label>
+
+
+                <?php if ($shipping_already_saved) : ?>
+
+                    <label
+                        class="hom-field"
+                        style="margin-top:14px"
+                    >
+
+                        <span>
+                            دلیل اصلاح اطلاعات ارسال
+                        </span>
+
+                        <textarea
+                            name="correction_reason"
+                            rows="3"
+                            placeholder="اگر اطلاعات ارسال بالا را تغییر داده‌اید، دلیل اصلاح را بنویسید..."
+                        ></textarea>
+
+                    </label>
+
+                    <small>
+                        در صورت تغییر هرکدام از اطلاعات ارسال ثبت‌شده،
+                        وارد کردن دلیل اصلاح الزامی است.
+                        برای تغییر صرفاً مرحله سفارش، این فیلد لازم نیست.
+                    </small>
+
+                <?php endif; ?>
 
 
                 <div
