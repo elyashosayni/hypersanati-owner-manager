@@ -10,7 +10,7 @@ class HOM_Product_Images {
         'sgo-watermark-auto-products.png';
 
     private const WATERMARK_OPACITY =
-        0.38;
+        1.0;
 
 
     private static $notice = '';
@@ -1078,13 +1078,20 @@ class HOM_Product_Images {
 
 
             /*
-             * 38% opacity.
+             * Preserve the original PNG alpha channel.
+             *
+             * WATERMARK_OPACITY is currently 1.0, so the visible
+             * parts of the logo stay at full strength while fully
+             * transparent pixels remain transparent.
              */
-            $logo->evaluateImage(
-                Imagick::EVALUATE_MULTIPLY,
-                self::WATERMARK_OPACITY,
-                Imagick::CHANNEL_ALPHA
-            );
+            if (self::WATERMARK_OPACITY < 1.0) {
+
+                $logo->evaluateImage(
+                    Imagick::EVALUATE_MULTIPLY,
+                    self::WATERMARK_OPACITY,
+                    Imagick::CHANNEL_ALPHA
+                );
+            }
 
 
             $margin_x =
@@ -1322,7 +1329,21 @@ class HOM_Product_Images {
             );
 
 
-        imagecopymerge(
+        /*
+         * IMPORTANT:
+         *
+         * Do not use imagecopymerge() here. It does not preserve
+         * per-pixel PNG alpha correctly and can turn transparent
+         * areas into dark/black pixels.
+         *
+         * imagecopy() respects the alpha channel of the scaled PNG.
+         */
+        imagealphablending(
+            $image,
+            true
+        );
+
+        imagecopy(
             $image,
             $scaled,
             $margin_x,
@@ -1330,8 +1351,7 @@ class HOM_Product_Images {
             0,
             0,
             $logo_width,
-            $logo_height,
-            38
+            $logo_height
         );
 
 
