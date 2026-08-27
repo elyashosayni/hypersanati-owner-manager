@@ -79,16 +79,14 @@ final class HOM_Seller_Settings_View {
                 method="post"
                 action="<?php
                 echo esc_url(
-                    admin_url(
-                        'admin-post.php'
-                    )
+                    HOM_Router::panel_url()
                 );
                 ?>"
             >
 
                 <input
                     type="hidden"
-                    name="action"
+                    name="hom_action"
                     value="hom_save_seller_settings"
                 >
 

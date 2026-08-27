@@ -155,16 +155,14 @@ final class HOM_Order_Detail_View {
                     method="post"
                     action="<?php
                     echo esc_url(
-                        admin_url(
-                            'admin-post.php'
-                        )
+                        HOM_Router::panel_url()
                     );
                     ?>"
                 >
 
                     <input
                         type="hidden"
-                        name="action"
+                        name="hom_action"
                         value="hom_save_b2b_customer"
                     >
 
@@ -448,7 +446,7 @@ final class HOM_Order_Detail_View {
                     method="post"
                     action="<?php
                     echo esc_url(
-                        admin_url('admin-post.php')
+                        HOM_Router::panel_url()
                     );
                     ?>"
                     style="
@@ -462,7 +460,7 @@ final class HOM_Order_Detail_View {
 
                     <input
                         type="hidden"
-                        name="action"
+                        name="hom_action"
                         value="hom_assign_order"
                     >
 
@@ -545,12 +543,12 @@ final class HOM_Order_Detail_View {
 
             <form
                 method="post"
-                action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
+                action="<?php echo esc_url(HOM_Router::panel_url()); ?>"
             >
 
                 <input
                     type="hidden"
-                    name="action"
+                    name="hom_action"
                     value="hom_save_preinvoice_prices"
                 >
 
@@ -738,13 +736,13 @@ final class HOM_Order_Detail_View {
 
                 <form
                     method="post"
-                    action="<?php echo esc_url(admin_url('admin-post.php')); ?>"
+                    action="<?php echo esc_url(HOM_Router::panel_url()); ?>"
                     style="margin-top:16px"
                 >
 
                     <input
                         type="hidden"
-                        name="action"
+                        name="hom_action"
                         value="hom_approve_preinvoice"
                     >
 

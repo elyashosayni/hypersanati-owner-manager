@@ -33,7 +33,7 @@ final class HOM_Order_Documents {
         $url =
             add_query_arg(
                 [
-                    'action' =>
+                    'hom_action' =>
                         'hom_print_order_document',
 
                     'order_id' =>
@@ -42,9 +42,7 @@ final class HOM_Order_Documents {
                     'document' =>
                         $document,
                 ],
-                admin_url(
-                    'admin-post.php'
-                )
+                HOM_Router::panel_url()
             );
 
 
