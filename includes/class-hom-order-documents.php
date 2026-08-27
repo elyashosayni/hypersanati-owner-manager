@@ -586,6 +586,122 @@ final class HOM_Order_Documents {
     }
 
 
+    private static function b2b_customer_block(
+        $order
+    ) {
+
+        $data =
+            HOM_Orders::b2b_customer_data(
+                $order
+            );
+
+
+        $has_data =
+            '' !== $data['legal_name'] ||
+            '' !== $data['national_id'] ||
+            '' !== $data['economic_code'] ||
+            '' !== $data['registration_no'] ||
+            '' !== $data['postcode'] ||
+            '' !== $data['address'];
+
+
+        if (!$has_data) {
+            return;
+        }
+
+        ?>
+
+        <section
+            class="hom-print-card"
+            style="margin-top:14px"
+        >
+
+            <strong>
+                اطلاعات حقوقی خریدار
+            </strong>
+
+
+            <div>
+                نام حقوقی / شرکت:
+                <strong>
+                    <?php
+                    echo esc_html(
+                        $data['legal_name']
+                            ?: '—'
+                    );
+                    ?>
+                </strong>
+            </div>
+
+
+            <div>
+                شناسه ملی:
+                <span dir="ltr">
+                    <?php
+                    echo esc_html(
+                        $data['national_id']
+                            ?: '—'
+                    );
+                    ?>
+                </span>
+            </div>
+
+
+            <div>
+                کد اقتصادی:
+                <span dir="ltr">
+                    <?php
+                    echo esc_html(
+                        $data['economic_code']
+                            ?: '—'
+                    );
+                    ?>
+                </span>
+            </div>
+
+
+            <div>
+                شماره ثبت:
+                <span dir="ltr">
+                    <?php
+                    echo esc_html(
+                        $data['registration_no']
+                            ?: '—'
+                    );
+                    ?>
+                </span>
+            </div>
+
+
+            <div>
+                کدپستی:
+                <span dir="ltr">
+                    <?php
+                    echo esc_html(
+                        $data['postcode']
+                            ?: '—'
+                    );
+                    ?>
+                </span>
+            </div>
+
+
+            <div>
+                آدرس فاکتور:
+                <?php
+                echo esc_html(
+                    $data['address']
+                        ?: '—'
+                );
+                ?>
+            </div>
+
+        </section>
+
+        <?php
+    }
+
+
     private static function render_invoice(
         $order
     ) {
@@ -597,6 +713,11 @@ final class HOM_Order_Documents {
 
 
         self::customer_block(
+            $order
+        );
+
+
+        self::b2b_customer_block(
             $order
         );
 
