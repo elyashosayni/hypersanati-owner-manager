@@ -28,6 +28,7 @@ require_once HOM_PATH . 'includes/class-hom-products.php';
 require_once HOM_PATH . 'includes/class-hom-orders.php';
 require_once HOM_PATH . 'includes/class-hom-order-detail-view.php';
 require_once HOM_PATH . 'includes/class-hom-order-fulfillment-view.php';
+require_once HOM_PATH . 'includes/class-hom-order-documents.php';
 require_once HOM_PATH . 'includes/class-hom-product-images.php';
 require_once HOM_PATH . 'includes/class-hom-my-account.php';
 require_once HOM_PATH . 'includes/class-hom-view.php';

@@ -343,6 +343,78 @@ final class HOM_Order_Detail_View {
 
         </section>
 
+        <section
+            class="hom-card hom-order-document-actions"
+            style="margin-top:20px"
+        >
+
+            <h2>
+                اسناد و چاپ
+            </h2>
+
+            <div
+                style="
+                    display:flex;
+                    flex-wrap:wrap;
+                    gap:10px
+                "
+            >
+
+                <a
+                    class="hom-button hom-button-secondary"
+                    target="_blank"
+                    rel="noopener"
+                    href="<?php
+                    echo esc_url(
+                        HOM_Order_Documents::url(
+                            $order->get_id(),
+                            'invoice'
+                        )
+                    );
+                    ?>"
+                >
+                    چاپ فاکتور
+                </a>
+
+
+                <a
+                    class="hom-button hom-button-secondary"
+                    target="_blank"
+                    rel="noopener"
+                    href="<?php
+                    echo esc_url(
+                        HOM_Order_Documents::url(
+                            $order->get_id(),
+                            'warehouse'
+                        )
+                    );
+                    ?>"
+                >
+                    برگه انبار بدون قیمت
+                </a>
+
+
+                <a
+                    class="hom-button hom-button-secondary"
+                    target="_blank"
+                    rel="noopener"
+                    href="<?php
+                    echo esc_url(
+                        HOM_Order_Documents::url(
+                            $order->get_id(),
+                            'shipping'
+                        )
+                    );
+                    ?>"
+                >
+                    برچسب ارسال
+                </a>
+
+            </div>
+
+        </section>
+
+
         <?php
         $timeline =
             HOM_Orders::timeline(
