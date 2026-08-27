@@ -9,6 +9,72 @@ class HOM_Products {
     public const PER_PAGE = 25;
 
 
+    private static function normalize_search(
+        $value
+    ) {
+
+        $value =
+            sanitize_text_field(
+                (string) $value
+            );
+
+
+        /*
+         * Persian digits:
+         * ۰۱۲۳۴۵۶۷۸۹
+         *
+         * Arabic-Indic digits:
+         * ٠١٢٣٤٥٦٧٨٩
+         *
+         * Normalize both to ASCII:
+         * 0123456789
+         */
+        $value =
+            strtr(
+                $value,
+                [
+                    '۰' => '0',
+                    '۱' => '1',
+                    '۲' => '2',
+                    '۳' => '3',
+                    '۴' => '4',
+                    '۵' => '5',
+                    '۶' => '6',
+                    '۷' => '7',
+                    '۸' => '8',
+                    '۹' => '9',
+
+                    '٠' => '0',
+                    '١' => '1',
+                    '٢' => '2',
+                    '٣' => '3',
+                    '٤' => '4',
+                    '٥' => '5',
+                    '٦' => '6',
+                    '٧' => '7',
+                    '٨' => '8',
+                    '٩' => '9',
+                ]
+            );
+
+
+        /*
+         * Normalize invisible/extra whitespace too.
+         */
+        $value =
+            preg_replace(
+                '/\s+/u',
+                ' ',
+                $value
+            );
+
+
+        return trim(
+            (string) $value
+        );
+    }
+
+
     public static function search(
         $search = '',
         $page = 1
@@ -16,11 +82,10 @@ class HOM_Products {
 
         global $wpdb;
 
-        $search = trim(
-            sanitize_text_field(
-                (string) $search
-            )
-        );
+        $search =
+            self::normalize_search(
+                $search
+            );
 
         $page = max(
             1,

@@ -4195,3 +4195,1460 @@ body.hom-page a[href*="view=product-images"]::after {
     }
 
 }
+
+
+/* ==========================================================================
+   HOM PRODUCT IMAGE EDITOR V1
+   ========================================================================== */
+
+body.hom-image-editor-open {
+    overflow: hidden;
+}
+
+.hom-editor-modal[hidden] {
+    display: none !important;
+}
+
+.hom-editor-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 100050;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+.hom-editor-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(30, 23, 14, 0.72);
+    backdrop-filter: blur(5px);
+}
+
+.hom-editor-dialog {
+    position: relative;
+    z-index: 1;
+    width: min(1120px, 96vw);
+    max-height: 94vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 22px;
+    box-shadow:
+        0 30px 80px rgba(38, 27, 12, 0.28),
+        0 0 0 1px rgba(159, 133, 97, 0.16);
+}
+
+.hom-editor-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 22px;
+    background: rgba(255, 255, 255, 0.97);
+    border-bottom: 1px solid #ece6dd;
+}
+
+.hom-editor-header > div {
+    display: grid;
+    gap: 4px;
+}
+
+.hom-editor-header strong {
+    color: #493416;
+    font-size: 18px;
+}
+
+.hom-editor-header span {
+    color: #806d55;
+    font-size: 13px;
+}
+
+.hom-editor-close {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 12px;
+    background: #f4f1eb;
+    color: #493416;
+    font: inherit;
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.hom-editor-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 310px;
+    gap: 24px;
+    padding: 24px;
+}
+
+.hom-editor-canvas-column {
+    min-width: 0;
+}
+
+.hom-editor-canvas-wrap {
+    width: min(100%, 720px);
+    margin-inline: auto;
+    padding: 10px;
+    background:
+        linear-gradient(45deg, #eeeeee 25%, transparent 25%),
+        linear-gradient(-45deg, #eeeeee 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #eeeeee 75%),
+        linear-gradient(-45deg, transparent 75%, #eeeeee 75%);
+    background-size: 20px 20px;
+    background-position:
+        0 0,
+        0 10px,
+        10px -10px,
+        -10px 0;
+    border: 1px solid #ded6ca;
+    border-radius: 18px;
+}
+
+.hom-editor-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    background: #fff;
+    border-radius: 12px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+.hom-editor-canvas-wrap canvas:active {
+    cursor: grabbing;
+}
+
+.hom-editor-gesture-help {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.hom-editor-gesture-help span {
+    padding: 7px 10px;
+    border-radius: 999px;
+    background: #f4f1eb;
+    color: #6f593c;
+    font-size: 11px;
+}
+
+.hom-editor-controls {
+    display: grid;
+    align-content: start;
+    gap: 14px;
+}
+
+.hom-editor-control,
+.hom-editor-white-note {
+    padding: 15px;
+    border: 1px solid #e8dfd3;
+    border-radius: 16px;
+    background: #fffdfa;
+}
+
+.hom-editor-control__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.hom-editor-control__head strong {
+    color: #493416;
+    font-size: 13px;
+}
+
+.hom-editor-control__head output {
+    min-width: 62px;
+    padding: 5px 8px;
+    border-radius: 9px;
+    background: #f4f1eb;
+    color: #5e4420;
+    font-weight: 700;
+    text-align: center;
+    direction: ltr;
+}
+
+.hom-editor-control input[type="range"] {
+    width: 100%;
+    accent-color: #9f8561;
+    cursor: pointer;
+}
+
+.hom-editor-small-button {
+    width: 100%;
+    margin-top: 10px;
+    padding: 8px 10px;
+    border: 1px solid #d9cbb8;
+    border-radius: 10px;
+    background: #fff;
+    color: #5e4420;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.hom-editor-presets {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.hom-editor-preset {
+    display: grid;
+    gap: 4px;
+    min-height: 82px;
+    padding: 12px;
+    border: 1px solid #ddcfbc;
+    border-radius: 14px;
+    background: #fff;
+    color: #493416;
+    font: inherit;
+    text-align: right;
+    cursor: pointer;
+}
+
+.hom-editor-preset:hover {
+    border-color: #9f8561;
+    background: #f9f6f1;
+}
+
+.hom-editor-preset strong {
+    font-size: 12px;
+}
+
+.hom-editor-preset span {
+    color: #826e54;
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+.hom-editor-white-note {
+    background: #f8f5ef;
+}
+
+.hom-editor-white-note strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #5e4420;
+    font-size: 12px;
+}
+
+.hom-editor-white-note p {
+    margin: 0;
+    color: #78664f;
+    font-size: 11px;
+    line-height: 1.9;
+}
+
+.hom-editor-reset {
+    padding: 11px 12px;
+    border: 1px dashed #c6b397;
+    border-radius: 12px;
+    background: transparent;
+    color: #5e4420;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.hom-editor-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 16px 22px;
+    background: rgba(255, 255, 255, 0.98);
+    border-top: 1px solid #ece6dd;
+}
+
+.hom-editor-status {
+    color: #78664f;
+    font-size: 12px;
+}
+
+.hom-editor-footer__actions {
+    display: flex;
+    gap: 9px;
+}
+
+.hom-editor-cancel-button,
+.hom-editor-confirm {
+    min-height: 42px;
+    padding-inline: 17px;
+    font: inherit;
+    cursor: pointer;
+}
+
+.hom-editor-cancel-button {
+    border: 1px solid #d7c9b6;
+    border-radius: 11px;
+    background: #fff;
+    color: #5e4420;
+}
+
+.hom-editor-confirm {
+    border: 0;
+    border-radius: 11px;
+}
+
+.hom-editor-confirm:disabled {
+    opacity: 0.55;
+    cursor: wait;
+}
+
+@media (max-width: 860px) {
+    .hom-editor-modal {
+        padding: 10px;
+    }
+
+    .hom-editor-dialog {
+        width: 100%;
+        max-height: 97vh;
+        border-radius: 17px;
+    }
+
+    .hom-editor-body {
+        grid-template-columns: 1fr;
+        padding: 14px;
+        gap: 16px;
+    }
+
+    .hom-editor-controls {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-editor-header,
+    .hom-editor-footer {
+        padding: 13px 14px;
+    }
+
+    .hom-editor-footer {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .hom-editor-footer__actions {
+        width: 100%;
+    }
+
+    .hom-editor-footer__actions > * {
+        flex: 1;
+    }
+}
+
+@media (max-width: 520px) {
+    .hom-editor-presets {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-editor-gesture-help span {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+
+/* ==========================================================================
+   HOM PRODUCT IMAGE EDITOR RESPONSIVE FIX
+   ========================================================================== */
+
+.hom-editor-flyout[hidden] {
+    display: none !important;
+}
+
+
+/* ---------- DESKTOP ---------- */
+
+.hom-editor-dialog {
+    display: grid;
+    grid-template-rows:
+        auto
+        minmax(0, 1fr)
+        auto;
+
+    width: min(1060px, 96vw);
+    height: min(
+        750px,
+        calc(100dvh - 24px)
+    );
+
+    max-height: none;
+    overflow: hidden;
+}
+
+
+.hom-editor-body {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        260px;
+
+    gap: 16px;
+    min-height: 0;
+    padding: 14px 18px;
+    overflow: hidden;
+}
+
+
+.hom-editor-workspace {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+
+.hom-editor-canvas-wrap {
+    width: min(
+        100%,
+        620px,
+        calc(100dvh - 165px)
+    );
+
+    margin: 0 auto;
+    padding: 7px;
+}
+
+
+.hom-editor-toolbar {
+    display: none;
+}
+
+
+.hom-editor-desktop-controls {
+    display: grid;
+    align-content: center;
+    gap: 11px;
+    min-width: 0;
+}
+
+
+.hom-editor-desktop-controls
+.hom-editor-control {
+    padding: 12px;
+}
+
+
+.hom-editor-desktop-controls
+.hom-editor-control__head {
+    margin-bottom: 8px;
+}
+
+
+.hom-editor-desktop-controls
+input[type="range"] {
+    width: 100%;
+    accent-color: #9f8561;
+}
+
+
+.hom-editor-quick-actions {
+    display: grid;
+    grid-template-columns:
+        1fr
+        1fr;
+
+    gap: 7px;
+}
+
+
+.hom-editor-quick-actions button {
+    min-height: 38px;
+    padding: 7px 8px;
+
+    border:
+        1px solid
+        #ddcfbc;
+
+    border-radius: 10px;
+
+    background: #fff;
+    color: #5e4420;
+
+    font: inherit;
+    font-size: 10px;
+
+    cursor: pointer;
+}
+
+
+.hom-editor-quick-actions button:hover {
+    border-color: #9f8561;
+    background: #f7f3ed;
+}
+
+
+.hom-editor-footer {
+    position: static;
+    padding: 10px 18px;
+}
+
+
+.hom-editor-flyout {
+    position: absolute;
+    z-index: 20;
+
+    top: 50%;
+    right: 14px;
+
+    width: min(
+        300px,
+        calc(100% - 28px)
+    );
+
+    padding: 13px;
+
+    border:
+        1px solid
+        #d8c8b2;
+
+    border-radius: 14px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .98
+        );
+
+    box-shadow:
+        0 16px 40px
+        rgba(
+            44,
+            32,
+            16,
+            .18
+        );
+
+    transform:
+        translateY(-50%);
+}
+
+
+.hom-editor-flyout__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+
+.hom-editor-flyout__head output {
+    direction: ltr;
+    font-weight: 700;
+    color: #5e4420;
+}
+
+
+.hom-editor-flyout
+input[type="range"] {
+    width: 100%;
+    accent-color: #9f8561;
+}
+
+
+.hom-editor-zero-button {
+    width: 100%;
+    margin-top: 9px;
+    padding: 7px 9px;
+
+    border:
+        1px solid
+        #d8c8b2;
+
+    border-radius: 8px;
+
+    background: #fff;
+    color: #5e4420;
+
+    font: inherit;
+    font-size: 10px;
+
+    cursor: pointer;
+}
+
+
+.hom-editor-help p {
+    margin:
+        8px
+        0
+        0;
+
+    color: #75634c;
+    font-size: 11px;
+    line-height: 1.9;
+}
+
+
+/*
+ * Override the old <=860px editor rule.
+ * Desktop/tablet keeps the normal desktop editor
+ * until the true mobile breakpoint.
+ */
+@media (min-width: 721px) {
+
+    .hom-editor-body {
+        grid-template-columns:
+            minmax(0, 1fr)
+            260px;
+    }
+
+    .hom-editor-desktop-controls {
+        display: grid;
+    }
+
+    .hom-editor-toolbar {
+        display: none;
+    }
+}
+
+
+/* ---------- MOBILE TOOLBAR ---------- */
+
+@media (max-width: 720px) {
+
+    .hom-editor-modal {
+        padding: 0;
+    }
+
+
+    .hom-editor-dialog {
+        width: 100%;
+        height: 100dvh;
+
+        max-height: none;
+        border-radius: 0;
+
+        overflow: hidden;
+    }
+
+
+    .hom-editor-header {
+        padding:
+            9px
+            11px;
+    }
+
+
+    .hom-editor-header strong {
+        font-size: 13px;
+    }
+
+
+    .hom-editor-header span {
+        font-size: 9px;
+    }
+
+
+    .hom-editor-body {
+        display: block;
+
+        min-height: 0;
+        padding: 7px;
+
+        overflow: hidden;
+    }
+
+
+    .hom-editor-desktop-controls {
+        display: none;
+    }
+
+
+    .hom-editor-canvas-column,
+    .hom-editor-workspace {
+        width: 100%;
+        height: 100%;
+        min-height: 0;
+    }
+
+
+    .hom-editor-workspace {
+        display: grid;
+
+        grid-template-columns:
+            minmax(0, 1fr)
+            44px;
+
+        gap: 7px;
+
+        align-items: center;
+    }
+
+
+    .hom-editor-canvas-wrap {
+        grid-column: 1;
+
+        width: min(
+            100%,
+            calc(100dvh - 135px)
+        );
+
+        justify-self: center;
+
+        margin: 0;
+        padding: 5px;
+
+        border-radius: 12px;
+    }
+
+
+    .hom-editor-toolbar {
+        grid-column: 2;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        gap: 6px;
+    }
+
+
+    .hom-editor-tool {
+        display: grid;
+        place-items: center;
+
+        width: 42px;
+        height: 42px;
+
+        padding: 0;
+
+        border:
+            1px solid
+            #d8c8b2;
+
+        border-radius: 11px;
+
+        background:
+            rgba(
+                255,
+                255,
+                255,
+                .98
+            );
+
+        color: #5e4420;
+
+        box-shadow:
+            0 4px 12px
+            rgba(
+                53,
+                39,
+                20,
+                .09
+            );
+
+        cursor: pointer;
+    }
+
+
+    .hom-editor-tool svg {
+        width: 20px;
+        height: 20px;
+
+        fill: none;
+        stroke: currentColor;
+
+        stroke-width: 1.8;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+    }
+
+
+    .hom-editor-tool strong {
+        font-size: 20px;
+        line-height: 1;
+    }
+
+
+    .hom-editor-tool.is-active {
+        border-color: #5e4420;
+        background: #5e4420;
+        color: #fff;
+    }
+
+
+    /*
+     * Popup belongs to the selected toolbar tool.
+     */
+    .hom-editor-flyout {
+        top: 50%;
+        right: 52px;
+
+        width: min(
+            285px,
+            calc(100% - 62px)
+        );
+
+        padding: 11px;
+
+        transform:
+            translateY(-50%);
+    }
+
+
+    .hom-editor-footer {
+        padding:
+            7px
+            9px;
+
+        gap: 6px;
+    }
+
+
+    .hom-editor-status {
+        max-width: 38%;
+
+        font-size: 9px;
+        line-height: 1.5;
+    }
+
+
+    .hom-editor-footer__actions {
+        gap: 5px;
+    }
+
+
+    .hom-editor-cancel-button,
+    .hom-editor-confirm {
+        min-height: 34px;
+
+        padding:
+            5px
+            9px;
+
+        font-size: 10px;
+    }
+}
+
+
+/* ==========================================================================
+   HOM IMAGE EDITOR UX POLISH V3
+   ========================================================================== */
+
+/* DESKTOP: smaller image workspace, no internal scroll */
+@media (min-width: 721px) {
+
+    .hom-editor-dialog {
+        width: min(960px, 95vw);
+        height: min(680px, calc(100dvh - 30px));
+        overflow: hidden;
+    }
+
+    .hom-editor-body {
+        grid-template-columns:
+            minmax(0, 1fr)
+            245px;
+
+        gap: 14px;
+        padding: 12px 16px;
+        overflow: hidden;
+    }
+
+    .hom-editor-canvas-wrap {
+        width: min(
+            100%,
+            520px,
+            calc(100dvh - 160px)
+        );
+
+        padding: 6px;
+    }
+
+    .hom-editor-footer {
+        padding: 9px 16px;
+    }
+}
+
+
+/* MOBILE: vertical Photoshop-like slider beside the image */
+@media (max-width: 720px) {
+
+    /*
+     * Tool popup now occupies the toolbar column
+     * instead of covering the product image.
+     */
+    .hom-editor-flyout {
+        top: 50%;
+        right: 0;
+
+        width: 44px;
+        height: 230px;
+
+        padding: 7px 4px;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        border-radius: 13px;
+
+        transform:
+            translateY(-50%);
+
+        overflow: visible;
+    }
+
+
+    /*
+     * Rotation + zoom headers become compact.
+     */
+    .hom-editor-flyout__head {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        width: 100%;
+        margin: 0 0 5px;
+    }
+
+    .hom-editor-flyout__head strong {
+        display: none;
+    }
+
+    .hom-editor-flyout__head output {
+        min-width: 38px;
+
+        padding: 3px 2px;
+
+        border-radius: 7px;
+
+        background: #f4f1eb;
+
+        font-size: 9px;
+
+        text-align: center;
+    }
+
+
+    /*
+     * Horizontal range becomes a true
+     * bottom-to-top vertical control.
+     */
+    .hom-editor-flyout input[type="range"] {
+        width: 180px;
+        height: 32px;
+
+        margin:
+            74px
+            -69px;
+
+        transform:
+            rotate(-90deg);
+
+        transform-origin: center;
+
+        accent-color: #9f8561;
+    }
+
+
+    /*
+     * Rotation reset remains available
+     * as a tiny button at the bottom.
+     */
+    .hom-editor-zero-button {
+        width: 36px;
+        min-height: 30px;
+
+        margin: 4px 0 0;
+        padding: 3px;
+
+        font-size: 0;
+
+        border-radius: 8px;
+    }
+
+    .hom-editor-zero-button::after {
+        content: "0°";
+
+        font-size: 10px;
+        font-weight: 700;
+    }
+
+
+    /*
+     * Help is not a slider, so keep it
+     * as a readable small floating card.
+     */
+    .hom-editor-flyout.hom-editor-help {
+        right: 52px;
+
+        width: min(
+            270px,
+            calc(100% - 65px)
+        );
+
+        height: auto;
+
+        padding: 12px;
+
+        display: block;
+    }
+
+
+    /*
+     * Image keeps maximum available space
+     * while toolbar stays outside it.
+     */
+    .hom-editor-workspace {
+        grid-template-columns:
+            minmax(0, 1fr)
+            44px;
+    }
+
+    .hom-editor-canvas-wrap {
+        width: min(
+            100%,
+            calc(100dvh - 138px)
+        );
+    }
+}
+
+
+/* ==========================================================================
+   HOM IMAGE EDITOR SIZE + MOBILE RANGE DIRECTION FIX
+   ========================================================================== */
+
+/* DESKTOP */
+@media (min-width: 721px) {
+
+    /*
+     * Force the editor square to fit completely
+     * inside the available vertical workspace.
+     */
+    .hom-editor-modal .hom-editor-canvas-wrap {
+        width: min(
+            460px,
+            calc(100dvh - 250px)
+        ) !important;
+
+        max-width: 100% !important;
+
+        aspect-ratio: 1 / 1 !important;
+
+        margin:
+            auto !important;
+
+        flex:
+            none !important;
+    }
+
+
+    .hom-editor-modal .hom-editor-workspace,
+    .hom-editor-modal .hom-editor-canvas-column {
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+
+
+    .hom-editor-modal .hom-editor-body {
+        min-height: 0 !important;
+        overflow: visible !important;
+    }
+}
+
+
+/* MOBILE */
+@media (max-width: 720px) {
+
+    /*
+     * The site is RTL, but design-tool sliders
+     * should behave logically:
+     *
+     * UP   = increase / zoom in
+     * DOWN = decrease / zoom out
+     */
+    .hom-editor-modal
+    .hom-editor-flyout
+    input[type="range"] {
+        direction: ltr !important;
+    }
+}
+
+
+/* HOM WATERMARK PREVIEW STYLE */
+
+.hom-editor-canvas-wrap {
+    position: relative;
+}
+
+.hom-editor-watermark-preview {
+    position: absolute;
+
+    top: calc(3.5% + 6px);
+    left: calc(3.5% + 6px);
+
+    z-index: 5;
+
+    width: 18%;
+    height: auto;
+
+    opacity: .38;
+
+    pointer-events: none;
+    user-select: none;
+
+    filter:
+        drop-shadow(
+            2px 3px 2px
+            rgba(0, 0, 0, .28)
+        );
+}
+
+
+/* ==========================================================================
+   HOM MOBILE SIDEBAR NAV 2x2
+   ========================================================================== */
+
+@media (max-width: 720px) {
+
+    .hom-sidebar {
+        width: 100%;
+        max-width: 100%;
+        overflow: hidden;
+        padding: 13px 14px 14px;
+    }
+
+
+    .hom-nav {
+        display: grid !important;
+
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        gap: 8px;
+
+        width: 100%;
+        max-width: 100%;
+
+        margin-top: 12px;
+        padding: 0;
+
+        overflow: visible !important;
+    }
+
+
+    .hom-nav-item {
+        width: 100%;
+        min-width: 0;
+
+        min-height: 46px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        gap: 7px;
+
+        padding:
+            8px
+            7px;
+
+        white-space: normal !important;
+
+        text-align: center;
+        line-height: 1.45;
+
+        font-size: 11.5px;
+    }
+
+
+    .hom-nav-icon {
+        width: auto;
+        flex: 0 0 auto;
+
+        font-size: 16px;
+    }
+
+
+    .hom-nav-item > span:last-child {
+        min-width: 0;
+    }
+
+
+    .hom-nav-item.is-active {
+        box-shadow:
+            inset -4px 0 0
+            var(--hom-accent);
+    }
+}
+
+
+/* ==========================================================================
+   HOM RESPONSIVE HAMBURGER SIDEBAR
+   ========================================================================== */
+
+.hom-menu-toggle {
+    display: none;
+}
+
+
+/* Tablet + Mobile */
+@media (max-width: 980px) {
+
+    .hom-app {
+        display: block !important;
+    }
+
+
+    .hom-sidebar {
+        position: relative;
+
+        width: 100%;
+        max-width: 100%;
+
+        padding:
+            13px
+            16px;
+
+        overflow: visible;
+    }
+
+
+    .hom-sidebar-brand {
+        min-height: 52px;
+
+        padding:
+            0
+            52px
+            0
+            2px;
+
+        border-bottom: 0;
+    }
+
+
+    .hom-sidebar-brand .hom-brand-mark {
+        width: 40px;
+        height: 40px;
+
+        flex-basis: 40px;
+
+        border-radius: 11px;
+
+        font-size: 18px;
+    }
+
+
+    .hom-menu-toggle {
+        position: absolute;
+
+        top: 20px;
+        left: 16px;
+
+        z-index: 10;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        gap: 5px;
+
+        width: 40px;
+        height: 40px;
+
+        padding: 0;
+
+        border:
+            1px solid
+            rgba(
+                255,
+                255,
+                255,
+                .18
+            );
+
+        border-radius: 11px;
+
+        background:
+            rgba(
+                255,
+                255,
+                255,
+                .08
+            );
+
+        color: #fff;
+
+        cursor: pointer;
+    }
+
+
+    .hom-menu-toggle span {
+        display: block;
+
+        width: 19px;
+        height: 2px;
+
+        border-radius: 2px;
+
+        background: currentColor;
+
+        transition:
+            transform .2s ease,
+            opacity .2s ease;
+    }
+
+
+    .hom-sidebar.is-menu-open
+    .hom-menu-toggle span:nth-child(1) {
+        transform:
+            translateY(7px)
+            rotate(45deg);
+    }
+
+
+    .hom-sidebar.is-menu-open
+    .hom-menu-toggle span:nth-child(2) {
+        opacity: 0;
+    }
+
+
+    .hom-sidebar.is-menu-open
+    .hom-menu-toggle span:nth-child(3) {
+        transform:
+            translateY(-7px)
+            rotate(-45deg);
+    }
+
+
+    /*
+     * Closed by default.
+     */
+    .hom-nav {
+        display: none !important;
+
+        width: 100%;
+
+        margin:
+            13px
+            0
+            2px;
+
+        padding-top: 12px;
+
+        border-top:
+            1px solid
+            rgba(
+                255,
+                255,
+                255,
+                .09
+            );
+    }
+
+
+    /*
+     * Dropdown menu.
+     */
+    .hom-sidebar.is-menu-open
+    .hom-nav {
+        display: grid !important;
+
+        grid-template-columns:
+            1fr !important;
+
+        gap: 6px;
+
+        overflow: visible !important;
+    }
+
+
+    .hom-nav-item {
+        width: 100% !important;
+
+        min-width: 0;
+        min-height: 44px;
+
+        justify-content:
+            flex-start;
+
+        gap: 10px;
+
+        padding:
+            9px
+            12px;
+
+        white-space:
+            normal !important;
+
+        text-align: right;
+
+        font-size: 12px;
+    }
+
+
+    .hom-nav-icon {
+        width: 24px;
+
+        flex:
+            0
+            0
+            24px;
+
+        font-size: 16px;
+    }
+
+
+    .hom-nav-item.is-active {
+        box-shadow:
+            inset -4px 0 0
+            var(--hom-accent);
+    }
+
+
+    .hom-workspace {
+        width: 100%;
+        min-width: 0;
+    }
+}
+
+
+/* Small mobile refinement */
+@media (max-width: 720px) {
+
+    .hom-sidebar {
+        padding:
+            11px
+            13px;
+    }
+
+
+    .hom-sidebar-brand {
+        padding-left: 48px;
+    }
+
+
+    .hom-menu-toggle {
+        top: 17px;
+        left: 13px;
+
+        width: 38px;
+        height: 38px;
+    }
+}

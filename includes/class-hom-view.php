@@ -328,6 +328,19 @@ class HOM_View {
         </div>
 
 
+        <button
+            type="button"
+            class="hom-menu-toggle"
+            data-hom-menu-toggle
+            aria-expanded="false"
+            aria-label="باز کردن منوی مدیریت"
+        >
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+
+
         <nav
             class="hom-nav"
             aria-label="منوی مدیریت"
@@ -446,6 +459,91 @@ class HOM_View {
         </nav>
 
     </aside>
+
+
+    <script>
+    /* HOM RESPONSIVE SIDEBAR MENU */
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+
+            var sidebar =
+                document.querySelector(
+                    '.hom-sidebar'
+                );
+
+            var toggle =
+                document.querySelector(
+                    '[data-hom-menu-toggle]'
+                );
+
+            if (!sidebar || !toggle) {
+                return;
+            }
+
+
+            function closeMenu() {
+
+                sidebar.classList.remove(
+                    'is-menu-open'
+                );
+
+                toggle.setAttribute(
+                    'aria-expanded',
+                    'false'
+                );
+            }
+
+
+            toggle.addEventListener(
+                'click',
+                function () {
+
+                    var open =
+                        sidebar.classList.toggle(
+                            'is-menu-open'
+                        );
+
+                    toggle.setAttribute(
+                        'aria-expanded',
+                        open
+                            ? 'true'
+                            : 'false'
+                    );
+                }
+            );
+
+
+            sidebar
+                .querySelectorAll(
+                    '.hom-nav-item'
+                )
+                .forEach(
+                    function (item) {
+
+                        item.addEventListener(
+                            'click',
+                            closeMenu
+                        );
+                    }
+                );
+
+
+            window.addEventListener(
+                'resize',
+                function () {
+
+                    if (
+                        window.innerWidth >
+                        980
+                    ) {
+                        closeMenu();
+                    }
+                }
+            );
+        }
+    );
+    </script>
 
 
     <div class="hom-workspace">
@@ -821,9 +919,10 @@ class HOM_View {
                     </h3>
 
                     <p>
-                        تصویر اصلی باید واضح، مرتبط با همان
-                        محصول و تا حد امکان بهترین نمای محصول
-                        برای مشتری باشد.
+                        تصویر اصلی باید واضح، مرتبط با همان محصول
+                        و بهترین نمای کالا برای مشتری باشد. تصویر
+                        انتخاب‌شده، حتی اگر از قبل مربع باشد، قبل
+                        از آپلود وارد ویرایشگر تصویر می‌شود.
                     </p>
 
                 </article>
@@ -845,8 +944,9 @@ class HOM_View {
 
                     <p>
                         تصاویر تکمیلی، زوایای دیگر محصول،
-                        بسته‌بندی، نقشه یا ابعاد فنی مناسب را
-                        در گالری قرار دهید.
+                        بسته‌بندی، نقشه یا ابعاد فنی را در گالری
+                        قرار دهید. تصاویر گالری نیز قبل از آپلود
+                        از همان ویرایشگر عبور می‌کنند.
                     </p>
 
                 </article>
@@ -859,17 +959,18 @@ class HOM_View {
                     </div>
 
                     <div class="hom-help-step__icon">
-                        ⬆️
+                        ✥
                     </div>
 
                     <h3>
-                        آپلود را کامل کنید
+                        تصویر را تنظیم و تأیید کنید
                     </h3>
 
                     <p>
-                        اگر تصاویر را از دستگاه یا دوربین
-                        انتخاب کرده‌اید، صبر کنید فرآیند آپلود
-                        کاملاً تمام شود.
+                        در ویرایشگر می‌توانید تصویر را جابه‌جا،
+                        زوم، کوچک، بزرگ و آزادانه بچرخانید.
+                        خروجی همیشه مربع ۱:۱ است. بهتر است اطراف
+                        خود محصول کمی فضای سفید باقی بماند.
                     </p>
 
                 </article>
@@ -886,18 +987,92 @@ class HOM_View {
                     </div>
 
                     <h3>
-                        ذخیره نهایی را بزنید
+                        آپلود و ذخیره نهایی را انجام دهید
                     </h3>
 
                     <p>
-                        تغییرات زمانی نهایی می‌شوند که دکمه
-                        «ذخیره تغییرات» را بزنید. قبل از آن
-                        یک بار همه تصاویر را کنترل کنید.
+                        پس از تأیید ویرایش، تصویر را آپلود کنید.
+                        واترمارک به‌صورت خودکار روی نسخه جدید
+                        اعمال می‌شود. در پایان حتماً دکمه
+                        «ذخیره تغییرات» را بزنید.
                     </p>
 
                 </article>
 
             </section>
+
+
+
+            <section class="hom-help-important hom-help-image-editor-guide">
+
+                <div class="hom-help-important__icon">
+                    !
+                </div>
+
+                <div>
+
+                    <strong>
+                        نکات مهم ویرایش و مدیریت تصاویر
+                    </strong>
+
+                    <p>
+                        تمام تصاویر محصول، چه از دستگاه و دوربین
+                        و چه از Media Library انتخاب شوند، قبل
+                        از آپلود وارد ویرایشگر می‌شوند. خروجی
+                        نهایی همیشه مربع با نسبت ۱:۱ است.
+                    </p>
+
+                    <p>
+                        برای نمایش حرفه‌ای محصول بهتر است کالا
+                        کاملاً به لبه‌های تصویر نچسبد. با ابزار
+                        «حاشیه سفید» می‌توانید کل محصول را با
+                        فضای مناسب داخل کادر نگه دارید و با
+                        «پر کردن کادر» تصویر را تا لبه‌های مربع
+                        گسترش دهید.
+                    </p>
+
+                    <p>
+                        امکان جابه‌جایی تصویر، زوم، چرخش آزاد،
+                        مشاهده درجه چرخش و صفر کردن زاویه وجود
+                        دارد. در موبایل ابزارهای اصلی در نوار
+                        ابزار کنار تصویر قرار دارند و زوم و
+                        چرخش با دو انگشت نیز امکان‌پذیر است.
+                    </p>
+
+                    <p>
+                        سیستم به‌صورت خودکار آرم
+                        «صنعت گستران الفت» را به‌عنوان واترمارک
+                        روی نسخه نهایی تولیدشده قرار می‌دهد.
+                        محل و ظاهر تقریبی واترمارک را قبل از
+                        آپلود در همان کادر ویرایش به‌صورت
+                        پیش‌نمایش مشاهده می‌کنید.
+                    </p>
+
+                    <p>
+                        فایل اصلی انتخاب‌شده از Media Library
+                        تغییر نمی‌کند. سیستم پس از ویرایش یک
+                        تصویر جدید می‌سازد و واترمارک روی همان
+                        نسخه جدید اعمال می‌شود.
+                    </p>
+
+                    <p>
+                        گزینه «جدا کردن از محصول» فقط ارتباط
+                        تصویر با محصول را حذف می‌کند و خود فایل
+                        تصویر از Media Library یا سرور حذف
+                        نمی‌شود. لغو تغییرات نیز هیچ فایل
+                        رسانه‌ای را حذف نمی‌کند.
+                    </p>
+
+                    <p>
+                        پس از آپلود تصاویر، برای ثبت قطعی تصویر
+                        اصلی و گالری روی محصول حتماً دکمه
+                        «ذخیره تغییرات» را بزنید.
+                    </p>
+
+                </div>
+
+            </section>
+
 
 
             <div class="hom-help-section-heading">
@@ -2245,6 +2420,383 @@ class HOM_View {
             </div>
 
 
+
+            <!-- PRODUCT IMAGE EDITOR -->
+            <div
+                class="hom-editor-modal"
+                data-hom-editor-modal
+                hidden
+            >
+
+                <div
+                    class="hom-editor-modal__backdrop"
+                    data-hom-editor-cancel
+                ></div>
+
+
+                <div
+                    class="hom-editor-dialog"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="ویرایش تصویر محصول"
+                >
+
+                    <div class="hom-editor-header">
+
+                        <div>
+                            <strong>
+                                تنظیم تصویر محصول
+                            </strong>
+
+                            <span>
+                                خروجی نهایی مربع ۱:۱
+                            </span>
+                        </div>
+
+
+                        <button
+                            type="button"
+                            class="hom-editor-close"
+                            data-hom-editor-cancel
+                            aria-label="بستن"
+                        >
+                            ×
+                        </button>
+
+                    </div>
+
+
+                    <div class="hom-editor-body">
+
+                        <div class="hom-editor-canvas-column">
+
+                            <div class="hom-editor-workspace">
+
+                                <div class="hom-editor-canvas-wrap">
+
+                                    <canvas
+                                        width="720"
+                                        height="720"
+                                        data-hom-editor-canvas
+                                    ></canvas>
+
+                                </div>
+
+
+                                <!-- MOBILE TOOLBAR -->
+                                <div class="hom-editor-toolbar">
+
+                                    <button
+                                        type="button"
+                                        class="hom-editor-tool"
+                                        data-hom-editor-tool="rotate"
+                                        aria-label="چرخش"
+                                        title="چرخش"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M20 11a8 8 0 1 0-2.3 5.7M20 5v6h-6"/>
+                                        </svg>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="hom-editor-tool"
+                                        data-hom-editor-tool="zoom"
+                                        aria-label="زوم"
+                                        title="زوم"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <circle cx="10.5" cy="10.5" r="6.5"/>
+                                            <path d="m15.5 15.5 5 5M10.5 7.5v6M7.5 10.5h6"/>
+                                        </svg>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="hom-editor-tool"
+                                        data-hom-editor-fit
+                                        aria-label="حاشیه سفید"
+                                        title="حاشیه سفید"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <rect x="3" y="3" width="18" height="18" rx="2"/>
+                                            <rect x="7" y="7" width="10" height="10" rx="1"/>
+                                        </svg>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="hom-editor-tool"
+                                        data-hom-editor-fill
+                                        aria-label="پر کردن کادر"
+                                        title="پر کردن کادر"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5"/>
+                                        </svg>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="hom-editor-tool"
+                                        data-hom-editor-reset
+                                        aria-label="بازنشانی"
+                                        title="بازنشانی"
+                                    >
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <path d="M4 4v6h6M5.5 15a7 7 0 1 0 1-8L4 10"/>
+                                        </svg>
+                                    </button>
+
+
+                                    <button
+                                        type="button"
+                                        class="hom-editor-tool"
+                                        data-hom-editor-tool="help"
+                                        aria-label="راهنما"
+                                        title="راهنما"
+                                    >
+                                        <strong>!</strong>
+                                    </button>
+
+                                </div>
+
+
+                                <!-- TOOL FLYOUTS -->
+                                <div
+                                    class="hom-editor-flyout"
+                                    data-hom-editor-panel="rotate"
+                                    hidden
+                                >
+                                    <div class="hom-editor-flyout__head">
+                                        <strong>چرخش تصویر</strong>
+
+                                        <output
+                                            data-hom-editor-rotation-output
+                                        >
+                                            0°
+                                        </output>
+                                    </div>
+
+                                    <input
+                                        type="range"
+                                        min="-180"
+                                        max="180"
+                                        step="0.1"
+                                        value="0"
+                                        data-hom-editor-rotation
+                                    >
+
+                                    <button
+                                        type="button"
+                                        class="hom-editor-zero-button"
+                                        data-hom-editor-zero-rotation
+                                    >
+                                        صفر کردن زاویه
+                                    </button>
+                                </div>
+
+
+                                <div
+                                    class="hom-editor-flyout"
+                                    data-hom-editor-panel="zoom"
+                                    hidden
+                                >
+                                    <div class="hom-editor-flyout__head">
+                                        <strong>زوم تصویر</strong>
+
+                                        <output
+                                            data-hom-editor-zoom-output
+                                        >
+                                            100٪
+                                        </output>
+                                    </div>
+
+                                    <input
+                                        type="range"
+                                        min="25"
+                                        max="400"
+                                        step="1"
+                                        value="100"
+                                        data-hom-editor-zoom
+                                    >
+                                </div>
+
+
+                                <div
+                                    class="hom-editor-flyout hom-editor-help"
+                                    data-hom-editor-panel="help"
+                                    hidden
+                                >
+                                    <strong>
+                                        راهنمای ابزار
+                                    </strong>
+
+                                    <p>
+                                        تصویر را با موس یا یک انگشت جابه‌جا کنید.
+                                        با اسکرول موس زوم کنید.
+                                        در موبایل با دو انگشت زوم و چرخش انجام می‌شود.
+                                    </p>
+
+                                    <p>
+                                        «حاشیه سفید» کل محصول را با فاصله مناسب
+                                        داخل کادر نگه می‌دارد و «پر کردن کادر»
+                                        تصویر را تا لبه‌های مربع گسترش می‌دهد.
+                                    </p>
+
+
+                                    <p>
+                                        سیستم به‌صورت خودکار آرم «صنعت گستران الفت»
+                                        را به‌عنوان واترمارک روی نسخه نهایی تصویر
+                                        قرار می‌دهد. فایل اصلی تصویر بدون تغییر
+                                        باقی می‌ماند و می‌توانید محل و ظاهر واترمارک
+                                        را در همین کادر به‌صورت پیش‌نمایش مشاهده کنید.
+                                    </p>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- DESKTOP COMPACT CONTROLS -->
+                        <aside class="hom-editor-desktop-controls">
+
+                            <div class="hom-editor-control">
+
+                                <div class="hom-editor-control__head">
+                                    <strong>چرخش</strong>
+
+                                    <output
+                                        data-hom-editor-rotation-output-desktop
+                                    >
+                                        0°
+                                    </output>
+                                </div>
+
+                                <input
+                                    type="range"
+                                    min="-180"
+                                    max="180"
+                                    step="0.1"
+                                    value="0"
+                                    data-hom-editor-rotation-desktop
+                                >
+
+                                <button
+                                    type="button"
+                                    class="hom-editor-small-button"
+                                    data-hom-editor-zero-rotation
+                                >
+                                    صفر کردن چرخش
+                                </button>
+
+                            </div>
+
+
+                            <div class="hom-editor-control">
+
+                                <div class="hom-editor-control__head">
+                                    <strong>زوم</strong>
+
+                                    <output
+                                        data-hom-editor-zoom-output-desktop
+                                    >
+                                        100٪
+                                    </output>
+                                </div>
+
+                                <input
+                                    type="range"
+                                    min="25"
+                                    max="400"
+                                    step="1"
+                                    value="100"
+                                    data-hom-editor-zoom-desktop
+                                >
+
+                            </div>
+
+
+                            <div class="hom-editor-quick-actions">
+
+                                <button
+                                    type="button"
+                                    data-hom-editor-fit
+                                >
+                                    حاشیه سفید
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-hom-editor-fill
+                                >
+                                    پر کردن کادر
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-hom-editor-reset
+                                >
+                                    بازنشانی
+                                </button>
+
+                                <button
+                                    type="button"
+                                    data-hom-editor-tool="help"
+                                >
+                                    ! راهنما
+                                </button>
+
+                            </div>
+
+                        </aside>
+
+                    </div>
+
+
+                    <div class="hom-editor-footer">
+
+                        <span
+                            class="hom-editor-status"
+                            data-hom-editor-status
+                        >
+                            تصویر را تنظیم کنید.
+                        </span>
+
+
+                        <div class="hom-editor-footer__actions">
+
+                            <button
+                                type="button"
+                                class="hom-editor-cancel-button"
+                                data-hom-editor-cancel
+                            >
+                                انصراف
+                            </button>
+
+
+                            <button
+                                type="button"
+                                class="hom-button hom-editor-confirm"
+                                data-hom-editor-confirm
+                            >
+                                تأیید تصویر
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
             <!-- MEDIA LIBRARY MODAL -->
             <div
                 class="hom-media-modal"
@@ -2273,7 +2825,7 @@ class HOM_View {
                             </strong>
 
                             <span>
-                                انتخاب تصویر بدون تغییر نام یا اطلاعات فایل
+                                اصل فایل بدون تغییر می‌ماند و نسخه ویرایش‌شده جدید ساخته می‌شود
                             </span>
                         </div>
 
@@ -2389,6 +2941,19 @@ class HOM_View {
                         wp_max_upload_size()
                     ),
 
+                /*
+                 * High-resolution square output.
+                 * Watermark is applied server-side afterward.
+                 */
+                'editorOutputSize' =>
+                    1800,
+
+                'watermarkReady' =>
+                    HOM_Product_Images::watermark_is_ready(),
+
+                'watermarkUrl' =>
+                    HOM_Product_Images::watermark_url(),
+
                 'initialMain' =>
                     $images['main'],
 
@@ -2400,6 +2965,28 @@ class HOM_View {
         );
         ?>;
         </script>
+
+
+        <script
+            src="<?php
+            echo esc_url(
+                HOM_URL .
+                'assets/js/image-editor.js?ver=' .
+                (
+                    file_exists(
+                        HOM_PATH .
+                        'assets/js/image-editor.js'
+                    )
+                        ? filemtime(
+                            HOM_PATH .
+                            'assets/js/image-editor.js'
+                        )
+                        : HOM_VERSION
+                )
+            );
+            ?>"
+            defer
+        ></script>
 
 
         <script

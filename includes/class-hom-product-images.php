@@ -6,6 +6,13 @@ if (!defined('ABSPATH')) {
 
 class HOM_Product_Images {
 
+    private const WATERMARK_FILENAME =
+        'sgo-watermark-auto-products.png';
+
+    private const WATERMARK_OPACITY =
+        0.38;
+
+
     private static $notice = '';
     private static $notice_type = 'success';
 
@@ -687,6 +694,20 @@ class HOM_Product_Images {
             . 'wp-admin/includes/media.php';
 
 
+        /*
+         * The browser editor sends a NEW square copy.
+         * Apply the automatic watermark only to that copy.
+         */
+        $watermark_result =
+            self::apply_auto_watermark(
+                $file['tmp_name']
+            );
+
+        if (is_wp_error($watermark_result)) {
+            return $watermark_result;
+        }
+
+
         $file['name'] =
             self::build_filename(
                 $product,
@@ -783,16 +804,9 @@ class HOM_Product_Images {
             )
         ) {
 
-            if (
-                file_exists(
-                    $upload['file']
-                )
-            ) {
-                @unlink(
-                    $upload['file']
-                );
-            }
-
+            /*
+             * Owner Panel never deletes physical media files.
+             */
             return $attachment_id;
         }
 
@@ -822,6 +836,13 @@ class HOM_Product_Images {
 
         update_post_meta(
             $attachment_id,
+            '_hom_auto_watermarked',
+            1
+        );
+
+
+        update_post_meta(
+            $attachment_id,
             '_hom_product_image_product_id',
             $product->get_id()
         );
@@ -837,6 +858,508 @@ class HOM_Product_Images {
             $attachment_id
         );
     }
+
+
+    private static function get_watermark_attachment_id() {
+
+        $items =
+            get_posts(
+                [
+                    'post_type' =>
+                        'attachment',
+
+                    'post_status' =>
+                        'inherit',
+
+                    'post_mime_type' =>
+                        'image/png',
+
+                    'posts_per_page' =>
+                        1,
+
+                    'fields' =>
+                        'ids',
+
+                    'orderby' =>
+                        'ID',
+
+                    'order' =>
+                        'DESC',
+
+                    'meta_query' =>
+                        [
+                            [
+                                'key' =>
+                                    '_wp_attached_file',
+
+                                'value' =>
+                                    self::WATERMARK_FILENAME,
+
+                                'compare' =>
+                                    'LIKE',
+                            ],
+                        ],
+                ]
+            );
+
+
+        return !empty($items)
+            ? absint($items[0])
+            : 0;
+    }
+
+
+
+    private static function get_watermark_path() {
+
+        $attachment_id =
+            self::get_watermark_attachment_id();
+
+
+        if (!$attachment_id) {
+
+            return new WP_Error(
+                'hom_watermark_missing',
+                sprintf(
+                    'واترمارک %s در رسانه‌های سایت پیدا نشد.',
+                    self::WATERMARK_FILENAME
+                )
+            );
+        }
+
+
+        $path =
+            get_attached_file(
+                $attachment_id
+            );
+
+
+        if (
+            !$path ||
+            !is_readable($path)
+        ) {
+
+            return new WP_Error(
+                'hom_watermark_unreadable',
+                'فایل واترمارک قابل خواندن نیست.'
+            );
+        }
+
+
+        return $path;
+    }
+
+
+
+    public static function watermark_is_ready() {
+
+        return !is_wp_error(
+            self::get_watermark_path()
+        );
+    }
+
+
+
+    public static function watermark_url() {
+
+        $attachment_id =
+            self::get_watermark_attachment_id();
+
+        if (!$attachment_id) {
+            return '';
+        }
+
+        return (string) wp_get_attachment_url(
+            $attachment_id
+        );
+    }
+
+
+
+    private static function apply_auto_watermark(
+        $target_path
+    ) {
+
+        $watermark_path =
+            self::get_watermark_path();
+
+
+        if (is_wp_error($watermark_path)) {
+            return $watermark_path;
+        }
+
+
+        if (class_exists('Imagick')) {
+
+            return self::apply_watermark_imagick(
+                $target_path,
+                $watermark_path
+            );
+        }
+
+
+        if (
+            extension_loaded('gd') &&
+            function_exists('imagecreatefromjpeg')
+        ) {
+
+            return self::apply_watermark_gd(
+                $target_path,
+                $watermark_path
+            );
+        }
+
+
+        return new WP_Error(
+            'hom_watermark_engine',
+            'امکان پردازش واترمارک روی سرور فعال نیست.'
+        );
+    }
+
+
+
+    private static function apply_watermark_imagick(
+        $target_path,
+        $watermark_path
+    ) {
+
+        try {
+
+            $image =
+                new Imagick(
+                    $target_path
+                );
+
+            $logo =
+                new Imagick(
+                    $watermark_path
+                );
+
+
+            $width =
+                (int) $image->getImageWidth();
+
+            $height =
+                (int) $image->getImageHeight();
+
+
+            if (
+                !$width ||
+                !$height
+            ) {
+                throw new RuntimeException(
+                    'Invalid image dimensions'
+                );
+            }
+
+
+            /*
+             * Logo = 18% of final image width.
+             */
+            $logo_width =
+                max(
+                    80,
+                    (int) round(
+                        $width * 0.18
+                    )
+                );
+
+
+            $logo->thumbnailImage(
+                $logo_width,
+                $logo_width,
+                true
+            );
+
+
+            $logo->setImageAlphaChannel(
+                Imagick::ALPHACHANNEL_ACTIVATE
+            );
+
+
+            /*
+             * 38% opacity.
+             */
+            $logo->evaluateImage(
+                Imagick::EVALUATE_MULTIPLY,
+                self::WATERMARK_OPACITY,
+                Imagick::CHANNEL_ALPHA
+            );
+
+
+            $margin_x =
+                max(
+                    18,
+                    (int) round(
+                        $width * 0.035
+                    )
+                );
+
+            $margin_y =
+                max(
+                    18,
+                    (int) round(
+                        $height * 0.035
+                    )
+                );
+
+
+            /*
+             * Soft shadow.
+             */
+            try {
+
+                $shadow =
+                    clone $logo;
+
+                $shadow->setImageBackgroundColor(
+                    new ImagickPixel(
+                        'rgba(0,0,0,0.40)'
+                    )
+                );
+
+                $shadow->shadowImage(
+                    35,
+                    2,
+                    2,
+                    3
+                );
+
+                $image->compositeImage(
+                    $shadow,
+                    Imagick::COMPOSITE_OVER,
+                    $margin_x + 2,
+                    $margin_y + 3
+                );
+
+                $shadow->clear();
+                $shadow->destroy();
+
+            } catch (Throwable $e) {
+                // Shadow is optional.
+            }
+
+
+            /*
+             * Top-left watermark.
+             */
+            $image->compositeImage(
+                $logo,
+                Imagick::COMPOSITE_OVER,
+                $margin_x,
+                $margin_y
+            );
+
+
+            $image->setImageCompressionQuality(
+                94
+            );
+
+
+            if (
+                !$image->writeImage(
+                    $target_path
+                )
+            ) {
+                throw new RuntimeException(
+                    'Image write failed'
+                );
+            }
+
+
+            $logo->clear();
+            $logo->destroy();
+
+            $image->clear();
+            $image->destroy();
+
+
+            return true;
+
+        } catch (Throwable $e) {
+
+            return new WP_Error(
+                'hom_watermark_imagick',
+                'اعمال واترمارک روی تصویر انجام نشد.'
+            );
+        }
+    }
+
+
+
+    private static function apply_watermark_gd(
+        $target_path,
+        $watermark_path
+    ) {
+
+        $image =
+            @imagecreatefromjpeg(
+                $target_path
+            );
+
+        $logo =
+            @imagecreatefrompng(
+                $watermark_path
+            );
+
+
+        if (
+            !$image ||
+            !$logo
+        ) {
+
+            if ($image) {
+                imagedestroy($image);
+            }
+
+            if ($logo) {
+                imagedestroy($logo);
+            }
+
+
+            return new WP_Error(
+                'hom_watermark_gd',
+                'پردازش واترمارک انجام نشد.'
+            );
+        }
+
+
+        $width =
+            imagesx($image);
+
+        $height =
+            imagesy($image);
+
+        $source_width =
+            imagesx($logo);
+
+        $source_height =
+            imagesy($logo);
+
+
+        $logo_width =
+            max(
+                80,
+                (int) round(
+                    $width * 0.18
+                )
+            );
+
+        $logo_height =
+            (int) round(
+                $source_height *
+                (
+                    $logo_width /
+                    $source_width
+                )
+            );
+
+
+        $scaled =
+            imagecreatetruecolor(
+                $logo_width,
+                $logo_height
+            );
+
+
+        imagealphablending(
+            $scaled,
+            false
+        );
+
+        imagesavealpha(
+            $scaled,
+            true
+        );
+
+
+        $transparent =
+            imagecolorallocatealpha(
+                $scaled,
+                255,
+                255,
+                255,
+                127
+            );
+
+
+        imagefill(
+            $scaled,
+            0,
+            0,
+            $transparent
+        );
+
+
+        imagecopyresampled(
+            $scaled,
+            $logo,
+            0,
+            0,
+            0,
+            0,
+            $logo_width,
+            $logo_height,
+            $source_width,
+            $source_height
+        );
+
+
+        $margin_x =
+            max(
+                18,
+                (int) round(
+                    $width * 0.035
+                )
+            );
+
+        $margin_y =
+            max(
+                18,
+                (int) round(
+                    $height * 0.035
+                )
+            );
+
+
+        imagecopymerge(
+            $image,
+            $scaled,
+            $margin_x,
+            $margin_y,
+            0,
+            0,
+            $logo_width,
+            $logo_height,
+            38
+        );
+
+
+        $saved =
+            imagejpeg(
+                $image,
+                $target_path,
+                94
+            );
+
+
+        imagedestroy($scaled);
+        imagedestroy($logo);
+        imagedestroy($image);
+
+
+        if (!$saved) {
+
+            return new WP_Error(
+                'hom_watermark_save',
+                'ذخیره تصویر واترمارک‌شده انجام نشد.'
+            );
+        }
+
+
+        return true;
+    }
+
 
 
     private static function build_filename(
@@ -1460,6 +1983,14 @@ class HOM_Product_Images {
             'post_mime_type' =>
                 'image',
 
+
+            'post__not_in' =>
+                array_filter(
+                    [
+                        self::get_watermark_attachment_id(),
+                    ]
+                ),
+
             'posts_per_page' =>
                 $per_page,
 
@@ -1838,25 +2369,19 @@ class HOM_Product_Images {
             self::ajax_error($product);
         }
 
-
         $product_id =
             $product->get_id();
 
-
         $raw_ids =
             isset($_POST['attachment_ids'])
-                ? wp_unslash(
-                    $_POST['attachment_ids']
-                )
+                ? wp_unslash($_POST['attachment_ids'])
                 : '[]';
-
 
         $attachment_ids =
             json_decode(
                 $raw_ids,
                 true
             );
-
 
         if (!is_array($attachment_ids)) {
 
@@ -1868,7 +2393,6 @@ class HOM_Product_Images {
                 400
             );
         }
-
 
         $attachment_ids =
             array_values(
@@ -1882,19 +2406,10 @@ class HOM_Product_Images {
                 )
             );
 
-
-        $deleted = [];
-
+        $released = [];
 
         foreach ($attachment_ids as $attachment_id) {
 
-            /*
-             * Existing Media Library images must NEVER
-             * be deleted by the reset operation.
-             *
-             * Only attachments explicitly marked staged
-             * by this plugin are eligible.
-             */
             $is_staged =
                 (bool) get_post_meta(
                     $attachment_id,
@@ -1902,11 +2417,9 @@ class HOM_Product_Images {
                     true
                 );
 
-
             if (!$is_staged) {
                 continue;
             }
-
 
             $source_product_id =
                 absint(
@@ -1917,55 +2430,54 @@ class HOM_Product_Images {
                     )
                 );
 
-
-            if (
-                $source_product_id !==
-                $product_id
-            ) {
+            if ($source_product_id !== $product_id) {
                 continue;
             }
-
 
             if (
                 'attachment' !==
-                get_post_type(
-                    $attachment_id
-                )
+                get_post_type($attachment_id)
             ) {
                 continue;
             }
 
+            /*
+             * فقط وضعیت موقت برداشته می‌شود.
+             * فایل و Media Library هرگز حذف نمی‌شوند.
+             */
+            delete_post_meta(
+                $attachment_id,
+                '_hom_product_image_staged'
+            );
 
-            $result =
-                wp_delete_attachment(
-                    $attachment_id,
-                    true
-                );
+            wp_update_post(
+                [
+                    'ID' =>
+                        $attachment_id,
 
+                    'post_parent' =>
+                        0,
+                ]
+            );
 
-            if ($result) {
-
-                $deleted[] =
-                    $attachment_id;
-            }
+            $released[] =
+                $attachment_id;
         }
-
 
         wp_send_json_success(
             [
                 'message' =>
-                    'تغییرات موقت پاک شد.',
+                    'تغییرات موقت لغو شد؛ هیچ فایل رسانه‌ای حذف نشد.',
 
-                'deleted_ids' =>
-                    $deleted,
+                'released_ids' =>
+                    $released,
 
-                'deleted_count' =>
-                    count(
-                        $deleted
-                    ),
+                'released_count' =>
+                    count($released),
             ]
         );
     }
+
 
 
     private static function ajax_authorize_product() {
