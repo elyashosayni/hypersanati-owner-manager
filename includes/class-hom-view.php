@@ -278,6 +278,7 @@ class HOM_View {
             'dashboard',
             'products',
             'product-images',
+            'orders',
             'help',
         ];
 
@@ -403,6 +404,35 @@ class HOM_View {
 
                 <span>
                     محصولات
+                </span>
+            </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
+                        'orders',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo 'orders' === $current_view
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ≡
+                </span>
+
+                <span>
+                    پیش‌فاکتورها و سفارش‌ها
                 </span>
             </a>
 
@@ -634,6 +664,10 @@ class HOM_View {
 
                 self::render_products_content();
 
+            } elseif ('orders' === $current_view) {
+
+                self::render_orders_content();
+
             } else {
 
                 self::render_dashboard_content();
@@ -734,6 +768,465 @@ class HOM_View {
 
         <?php
     }
+
+
+    private static function render_orders_content() {
+
+        if (
+            !current_user_can(
+                HOM_Capabilities::CAP_VIEW_ORDERS
+            )
+        ) {
+            ?>
+            <div class="hom-alert hom-alert-error">
+                شما اجازه مشاهده سفارش‌ها را ندارید.
+            </div>
+            <?php
+
+            return;
+        }
+
+
+        $status =
+            isset($_GET['status'])
+                ? sanitize_key(
+                    wp_unslash(
+                        $_GET['status']
+                    )
+                )
+                : 'all';
+
+
+        $page =
+            isset($_GET['order_page'])
+                ? max(
+                    1,
+                    absint(
+                        $_GET['order_page']
+                    )
+                )
+                : 1;
+
+
+        $search =
+            isset($_GET['q'])
+                ? sanitize_text_field(
+                    wp_unslash(
+                        $_GET['q']
+                    )
+                )
+                : '';
+
+
+        $order_id =
+            isset($_GET['order_id'])
+                ? absint($_GET['order_id'])
+                : 0;
+
+        if ($order_id) {
+            HOM_Order_Detail_View::render($order_id);
+            return;
+        }
+
+        $result =
+            HOM_Orders::query(
+                $status,
+                $page,
+                $search
+            );
+
+
+        $counts =
+            HOM_Orders::summary_counts();
+
+
+        $filters = [
+            'all' =>
+                'همه',
+
+            'preinvoice-review' =>
+                'پیش‌فاکتور جدید',
+
+            'preinv-approved' =>
+                'تأیید شده',
+
+            'pending' =>
+                'انتظار پرداخت',
+
+            'on-hold' =>
+                'در انتظار بررسی',
+
+            'processing' =>
+                'در حال آماده‌سازی',
+
+            'hom-ready' =>
+                'آماده ارسال',
+
+            'hom-shipped' =>
+                'ارسال شده',
+
+            'completed' =>
+                'تحویل شده',
+        ];
+
+        ?>
+
+        <div class="hom-page-heading hom-orders-heading">
+
+            <div>
+
+                <span class="hom-eyebrow">
+                    SALES & ORDERS
+                </span>
+
+                <h1>
+                    پیش‌فاکتورها و سفارش‌ها
+                </h1>
+
+                <p>
+                    پیگیری یکپارچه درخواست پیش‌فاکتور، پرداخت، آماده‌سازی و ارسال سفارش‌ها
+                </p>
+
+            </div>
+
+            <div class="hom-products-count">
+
+                <strong>
+                    <?php
+                    echo esc_html(
+                        number_format_i18n(
+                            absint(
+                                $result['total']
+                            )
+                        )
+                    );
+                    ?>
+                </strong>
+
+                <span>
+                    مورد
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <form
+            method="get"
+            action="<?php
+            echo esc_url(
+                HOM_Router::panel_url()
+            );
+            ?>"
+            class="hom-orders-search"
+        >
+
+            <input
+                type="hidden"
+                name="view"
+                value="orders"
+            >
+
+            <input
+                type="hidden"
+                name="status"
+                value="<?php
+                echo esc_attr(
+                    $status
+                );
+                ?>"
+            >
+
+            <input
+                type="search"
+                name="q"
+                value="<?php
+                echo esc_attr(
+                    $search
+                );
+                ?>"
+                placeholder="شماره سفارش، نام، موبایل یا کد رهگیری..."
+            >
+
+            <button
+                type="submit"
+                class="hom-button hom-button-secondary"
+            >
+                جستجو
+            </button>
+
+        </form>
+
+
+        <section class="hom-order-status-grid">
+
+            <?php
+            foreach (
+                $filters
+                as $filter_status => $label
+            ) :
+
+                $url =
+                    add_query_arg(
+                        [
+                            'view' =>
+                                'orders',
+
+                            'status' =>
+                                $filter_status,
+
+                            'q' =>
+                                $search,
+                        ],
+                        HOM_Router::panel_url()
+                    );
+
+                $count =
+                    absint(
+                        $counts[
+                            $filter_status
+                        ] ?? 0
+                    );
+                ?>
+
+                <a
+                    href="<?php
+                    echo esc_url($url);
+                    ?>"
+                    class="hom-order-status-card <?php
+                    echo $status === $filter_status
+                        ? 'is-active'
+                        : '';
+                    ?>"
+                >
+
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            number_format_i18n(
+                                $count
+                            )
+                        );
+                        ?>
+                    </strong>
+
+                    <span>
+                        <?php
+                        echo esc_html(
+                            $label
+                        );
+                        ?>
+                    </span>
+
+                </a>
+
+            <?php endforeach; ?>
+
+        </section>
+
+
+        <section class="hom-orders-panel">
+
+            <?php
+            if (
+                empty(
+                    $result['items']
+                )
+            ) :
+                ?>
+
+                <div class="hom-orders-empty">
+
+                    <strong>
+                        سفارشی در این بخش وجود ندارد
+                    </strong>
+
+                    <p>
+                        درخواست‌های پیش‌فاکتور و سفارش‌های مشتریان در این قسمت نمایش داده می‌شوند.
+                    </p>
+
+                </div>
+
+            <?php else : ?>
+
+                <div class="hom-table-wrap">
+
+                    <table class="hom-products-table hom-orders-table">
+
+                        <thead>
+                            <tr>
+                                <th>شماره</th>
+                                <th>نوع</th>
+                                <th>مشتری</th>
+                                <th>شهر</th>
+                                <th>وضعیت</th>
+                                <th>مبلغ</th>
+                                <th>ارسال</th>
+                                <th>تاریخ</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <?php
+                        foreach (
+                            $result['items']
+                            as $item
+                        ) :
+                            ?>
+
+                            <tr>
+
+                                <td
+                                    data-label="شماره"
+                                >
+                                    <strong>
+                                        <a href="<?php
+                                        echo esc_url(
+                                            HOM_Orders::detail_url(
+                                                $item['id']
+                                            )
+                                        );
+                                        ?>">
+                                            #<?php
+                                            echo esc_html(
+                                                $item['number']
+                                            );
+                                            ?>
+                                        </a>
+                                    </strong>
+                                </td>
+
+                                <td
+                                    data-label="نوع"
+                                >
+                                    <?php
+                                    echo esc_html(
+                                        $item[
+                                            'is_preinvoice'
+                                        ]
+                                            ? 'پیش‌فاکتور'
+                                            : 'سفارش'
+                                    );
+                                    ?>
+                                </td>
+
+                                <td
+                                    data-label="مشتری"
+                                >
+                                    <div class="hom-order-customer">
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                $item[
+                                                    'customer_name'
+                                                ]
+                                            );
+                                            ?>
+                                        </strong>
+
+                                        <?php
+                                        if (
+                                            !empty(
+                                                $item['phone']
+                                            )
+                                        ) :
+                                            ?>
+
+                                            <span dir="ltr">
+                                                <?php
+                                                echo esc_html(
+                                                    $item[
+                                                        'phone'
+                                                    ]
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+                                </td>
+
+                                <td
+                                    data-label="شهر"
+                                >
+                                    <?php
+                                    echo esc_html(
+                                        $item['city']
+                                            ?: '—'
+                                    );
+                                    ?>
+                                </td>
+
+                                <td
+                                    data-label="وضعیت"
+                                >
+                                    <span class="hom-order-status-badge">
+                                        <?php
+                                        echo esc_html(
+                                            $item[
+                                                'status_label'
+                                            ]
+                                        );
+                                        ?>
+                                    </span>
+                                </td>
+
+                                <td
+                                    data-label="مبلغ"
+                                >
+                                    <?php
+                                    echo wp_kses_post(
+                                        $item[
+                                            'total_html'
+                                        ]
+                                    );
+                                    ?>
+                                </td>
+
+                                <td
+                                    data-label="ارسال"
+                                >
+                                    <?php
+                                    echo esc_html(
+                                        $item[
+                                            'shipping_method'
+                                        ]
+                                            ?: 'تعیین نشده'
+                                    );
+                                    ?>
+                                </td>
+
+                                <td
+                                    data-label="تاریخ"
+                                >
+                                    <?php
+                                    echo esc_html(
+                                        $item['date']
+                                    );
+                                    ?>
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            <?php endif; ?>
+
+        </section>
+
+        <?php
+    }
+
 
 
     private static function render_help_content() {

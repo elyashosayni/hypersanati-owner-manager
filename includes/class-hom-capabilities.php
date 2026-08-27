@@ -30,7 +30,7 @@ class HOM_Capabilities {
 
 
     public const ROLE_VERSION =
-        '2';
+        '3';
 
 
     public const CAP_ACCESS_PANEL =
@@ -41,6 +41,16 @@ class HOM_Capabilities {
 
     public const CAP_MANAGE_PRODUCT_IMAGES =
         'hom_manage_product_images';
+
+
+    public const CAP_VIEW_ORDERS =
+        'hom_view_orders';
+
+    public const CAP_MANAGE_PREINVOICES =
+        'hom_manage_preinvoices';
+
+    public const CAP_MANAGE_FULFILLMENT =
+        'hom_manage_order_fulfillment';
 
 
     /*
@@ -69,6 +79,12 @@ class HOM_Capabilities {
             self::CAP_VIEW_PRODUCTS => true,
 
             self::CAP_MANAGE_PRODUCT_IMAGES => true,
+
+            self::CAP_VIEW_ORDERS => true,
+
+            self::CAP_MANAGE_PREINVOICES => true,
+
+            self::CAP_MANAGE_FULFILLMENT => true,
         ];
     }
 
@@ -82,6 +98,12 @@ class HOM_Capabilities {
             self::CAP_VIEW_PRODUCTS,
 
             self::CAP_MANAGE_PRODUCT_IMAGES,
+
+            self::CAP_VIEW_ORDERS,
+
+            self::CAP_MANAGE_PREINVOICES,
+
+            self::CAP_MANAGE_FULFILLMENT,
 
             self::CAP_MANAGE_PRODUCT_PRICES,
 
