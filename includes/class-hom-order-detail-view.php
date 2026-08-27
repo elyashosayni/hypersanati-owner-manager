@@ -318,6 +318,47 @@ final class HOM_Order_Detail_View {
                     </label>
 
 
+                    <?php
+                    $b2b_already_saved =
+                        '' !==
+                        trim(
+                            (string)
+                            $order->get_meta(
+                                '_hom_b2b_updated_at',
+                                true
+                            )
+                        );
+                    ?>
+
+
+                    <?php if ($b2b_already_saved) : ?>
+
+                        <label
+                            class="hom-field"
+                            style="margin-top:14px"
+                        >
+
+                            <span>
+                                دلیل اصلاح اطلاعات حقوقی
+                            </span>
+
+                            <textarea
+                                name="correction_reason"
+                                rows="3"
+                                required
+                                placeholder="علت اصلاح اطلاعات خریدار را بنویسید..."
+                            ></textarea>
+
+                        </label>
+
+                        <small>
+                            اطلاعات حقوقی این سفارش قبلاً ثبت شده است؛
+                            برای هر تغییر بعدی، ثبت دلیل الزامی است.
+                        </small>
+
+                    <?php endif; ?>
+
+
                     <button
                         type="submit"
                         class="hom-button hom-button-secondary"

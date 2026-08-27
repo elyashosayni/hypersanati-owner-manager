@@ -3142,7 +3142,8 @@ final class HOM_Orders {
     public static function save_b2b_customer(
         $order_id,
         array $data,
-        $actor_user_id
+        $actor_user_id,
+        $correction_reason = ''
     ) {
 
         $order =
@@ -3163,6 +3164,24 @@ final class HOM_Orders {
         $actor_user_id =
             absint(
                 $actor_user_id
+            );
+
+
+        $correction_reason =
+            sanitize_textarea_field(
+                (string)
+                $correction_reason
+            );
+
+
+        $already_saved =
+            '' !==
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_b2b_updated_at',
+                    true
+                )
             );
 
 
@@ -3206,6 +3225,171 @@ final class HOM_Orders {
         ];
 
 
+        /*
+         * For an existing order snapshot, compare against
+         * that immutable order-level data.
+         *
+         * For the first save, compare against the effective
+         * profile/billing data currently shown in the form.
+         */
+        $before =
+            $already_saved
+                ? [
+                    'legal_name' =>
+                        trim(
+                            (string)
+                            $order->get_meta(
+                                '_hom_b2b_legal_name',
+                                true
+                            )
+                        ),
+
+                    'national_id' =>
+                        trim(
+                            (string)
+                            $order->get_meta(
+                                '_hom_b2b_national_id',
+                                true
+                            )
+                        ),
+
+                    'economic_code' =>
+                        trim(
+                            (string)
+                            $order->get_meta(
+                                '_hom_b2b_economic_code',
+                                true
+                            )
+                        ),
+
+                    'registration_no' =>
+                        trim(
+                            (string)
+                            $order->get_meta(
+                                '_hom_b2b_registration_no',
+                                true
+                            )
+                        ),
+
+                    'postcode' =>
+                        trim(
+                            (string)
+                            $order->get_meta(
+                                '_hom_b2b_postcode',
+                                true
+                            )
+                        ),
+
+                    'address' =>
+                        trim(
+                            (string)
+                            $order->get_meta(
+                                '_hom_b2b_address',
+                                true
+                            )
+                        ),
+                ]
+                : self::b2b_customer_data(
+                    $order
+                );
+
+
+        $labels = [
+
+            'legal_name' =>
+                'نام حقوقی / نام شرکت',
+
+            'national_id' =>
+                'شناسه ملی',
+
+            'economic_code' =>
+                'کد اقتصادی',
+
+            'registration_no' =>
+                'شماره ثبت',
+
+            'postcode' =>
+                'کدپستی',
+
+            'address' =>
+                'آدرس فاکتور',
+        ];
+
+
+        $changes = [];
+
+
+        foreach ($labels as $field => $label) {
+
+            $old_value =
+                trim(
+                    (string)
+                    ($before[$field] ?? '')
+                );
+
+
+            $new_value =
+                trim(
+                    (string)
+                    ($clean[$field] ?? '')
+                );
+
+
+            if ($old_value === $new_value) {
+                continue;
+            }
+
+
+            $changes[] = [
+
+                'field' =>
+                    $label,
+
+                'before' =>
+                    $old_value,
+
+                'after' =>
+                    $new_value,
+            ];
+        }
+
+
+        /*
+         * Once this order already owns a saved legal snapshot,
+         * every actual correction must include a reason.
+         */
+        if (
+            $already_saved &&
+            $changes &&
+            '' === $correction_reason
+        ) {
+
+            return new WP_Error(
+                'b2b_correction_reason_required',
+                'برای اصلاح اطلاعات حقوقی ثبت‌شده، دلیل اصلاح را وارد کنید.'
+            );
+        }
+
+
+        /*
+         * Re-submitting an existing snapshot without changing
+         * anything should not create a fake audit event.
+         */
+        if (
+            $already_saved &&
+            !$changes
+        ) {
+
+            return new WP_Error(
+                'b2b_no_changes',
+                'هیچ تغییری در اطلاعات حقوقی ایجاد نشده است.'
+            );
+        }
+
+
+        /*
+         * Validation is complete. Persist order snapshot.
+         */
         foreach (
             self::b2b_profile_meta_map()
             as $field => $meta_key
@@ -3230,6 +3414,10 @@ final class HOM_Orders {
         );
 
 
+        /*
+         * Keep the permanent customer profile synchronized
+         * only after all correction validation has passed.
+         */
         self::save_b2b_customer_profile(
             $order->get_customer_id(),
             $clean
@@ -3238,9 +3426,25 @@ final class HOM_Orders {
 
         HOM_Order_Audit::record(
             $order,
-            'b2b_customer_updated',
+            $already_saved
+                ? 'b2b_customer_corrected'
+                : 'b2b_customer_updated',
             $actor_user_id,
-            'اطلاعات حقوقی خریدار و پروفایل دائمی مشتری به‌روزرسانی شد.'
+            $already_saved
+                ? 'اطلاعات حقوقی خریدار اصلاح و پروفایل دائمی مشتری به‌روزرسانی شد.'
+                : 'اطلاعات حقوقی خریدار ثبت و در پروفایل دائمی مشتری ذخیره شد.',
+            [
+                'source' =>
+                    'owner-panel',
+
+                'reason' =>
+                    $already_saved
+                        ? $correction_reason
+                        : '',
+
+                'changes' =>
+                    $changes,
+            ]
         );
 
 
@@ -3335,7 +3539,12 @@ final class HOM_Orders {
             self::save_b2b_customer(
                 $order_id,
                 $data,
-                get_current_user_id()
+                get_current_user_id(),
+                isset($_POST['correction_reason'])
+                    ? wp_unslash(
+                        $_POST['correction_reason']
+                    )
+                    : ''
             );
 
 
