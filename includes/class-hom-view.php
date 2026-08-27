@@ -1061,6 +1061,7 @@ class HOM_View {
                                 <th>مشتری</th>
                                 <th>شهر</th>
                                 <th>وضعیت</th>
+                                <th>مسئول</th>
                                 <th>مبلغ</th>
                                 <th>ارسال</th>
                                 <th>تاریخ</th>
@@ -1174,6 +1175,21 @@ class HOM_View {
                                         ?>
                                     </span>
                                 </td>
+
+                                <td
+                                    data-label="مسئول"
+                                >
+                                    <?php
+                                    echo esc_html(
+                                        !empty(
+                                            $item['assignee']['name']
+                                        )
+                                            ? $item['assignee']['name']
+                                            : 'تعیین نشده'
+                                    );
+                                    ?>
+                                </td>
+
 
                                 <td
                                     data-label="مبلغ"

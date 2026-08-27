@@ -40,6 +40,11 @@ final class HOM_Orders {
             'admin_post_hom_save_order_fulfillment',
             [self::class, 'handle_save_order_fulfillment']
         );
+
+        add_action(
+            'admin_post_hom_assign_order',
+            [self::class, 'handle_assign_order']
+        );
     }
 
 
@@ -878,6 +883,11 @@ final class HOM_Orders {
                         )
                     ),
 
+                'assignee' =>
+                    self::assignee_data(
+                        $order
+                    ),
+
                 'date' =>
                     $date_created
                         ? $date_created
@@ -1181,6 +1191,12 @@ final class HOM_Orders {
                 )
             );
         }
+
+
+        self::auto_assign(
+            $order,
+            $actor_user_id
+        );
 
 
         HOM_Order_Audit::record(
@@ -2315,6 +2331,361 @@ final class HOM_Orders {
 
 
         return $events;
+    }
+
+
+    public static function assignee_data(
+        $order
+    ) {
+
+        if (!($order instanceof WC_Order)) {
+
+            return [
+                'id' => 0,
+                'name' => '',
+                'login' => '',
+            ];
+        }
+
+
+        $user_id =
+            absint(
+                $order->get_meta(
+                    '_hom_assigned_sales_user_id',
+                    true
+                )
+            );
+
+
+        $user =
+            $user_id
+                ? get_userdata($user_id)
+                : false;
+
+
+        return [
+
+            'id' =>
+                $user_id,
+
+            'name' =>
+                $user
+                    ? (
+                        $user->display_name
+                            ?: $user->user_login
+                    )
+                    : '',
+
+            'login' =>
+                $user
+                    ? $user->user_login
+                    : '',
+        ];
+    }
+
+
+    public static function sales_users() {
+
+        $users =
+            get_users([
+                'fields' =>
+                    'all',
+            ]);
+
+
+        $result = [];
+
+
+        foreach ($users as $user) {
+
+            if (
+                !user_can(
+                    $user,
+                    HOM_Capabilities::CAP_MANAGE_PREINVOICES
+                )
+            ) {
+                continue;
+            }
+
+
+            $result[] = [
+
+                'id' =>
+                    absint($user->ID),
+
+                'name' =>
+                    $user->display_name
+                        ?: $user->user_login,
+
+                'login' =>
+                    $user->user_login,
+            ];
+        }
+
+
+        usort(
+            $result,
+            static function ($a, $b) {
+
+                return strnatcasecmp(
+                    $a['name'],
+                    $b['name']
+                );
+            }
+        );
+
+
+        return $result;
+    }
+
+
+    private static function auto_assign(
+        $order,
+        $actor_user_id
+    ) {
+
+        if (
+            !($order instanceof WC_Order) ||
+            $actor_user_id < 1
+        ) {
+            return;
+        }
+
+
+        $current =
+            absint(
+                $order->get_meta(
+                    '_hom_assigned_sales_user_id',
+                    true
+                )
+            );
+
+
+        if ($current > 0) {
+            return;
+        }
+
+
+        self::assign_order_object(
+            $order,
+            $actor_user_id,
+            $actor_user_id,
+            true
+        );
+    }
+
+
+    private static function assign_order_object(
+        $order,
+        $assignee_user_id,
+        $actor_user_id,
+        $automatic = false
+    ) {
+
+        if (!($order instanceof WC_Order)) {
+            return false;
+        }
+
+
+        $assignee_user_id =
+            absint(
+                $assignee_user_id
+            );
+
+
+        $assignee =
+            $assignee_user_id
+                ? get_userdata(
+                    $assignee_user_id
+                )
+                : false;
+
+
+        if (
+            !$assignee ||
+            !user_can(
+                $assignee,
+                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+            )
+        ) {
+            return false;
+        }
+
+
+        $previous =
+            self::assignee_data(
+                $order
+            );
+
+
+        if (
+            absint($previous['id']) ===
+            $assignee_user_id
+        ) {
+            return true;
+        }
+
+
+        $order->update_meta_data(
+            '_hom_assigned_sales_user_id',
+            $assignee_user_id
+        );
+
+
+        $order->update_meta_data(
+            '_hom_assigned_sales_at',
+            current_time('mysql')
+        );
+
+
+        $order->update_meta_data(
+            '_hom_assigned_sales_by',
+            absint($actor_user_id)
+        );
+
+
+        $description =
+            $automatic
+                ? 'پرونده به‌صورت خودکار به مسئول اولین اقدام فروش اختصاص یافت.'
+                : 'مسئول جاری پرونده تغییر کرد.';
+
+
+        if (!empty($previous['name'])) {
+
+            $description .=
+                ' مسئول قبلی: ' .
+                $previous['name'] .
+                '.';
+        }
+
+
+        $description .=
+            ' مسئول جدید: ' .
+            (
+                $assignee->display_name
+                    ?: $assignee->user_login
+            )
+            .
+            '.';
+
+
+        HOM_Order_Audit::record(
+            $order,
+            'assignee_changed',
+            $actor_user_id,
+            $description
+        );
+
+
+        $order->save();
+
+        return true;
+    }
+
+
+    public static function assign_order(
+        $order_id,
+        $assignee_user_id,
+        $actor_user_id
+    ) {
+
+        $order =
+            self::get_order(
+                $order_id
+            );
+
+
+        if (!$order) {
+
+            return new WP_Error(
+                'order_missing',
+                'سفارش پیدا نشد.'
+            );
+        }
+
+
+        if (
+            !self::assign_order_object(
+                $order,
+                $assignee_user_id,
+                $actor_user_id,
+                false
+            )
+        ) {
+
+            return new WP_Error(
+                'invalid_assignee',
+                'مسئول فروش انتخاب‌شده معتبر نیست.'
+            );
+        }
+
+
+        return $order;
+    }
+
+
+    public static function handle_assign_order() {
+
+        if (
+            !is_user_logged_in() ||
+            !current_user_can(
+                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+            )
+        ) {
+
+            wp_die(
+                'دسترسی غیرمجاز.',
+                '',
+                [
+                    'response' => 403,
+                ]
+            );
+        }
+
+
+        $order_id =
+            isset($_POST['order_id'])
+                ? absint(
+                    $_POST['order_id']
+                )
+                : 0;
+
+
+        $assignee_user_id =
+            isset($_POST['assignee_user_id'])
+                ? absint(
+                    $_POST['assignee_user_id']
+                )
+                : 0;
+
+
+        check_admin_referer(
+            'hom_assign_order_' .
+            $order_id
+        );
+
+
+        $result =
+            self::assign_order(
+                $order_id,
+                $assignee_user_id,
+                get_current_user_id()
+            );
+
+
+        wp_safe_redirect(
+            add_query_arg(
+                'notice',
+                is_wp_error($result)
+                    ? 'assignee-error'
+                    : 'assignee-saved',
+                self::detail_url(
+                    $order_id
+                )
+            )
+        );
+
+        exit;
     }
 
 }

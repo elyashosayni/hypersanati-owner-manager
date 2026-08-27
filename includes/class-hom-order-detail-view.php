@@ -101,6 +101,137 @@ final class HOM_Order_Detail_View {
         </section>
 
 
+        <?php
+        $assignee =
+            HOM_Orders::assignee_data(
+                $order
+            );
+
+        $sales_users =
+            HOM_Orders::sales_users();
+        ?>
+
+        <section
+            class="hom-card hom-order-assignee"
+            style="margin-bottom:20px"
+        >
+
+            <strong>
+                مسئول جاری پرونده:
+                <?php
+                echo esc_html(
+                    $assignee['name']
+                        ?: 'هنوز تعیین نشده'
+                );
+                ?>
+            </strong>
+
+            <?php if (!empty($assignee['login'])) : ?>
+                <span dir="ltr">
+                    (@<?php echo esc_html($assignee['login']); ?>)
+                </span>
+            <?php endif; ?>
+
+
+            <?php if ($sales_users) : ?>
+
+                <form
+                    method="post"
+                    action="<?php
+                    echo esc_url(
+                        admin_url('admin-post.php')
+                    );
+                    ?>"
+                    style="
+                        display:flex;
+                        flex-wrap:wrap;
+                        gap:10px;
+                        align-items:end;
+                        margin-top:14px
+                    "
+                >
+
+                    <input
+                        type="hidden"
+                        name="action"
+                        value="hom_assign_order"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="order_id"
+                        value="<?php
+                        echo esc_attr(
+                            $order->get_id()
+                        );
+                        ?>"
+                    >
+
+                    <?php
+                    wp_nonce_field(
+                        'hom_assign_order_' .
+                        $order->get_id()
+                    );
+                    ?>
+
+                    <label class="hom-field">
+
+                        <span>
+                            واگذاری به مسئول فروش
+                        </span>
+
+                        <select
+                            name="assignee_user_id"
+                            required
+                        >
+
+                            <?php foreach ($sales_users as $sales_user) : ?>
+
+                                <option
+                                    value="<?php
+                                    echo esc_attr(
+                                        $sales_user['id']
+                                    );
+                                    ?>"
+                                    <?php
+                                    selected(
+                                        absint($assignee['id']),
+                                        absint($sales_user['id'])
+                                    );
+                                    ?>
+                                >
+                                    <?php
+                                    echo esc_html(
+                                        $sales_user['name']
+                                    );
+                                    ?>
+                                    (@<?php
+                                    echo esc_html(
+                                        $sales_user['login']
+                                    );
+                                    ?>)
+                                </option>
+
+                            <?php endforeach; ?>
+
+                        </select>
+
+                    </label>
+
+                    <button
+                        type="submit"
+                        class="hom-button hom-button-secondary"
+                    >
+                        ثبت مسئول پرونده
+                    </button>
+
+                </form>
+
+            <?php endif; ?>
+
+        </section>
+
+
         <?php if ($can_price) : ?>
 
             <form

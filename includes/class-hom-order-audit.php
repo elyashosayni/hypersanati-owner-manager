@@ -158,6 +158,9 @@ final class HOM_Order_Audit {
 
         $labels = [
 
+            'assignee_changed' =>
+                'تغییر مسئول پرونده',
+
             'price_updated' =>
                 'قیمت‌گذاری پیش‌فاکتور',
 
