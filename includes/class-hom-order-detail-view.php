@@ -768,10 +768,38 @@ final class HOM_Order_Detail_View {
 
 
         <?php
-        HOM_Order_Audit::render(
+        HOM_Order_Fulfillment_View::render(
             $order
         );
         ?>
+
+
+        <hr
+            style="
+                margin:34px 0 22px;
+                border:0;
+                border-top:1px solid #dfe3e8
+            "
+        >
+
+        <section
+            class="hom-card hom-order-tracking-header"
+            style="margin-top:0"
+        >
+
+            <h2 style="margin-bottom:6px">
+                پیگیری و سوابق تغییرات
+            </h2>
+
+            <p
+                class="hom-muted"
+                style="margin:0"
+            >
+                تمام مراحل، تأییدها، اصلاحات و اقدامات انجام‌شده
+                روی این پرونده در این بخش نگهداری می‌شوند.
+            </p>
+
+        </section>
 
 
         <?php
@@ -789,7 +817,7 @@ final class HOM_Order_Detail_View {
             >
 
                 <h2>
-                    پیگیری سفارش
+                    مراحل سفارش
                 </h2>
 
                 <div class="hom-order-timeline__items">
@@ -844,10 +872,11 @@ final class HOM_Order_Detail_View {
 
 
         <?php
-        HOM_Order_Fulfillment_View::render(
+        HOM_Order_Audit::render(
             $order
         );
         ?>
+
 
         <?php
     }

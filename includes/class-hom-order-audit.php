@@ -452,11 +452,6 @@ final class HOM_Order_Audit {
                 $order
             );
 
-
-        if (!$log) {
-            return;
-        }
-
         ?>
 
         <section
@@ -465,122 +460,259 @@ final class HOM_Order_Audit {
         >
 
             <h2>
-                سوابق اقدامات مسئولان فروش
+                رخدادها و فعالیت‌های انجام‌شده
             </h2>
 
-            <div class="hom-order-audit__list">
+            <?php if (!$log) : ?>
 
-                <?php foreach ($log as $row) : ?>
+                <p class="hom-muted">
+                    هنوز فعالیتی برای این پرونده ثبت نشده است.
+                </p>
 
-                    <article class="hom-order-audit__item">
+            <?php else : ?>
 
-                        <div>
+                <div class="hom-order-audit__list">
 
-                            <strong>
-                                <?php
-                                echo esc_html(
-                                    self::event_label(
-                                        $row['event'] ?? ''
-                                    )
-                                );
-                                ?>
-                            </strong>
+                    <?php foreach ($log as $row) : ?>
 
-                            <?php
-                            if (
-                                !empty(
-                                    $row['description']
-                                )
-                            ) :
-                                ?>
+                        <article class="hom-order-audit__item">
 
-                                <span>
+                            <div>
+
+                                <strong>
                                     <?php
                                     echo esc_html(
-                                        $row['description']
-                                    );
-                                    ?>
-                                </span>
-
-                            <?php endif; ?>
-
-                        </div>
-
-
-                        <div class="hom-order-audit__actor">
-
-                            <strong>
-                                <?php
-                                echo esc_html(
-                                    $row['user_name']
-                                    ?? 'کاربر نامشخص'
-                                );
-                                ?>
-                            </strong>
-
-                            <?php
-                            if (
-                                !empty(
-                                    $row['user_login']
-                                )
-                            ) :
-                                ?>
-
-                                <span dir="ltr">
-                                    @<?php
-                                    echo esc_html(
-                                        $row['user_login']
-                                    );
-                                    ?>
-                                </span>
-
-                            <?php endif; ?>
-
-                            <small>
-                                User ID:
-                                <?php
-                                echo esc_html(
-                                    absint(
-                                        $row['user_id']
-                                        ?? 0
-                                    )
-                                );
-                                ?>
-                            </small>
-
-                        </div>
-
-
-                        <time>
-
-                            <?php
-                            echo esc_html(
-                                !empty(
-                                    $row['timestamp']
-                                )
-                                    ? wp_date(
-                                        'Y/m/d H:i',
-                                        absint(
-                                            $row['timestamp']
+                                        self::event_label(
+                                            $row['event']
+                                            ?? ''
                                         )
-                                    )
-                                    : (
-                                        $row['date']
-                                        ?? '—'
-                                    )
-                            );
-                            ?>
+                                    );
+                                    ?>
+                                </strong>
 
-                        </time>
 
-                    </article>
+                                <?php if (!empty($row['description'])) : ?>
 
-                <?php endforeach; ?>
+                                    <span>
+                                        <?php
+                                        echo esc_html(
+                                            $row['description']
+                                        );
+                                        ?>
+                                    </span>
 
-            </div>
+                                <?php endif; ?>
+
+
+                                <?php
+                                if (
+                                    !empty($row['changes']) &&
+                                    is_array($row['changes'])
+                                ) :
+                                    ?>
+
+                                    <div
+                                        style="
+                                            display:grid;
+                                            gap:8px;
+                                            margin-top:10px
+                                        "
+                                    >
+
+                                        <?php foreach ($row['changes'] as $change) : ?>
+
+                                            <div
+                                                style="
+                                                    padding:9px 11px;
+                                                    border:1px solid #e5e7eb;
+                                                    border-radius:8px;
+                                                    background:#fafafa
+                                                "
+                                            >
+
+                                                <strong>
+                                                    <?php
+                                                    echo esc_html(
+                                                        $change['field']
+                                                        ?? 'تغییر'
+                                                    );
+                                                    ?>
+                                                </strong>
+
+                                                <div
+                                                    style="
+                                                        display:flex;
+                                                        flex-wrap:wrap;
+                                                        gap:14px;
+                                                        margin-top:5px;
+                                                        font-size:13px
+                                                    "
+                                                >
+
+                                                    <span>
+                                                        قبل:
+                                                        <?php
+                                                        echo esc_html(
+                                                            (
+                                                                $change['before']
+                                                                ?? ''
+                                                            ) !== ''
+                                                                ? $change['before']
+                                                                : '—'
+                                                        );
+                                                        ?>
+                                                    </span>
+
+                                                    <span>
+                                                        بعد:
+                                                        <?php
+                                                        echo esc_html(
+                                                            (
+                                                                $change['after']
+                                                                ?? ''
+                                                            ) !== ''
+                                                                ? $change['after']
+                                                                : '—'
+                                                        );
+                                                        ?>
+                                                    </span>
+
+                                                </div>
+
+                                            </div>
+
+                                        <?php endforeach; ?>
+
+                                    </div>
+
+                                <?php endif; ?>
+
+
+                                <?php if (!empty($row['reason'])) : ?>
+
+                                    <p
+                                        style="
+                                            margin:10px 0 0;
+                                            padding:9px 11px;
+                                            border-right:3px solid #d4a72c;
+                                            background:#fffaf0;
+                                            border-radius:6px
+                                        "
+                                    >
+                                        <strong>
+                                            دلیل اصلاح:
+                                        </strong>
+
+                                        <?php
+                                        echo esc_html(
+                                            $row['reason']
+                                        );
+                                        ?>
+                                    </p>
+
+                                <?php endif; ?>
+
+                            </div>
+
+
+                            <div class="hom-order-audit__actor">
+
+                                <strong>
+                                    <?php
+                                    echo esc_html(
+                                        $row['user_name']
+                                        ?? 'سیستم'
+                                    );
+                                    ?>
+                                </strong>
+
+
+                                <?php if (!empty($row['role_name'])) : ?>
+
+                                    <span>
+                                        <?php
+                                        echo esc_html(
+                                            $row['role_name']
+                                        );
+                                        ?>
+                                    </span>
+
+                                <?php endif; ?>
+
+
+                                <?php if (!empty($row['user_login'])) : ?>
+
+                                    <span dir="ltr">
+                                        @<?php
+                                        echo esc_html(
+                                            $row['user_login']
+                                        );
+                                        ?>
+                                    </span>
+
+                                <?php endif; ?>
+
+
+                                <small>
+                                    منبع:
+                                    <?php
+                                    echo esc_html(
+                                        self::source_label(
+                                            $row['source']
+                                            ?? ''
+                                        )
+                                    );
+                                    ?>
+                                </small>
+
+
+                                <?php if (!empty($row['user_id'])) : ?>
+
+                                    <small>
+                                        User ID:
+                                        <?php
+                                        echo esc_html(
+                                            absint(
+                                                $row['user_id']
+                                            )
+                                        );
+                                        ?>
+                                    </small>
+
+                                <?php endif; ?>
+
+                            </div>
+
+
+                            <time>
+                                <?php
+                                echo esc_html(
+                                    !empty($row['timestamp'])
+                                        ? wp_date(
+                                            'Y/m/d H:i',
+                                            absint(
+                                                $row['timestamp']
+                                            )
+                                        )
+                                        : (
+                                            $row['date']
+                                            ?? '—'
+                                        )
+                                );
+                                ?>
+                            </time>
+
+                        </article>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            <?php endif; ?>
 
         </section>
 
         <?php
     }
+
 }
