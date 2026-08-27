@@ -857,6 +857,39 @@ class HOM_View {
             </div>
 
 
+            <section class="hom-help-important">
+
+                <div class="hom-help-important__icon">
+                    ℹ️
+                </div>
+
+                <div>
+                    <strong>
+                        این کدها یعنی چه؟
+                    </strong>
+
+                    <p>
+                        <strong>شناسه محصول (ID):</strong>
+                        شماره داخلی محصول در همین سایت است که وردپرس/ووکامرس آن را می‌سازد. این شماره ممکن است در نسخه‌های مختلف سایت متفاوت باشد؛ بنابراین برای جستجوی روزمره بهتر است از SKU یا Part Number استفاده کنید.
+                    </p>
+
+                    <p>
+                        <strong>SKU:</strong>
+                        کد انبار یا کد فروش محصول است. معمولاً برای تشخیص نسخه‌های مختلف کالا استفاده می‌شود.
+                    </p>
+
+                    <p>
+                        <strong>Part Number:</strong>
+                        کد فنی یا شماره فنی محصول است که معمولاً روی خود کالا، جعبه، کاتالوگ یا اطلاعات فنی دیده می‌شود.
+                    </p>
+
+                    <p>
+                        در بخش «محصولات» می‌توانید با نام محصول، ID، SKU، Part Number یا برند جستجو کنید. اگر فقط یک عدد یا کد دارید، همان را دقیق وارد کنید.
+                    </p>
+                </div>
+
+            </section>
+
             <section class="hom-help-steps">
 
                 <article class="hom-help-step">
@@ -1426,7 +1459,7 @@ class HOM_View {
                 </h1>
 
                 <p>
-                    جستجو بر اساس نام، ID، SKU، Part Number یا برند
+                    جستجو بر اساس نام محصول، شناسه محصول (ID)، کد SKU، Part Number یا برند. اگر فقط شماره یا کد دارید، همان را وارد کنید.
                 </p>
 
             </div>
@@ -1478,7 +1511,7 @@ class HOM_View {
                             $result['search']
                         );
                         ?>"
-                        placeholder="مثلاً 6205، KSM-1203 یا 5799"
+                        placeholder="مثلاً KSM-1203، 6205، SKF یا نام محصول"
                         autocomplete="off"
                     >
 
