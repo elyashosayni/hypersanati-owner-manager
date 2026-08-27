@@ -2695,82 +2695,227 @@ final class HOM_Orders {
 
 
 
+    private static function b2b_profile_meta_map() {
+
+        return [
+
+            'legal_name' =>
+                '_hom_b2b_legal_name',
+
+            'national_id' =>
+                '_hom_b2b_national_id',
+
+            'economic_code' =>
+                '_hom_b2b_economic_code',
+
+            'registration_no' =>
+                '_hom_b2b_registration_no',
+
+            'postcode' =>
+                '_hom_b2b_postcode',
+
+            'address' =>
+                '_hom_b2b_address',
+        ];
+    }
+
+
+    public static function b2b_customer_profile(
+        $customer_id
+    ) {
+
+        $customer_id =
+            absint(
+                $customer_id
+            );
+
+
+        $data = [
+
+            'legal_name' => '',
+            'national_id' => '',
+            'economic_code' => '',
+            'registration_no' => '',
+            'postcode' => '',
+            'address' => '',
+        ];
+
+
+        if ($customer_id < 1) {
+            return $data;
+        }
+
+
+        foreach (
+            self::b2b_profile_meta_map()
+            as $field => $meta_key
+        ) {
+
+            $data[$field] =
+                trim(
+                    (string)
+                    get_user_meta(
+                        $customer_id,
+                        $meta_key,
+                        true
+                    )
+                );
+        }
+
+
+        $customer =
+            new WC_Customer(
+                $customer_id
+            );
+
+
+        if (
+            '' === $data['legal_name']
+        ) {
+
+            $data['legal_name'] =
+                trim(
+                    (string)
+                    $customer
+                        ->get_billing_company()
+                );
+        }
+
+
+        if (
+            '' === $data['postcode']
+        ) {
+
+            $data['postcode'] =
+                trim(
+                    (string)
+                    $customer
+                        ->get_billing_postcode()
+                );
+        }
+
+
+        if (
+            '' === $data['address']
+        ) {
+
+            $parts =
+                array_filter(
+                    [
+                        $customer
+                            ->get_billing_address_1(),
+
+                        $customer
+                            ->get_billing_address_2(),
+
+                        $customer
+                            ->get_billing_city(),
+
+                        $customer
+                            ->get_billing_state(),
+                    ]
+                );
+
+
+            $data['address'] =
+                trim(
+                    implode(
+                        '، ',
+                        $parts
+                    )
+                );
+        }
+
+
+        return $data;
+    }
+
+
     public static function b2b_customer_data(
         $order
     ) {
 
+        $empty = [
+
+            'legal_name' => '',
+            'national_id' => '',
+            'economic_code' => '',
+            'registration_no' => '',
+            'postcode' => '',
+            'address' => '',
+        ];
+
+
         if (!($order instanceof WC_Order)) {
-
-            return [
-                'legal_name' =>
-                    '',
-                'national_id' =>
-                    '',
-                'economic_code' =>
-                    '',
-                'registration_no' =>
-                    '',
-                'postcode' =>
-                    '',
-                'address' =>
-                    '',
-            ];
+            return $empty;
         }
 
 
-        $legal_name =
-            trim(
-                (string)
-                $order->get_meta(
-                    '_hom_b2b_legal_name',
-                    true
-                )
+        $profile =
+            self::b2b_customer_profile(
+                $order->get_customer_id()
             );
 
 
-        if ('' === $legal_name) {
+        $data = [];
 
-            $legal_name =
+
+        foreach (
+            self::b2b_profile_meta_map()
+            as $field => $meta_key
+        ) {
+
+            $order_value =
                 trim(
                     (string)
-                    $order->get_billing_company()
+                    $order->get_meta(
+                        $meta_key,
+                        true
+                    )
+                );
+
+
+            $data[$field] =
+                '' !== $order_value
+                    ? $order_value
+                    : (
+                        $profile[$field]
+                        ?? ''
+                    );
+        }
+
+
+        if (
+            '' === $data['legal_name']
+        ) {
+
+            $data['legal_name'] =
+                trim(
+                    (string)
+                    $order
+                        ->get_billing_company()
                 );
         }
 
 
-        $postcode =
-            trim(
-                (string)
-                $order->get_meta(
-                    '_hom_b2b_postcode',
-                    true
-                )
-            );
+        if (
+            '' === $data['postcode']
+        ) {
 
-
-        if ('' === $postcode) {
-
-            $postcode =
+            $data['postcode'] =
                 trim(
                     (string)
-                    $order->get_billing_postcode()
+                    $order
+                        ->get_billing_postcode()
                 );
         }
 
 
-        $address =
-            trim(
-                (string)
-                $order->get_meta(
-                    '_hom_b2b_address',
-                    true
-                )
-            );
+        if (
+            '' === $data['address']
+        ) {
 
-
-        if ('' === $address) {
-
-            $address =
+            $data['address'] =
                 trim(
                     wp_strip_all_tags(
                         $order
@@ -2780,44 +2925,44 @@ final class HOM_Orders {
         }
 
 
-        return [
+        return $data;
+    }
 
-            'legal_name' =>
-                $legal_name,
 
-            'national_id' =>
-                trim(
-                    (string)
-                    $order->get_meta(
-                        '_hom_b2b_national_id',
-                        true
-                    )
-                ),
+    private static function save_b2b_customer_profile(
+        $customer_id,
+        array $data
+    ) {
 
-            'economic_code' =>
-                trim(
-                    (string)
-                    $order->get_meta(
-                        '_hom_b2b_economic_code',
-                        true
-                    )
-                ),
+        $customer_id =
+            absint(
+                $customer_id
+            );
 
-            'registration_no' =>
-                trim(
-                    (string)
-                    $order->get_meta(
-                        '_hom_b2b_registration_no',
-                        true
-                    )
-                ),
 
-            'postcode' =>
-                $postcode,
+        if ($customer_id < 1) {
+            return;
+        }
 
-            'address' =>
-                $address,
-        ];
+
+        foreach (
+            self::b2b_profile_meta_map()
+            as $field => $meta_key
+        ) {
+
+            update_user_meta(
+                $customer_id,
+                $meta_key,
+                $data[$field] ?? ''
+            );
+        }
+
+
+        update_user_meta(
+            $customer_id,
+            '_hom_b2b_updated_at',
+            current_time('mysql')
+        );
     }
 
 
@@ -2848,45 +2993,39 @@ final class HOM_Orders {
             );
 
 
-        self::auto_assign(
-            $order,
-            $actor_user_id
-        );
+        $clean = [
 
-
-        $fields = [
-
-            '_hom_b2b_legal_name' =>
+            'legal_name' =>
                 sanitize_text_field(
                     (string)
                     ($data['legal_name'] ?? '')
                 ),
 
-            '_hom_b2b_national_id' =>
+            'national_id' =>
                 sanitize_text_field(
                     (string)
                     ($data['national_id'] ?? '')
                 ),
 
-            '_hom_b2b_economic_code' =>
+            'economic_code' =>
                 sanitize_text_field(
                     (string)
                     ($data['economic_code'] ?? '')
                 ),
 
-            '_hom_b2b_registration_no' =>
+            'registration_no' =>
                 sanitize_text_field(
                     (string)
                     ($data['registration_no'] ?? '')
                 ),
 
-            '_hom_b2b_postcode' =>
+            'postcode' =>
                 sanitize_text_field(
                     (string)
                     ($data['postcode'] ?? '')
                 ),
 
-            '_hom_b2b_address' =>
+            'address' =>
                 sanitize_textarea_field(
                     (string)
                     ($data['address'] ?? '')
@@ -2895,13 +3034,13 @@ final class HOM_Orders {
 
 
         foreach (
-            $fields
-            as $meta_key => $value
+            self::b2b_profile_meta_map()
+            as $field => $meta_key
         ) {
 
             $order->update_meta_data(
                 $meta_key,
-                $value
+                $clean[$field]
             );
         }
 
@@ -2918,11 +3057,17 @@ final class HOM_Orders {
         );
 
 
+        self::save_b2b_customer_profile(
+            $order->get_customer_id(),
+            $clean
+        );
+
+
         HOM_Order_Audit::record(
             $order,
             'b2b_customer_updated',
             $actor_user_id,
-            'اطلاعات حقوقی خریدار ویرایش شد.'
+            'اطلاعات حقوقی خریدار و پروفایل دائمی مشتری به‌روزرسانی شد.'
         );
 
 
