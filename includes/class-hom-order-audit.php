@@ -11,7 +11,8 @@ final class HOM_Order_Audit {
 
 
     private static function actor(
-        $user_id
+        $user_id,
+        $source = ''
     ) {
 
         $user_id =
@@ -23,23 +24,218 @@ final class HOM_Order_Audit {
                 : false;
 
 
+        $role_slug = '';
+        $role_name = '';
+
+
+        if ($user instanceof WP_User) {
+
+            $roles =
+                array_values(
+                    (array) $user->roles
+                );
+
+
+            $role_slug =
+                isset($roles[0])
+                    ? sanitize_key(
+                        $roles[0]
+                    )
+                    : '';
+
+
+            if ($role_slug) {
+
+                $roles_object =
+                    wp_roles();
+
+
+                $role_name =
+                    isset(
+                        $roles_object
+                            ->roles[
+                                $role_slug
+                            ]['name']
+                    )
+                        ? translate_user_role(
+                            $roles_object
+                                ->roles[
+                                    $role_slug
+                                ]['name']
+                        )
+                        : $role_slug;
+            }
+        }
+
+
+        if ($user instanceof WP_User) {
+
+            $name =
+                $user->display_name
+                    ?: $user->user_login;
+
+        } elseif ('gateway' === $source) {
+
+            $name =
+                'درگاه پرداخت';
+
+        } elseif ('customer' === $source) {
+
+            $name =
+                'مشتری';
+
+        } else {
+
+            $name =
+                'سیستم';
+        }
+
+
         return [
+
             'id' =>
                 $user_id,
 
             'name' =>
-                $user
-                    ? (
-                        $user->display_name
-                            ?: $user->user_login
-                    )
-                    : 'کاربر نامشخص',
+                $name,
 
             'login' =>
-                $user
+                $user instanceof WP_User
                     ? $user->user_login
                     : '',
+
+            'role_slug' =>
+                $role_slug,
+
+            'role_name' =>
+                $role_name,
         ];
+    }
+
+
+    private static function normalize_changes(
+        $changes
+    ) {
+
+        if (!is_array($changes)) {
+            return [];
+        }
+
+
+        $result = [];
+
+
+        foreach ($changes as $change) {
+
+            if (!is_array($change)) {
+                continue;
+            }
+
+
+            $field =
+                sanitize_text_field(
+                    (string)
+                    ($change['field'] ?? '')
+                );
+
+
+            if ('' === $field) {
+                continue;
+            }
+
+
+            $before =
+                $change['before']
+                ?? '';
+
+            $after =
+                $change['after']
+                ?? '';
+
+
+            if (
+                is_array($before) ||
+                is_object($before)
+            ) {
+
+                $before =
+                    wp_json_encode(
+                        $before,
+                        JSON_UNESCAPED_UNICODE
+                    );
+            }
+
+
+            if (
+                is_array($after) ||
+                is_object($after)
+            ) {
+
+                $after =
+                    wp_json_encode(
+                        $after,
+                        JSON_UNESCAPED_UNICODE
+                    );
+            }
+
+
+            $result[] = [
+
+                'field' =>
+                    $field,
+
+                'before' =>
+                    sanitize_textarea_field(
+                        (string) $before
+                    ),
+
+                'after' =>
+                    sanitize_textarea_field(
+                        (string) $after
+                    ),
+            ];
+        }
+
+
+        return $result;
+    }
+
+
+    public static function source_label(
+        $source
+    ) {
+
+        $labels = [
+
+            'owner-panel' =>
+                'پنل فروش',
+
+            'customer' =>
+                'مشتری',
+
+            'gateway' =>
+                'درگاه پرداخت',
+
+            'system' =>
+                'سیستم',
+
+            'wp-admin' =>
+                'پیشخوان وردپرس',
+        ];
+
+
+        $source =
+            sanitize_key(
+                (string) $source
+            );
+
+
+        return
+            $labels[$source]
+            ?? (
+                $source
+                    ?: 'سیستم'
+            );
     }
 
 
@@ -47,7 +243,8 @@ final class HOM_Order_Audit {
         $order,
         $event,
         $user_id,
-        $description = ''
+        $description = '',
+        array $context = []
     ) {
 
         if (!($order instanceof WC_Order)) {
@@ -67,9 +264,24 @@ final class HOM_Order_Audit {
         }
 
 
+        $source =
+            sanitize_key(
+                (string)
+                (
+                    $context['source']
+                    ?? (
+                        $user_id
+                            ? 'owner-panel'
+                            : 'system'
+                    )
+                )
+            );
+
+
         $actor =
             self::actor(
-                $user_id
+                $user_id,
+                $source
             );
 
 
@@ -89,9 +301,33 @@ final class HOM_Order_Audit {
             'user_login' =>
                 $actor['login'],
 
+            'role_slug' =>
+                $actor['role_slug'],
+
+            'role_name' =>
+                $actor['role_name'],
+
+            'source' =>
+                $source,
+
             'description' =>
-                sanitize_text_field(
+                sanitize_textarea_field(
                     $description
+                ),
+
+            'reason' =>
+                sanitize_textarea_field(
+                    (string)
+                    (
+                        $context['reason']
+                        ?? ''
+                    )
+                ),
+
+            'changes' =>
+                self::normalize_changes(
+                    $context['changes']
+                    ?? []
                 ),
 
             'timestamp' =>
@@ -107,14 +343,13 @@ final class HOM_Order_Audit {
         ];
 
 
-        /*
-         * Prevent unlimited meta growth.
-         */
         if (count($log) > 250) {
-            $log = array_slice(
-                $log,
-                -250
-            );
+
+            $log =
+                array_slice(
+                    $log,
+                    -250
+                );
         }
 
 
@@ -181,6 +416,24 @@ final class HOM_Order_Audit {
 
             'order_delivered' =>
                 'ثبت تحویل سفارش',
+
+            'preinvoice_created' =>
+                'ثبت درخواست پیش‌فاکتور',
+
+            'payment_confirmed' =>
+                'تأیید پرداخت',
+
+            'payment_corrected' =>
+                'اصلاح وضعیت پرداخت',
+
+            'price_corrected' =>
+                'اصلاح قیمت پیش‌فاکتور',
+
+            'b2b_customer_corrected' =>
+                'اصلاح اطلاعات حقوقی خریدار',
+
+            'shipping_corrected' =>
+                'اصلاح اطلاعات ارسال',
         ];
 
 
