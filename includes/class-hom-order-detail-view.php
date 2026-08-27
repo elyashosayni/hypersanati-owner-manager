@@ -102,6 +102,315 @@ final class HOM_Order_Detail_View {
 
 
         <?php
+        $b2b =
+            HOM_Orders::b2b_customer_data(
+                $order
+            );
+
+        $b2b_notice =
+            isset($_GET['notice'])
+                ? sanitize_key(
+                    wp_unslash(
+                        $_GET['notice']
+                    )
+                )
+                : '';
+        ?>
+
+
+        <?php if ('b2b-saved' === $b2b_notice) : ?>
+
+            <div class="hom-alert hom-alert-success">
+                اطلاعات حقوقی خریدار ذخیره شد.
+            </div>
+
+        <?php elseif ('b2b-error' === $b2b_notice) : ?>
+
+            <div class="hom-alert hom-alert-error">
+                ذخیره اطلاعات حقوقی خریدار انجام نشد.
+            </div>
+
+        <?php endif; ?>
+
+
+        <section
+            class="hom-card hom-b2b-customer-card"
+            style="margin-bottom:20px"
+        >
+
+            <h2>
+                اطلاعات حقوقی خریدار
+            </h2>
+
+
+            <?php
+            if (
+                current_user_can(
+                    HOM_Capabilities::CAP_MANAGE_PREINVOICES
+                )
+            ) :
+                ?>
+
+                <form
+                    method="post"
+                    action="<?php
+                    echo esc_url(
+                        admin_url(
+                            'admin-post.php'
+                        )
+                    );
+                    ?>"
+                >
+
+                    <input
+                        type="hidden"
+                        name="action"
+                        value="hom_save_b2b_customer"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="order_id"
+                        value="<?php
+                        echo esc_attr(
+                            $order->get_id()
+                        );
+                        ?>"
+                    >
+
+                    <?php
+                    wp_nonce_field(
+                        'hom_save_b2b_customer_' .
+                        $order->get_id()
+                    );
+                    ?>
+
+
+                    <div
+                        style="
+                            display:grid;
+                            grid-template-columns:
+                                repeat(2,minmax(0,1fr));
+                            gap:14px
+                        "
+                    >
+
+                        <label class="hom-field">
+
+                            <span>
+                                نام حقوقی / نام شرکت
+                            </span>
+
+                            <input
+                                type="text"
+                                name="legal_name"
+                                value="<?php
+                                echo esc_attr(
+                                    $b2b['legal_name']
+                                );
+                                ?>"
+                            >
+
+                        </label>
+
+
+                        <label class="hom-field">
+
+                            <span>
+                                شناسه ملی
+                            </span>
+
+                            <input
+                                type="text"
+                                name="national_id"
+                                inputmode="numeric"
+                                dir="ltr"
+                                value="<?php
+                                echo esc_attr(
+                                    $b2b['national_id']
+                                );
+                                ?>"
+                            >
+
+                        </label>
+
+
+                        <label class="hom-field">
+
+                            <span>
+                                کد اقتصادی
+                            </span>
+
+                            <input
+                                type="text"
+                                name="economic_code"
+                                inputmode="numeric"
+                                dir="ltr"
+                                value="<?php
+                                echo esc_attr(
+                                    $b2b['economic_code']
+                                );
+                                ?>"
+                            >
+
+                        </label>
+
+
+                        <label class="hom-field">
+
+                            <span>
+                                شماره ثبت
+                            </span>
+
+                            <input
+                                type="text"
+                                name="registration_no"
+                                dir="ltr"
+                                value="<?php
+                                echo esc_attr(
+                                    $b2b['registration_no']
+                                );
+                                ?>"
+                            >
+
+                        </label>
+
+
+                        <label class="hom-field">
+
+                            <span>
+                                کدپستی
+                            </span>
+
+                            <input
+                                type="text"
+                                name="postcode"
+                                inputmode="numeric"
+                                dir="ltr"
+                                value="<?php
+                                echo esc_attr(
+                                    $b2b['postcode']
+                                );
+                                ?>"
+                            >
+
+                        </label>
+
+                    </div>
+
+
+                    <label
+                        class="hom-field"
+                        style="margin-top:14px"
+                    >
+
+                        <span>
+                            آدرس فاکتور
+                        </span>
+
+                        <textarea
+                            name="b2b_address"
+                            rows="3"
+                        ><?php
+                        echo esc_textarea(
+                            $b2b['address']
+                        );
+                        ?></textarea>
+
+                    </label>
+
+
+                    <button
+                        type="submit"
+                        class="hom-button hom-button-secondary"
+                        style="margin-top:14px"
+                    >
+                        ذخیره اطلاعات حقوقی
+                    </button>
+
+                </form>
+
+
+            <?php else : ?>
+
+
+                <p>
+                    نام حقوقی:
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $b2b['legal_name']
+                                ?: '—'
+                        );
+                        ?>
+                    </strong>
+                </p>
+
+                <p>
+                    شناسه ملی:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $b2b['national_id']
+                                ?: '—'
+                        );
+                        ?>
+                    </span>
+                </p>
+
+                <p>
+                    کد اقتصادی:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $b2b['economic_code']
+                                ?: '—'
+                        );
+                        ?>
+                    </span>
+                </p>
+
+                <p>
+                    شماره ثبت:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $b2b['registration_no']
+                                ?: '—'
+                        );
+                        ?>
+                    </span>
+                </p>
+
+                <p>
+                    کدپستی:
+                    <span dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $b2b['postcode']
+                                ?: '—'
+                        );
+                        ?>
+                    </span>
+                </p>
+
+                <p>
+                    آدرس:
+                    <?php
+                    echo esc_html(
+                        $b2b['address']
+                            ?: '—'
+                    );
+                    ?>
+                </p>
+
+
+            <?php endif; ?>
+
+        </section>
+
+
+        <?php
         $assignee =
             HOM_Orders::assignee_data(
                 $order
