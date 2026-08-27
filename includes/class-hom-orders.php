@@ -46,6 +46,11 @@ final class HOM_Orders {
         );
 
         add_action(
+            'admin_post_hom_correct_manual_payment',
+            [self::class, 'handle_correct_manual_payment']
+        );
+
+        add_action(
             'admin_post_hom_save_preinvoice_prices',
             [self::class, 'handle_save_preinvoice_prices']
         );
@@ -1449,6 +1454,274 @@ final class HOM_Orders {
     }
 
 
+    public static function can_correct_manual_payment(
+        $order
+    ) {
+
+        if (!($order instanceof WC_Order)) {
+            return false;
+        }
+
+
+        $payment =
+            self::manual_payment_data(
+                $order
+            );
+
+
+        return
+            'hom_manual_transfer'
+                ===
+                $order->get_payment_method() &&
+            'manual'
+                ===
+                $order->get_meta(
+                    '_hom_payment_source',
+                    true
+                ) &&
+            !empty(
+                $payment['confirmed_at']
+            ) &&
+            $order->is_paid();
+    }
+
+
+    public static function correct_manual_payment(
+        $order_id,
+        array $data,
+        $actor_user_id = 0,
+        $correction_reason = ''
+    ) {
+
+        $order =
+            self::get_order(
+                $order_id
+            );
+
+
+        if (!$order) {
+
+            return new WP_Error(
+                'order_missing',
+                'سفارش پیدا نشد.'
+            );
+        }
+
+
+        if (
+            !self::can_correct_manual_payment(
+                $order
+            )
+        ) {
+
+            return new WP_Error(
+                'payment_correction_not_allowed',
+                'اطلاعات پرداخت این سفارش قابل اصلاح نیست.'
+            );
+        }
+
+
+        $actor_user_id =
+            absint(
+                $actor_user_id
+            );
+
+
+        if ($actor_user_id < 1) {
+
+            return new WP_Error(
+                'payment_actor_required',
+                'کاربر اصلاح‌کننده پرداخت مشخص نیست.'
+            );
+        }
+
+
+        $correction_reason =
+            sanitize_textarea_field(
+                (string)
+                $correction_reason
+            );
+
+
+        if ('' === $correction_reason) {
+
+            return new WP_Error(
+                'payment_correction_reason_required',
+                'برای اصلاح اطلاعات پرداخت، دلیل اصلاح را وارد کنید.'
+            );
+        }
+
+
+        $current =
+            self::manual_payment_data(
+                $order
+            );
+
+
+        $reference =
+            sanitize_text_field(
+                (string)
+                ($data['reference'] ?? '')
+            );
+
+
+        if ('' === $reference) {
+
+            return new WP_Error(
+                'payment_reference_required',
+                'شماره پیگیری / مرجع پرداخت الزامی است.'
+            );
+        }
+
+
+        $notes =
+            sanitize_textarea_field(
+                (string)
+                ($data['notes'] ?? '')
+            );
+
+
+        $changes = [];
+
+
+        if (
+            $reference !==
+            (
+                $current['reference']
+                ?? ''
+            )
+        ) {
+
+            $changes[] = [
+
+                'field' =>
+                    'مرجع پرداخت',
+
+                'before' =>
+                    $current['reference']
+                    ?: '—',
+
+                'after' =>
+                    $reference,
+            ];
+        }
+
+
+        if (
+            $notes !==
+            (
+                $current['notes']
+                ?? ''
+            )
+        ) {
+
+            $changes[] = [
+
+                'field' =>
+                    'توضیحات پرداخت',
+
+                'before' =>
+                    $current['notes']
+                    ?: '—',
+
+                'after' =>
+                    $notes
+                    ?: '—',
+            ];
+        }
+
+
+        if (!$changes) {
+
+            return new WP_Error(
+                'payment_no_changes',
+                'هیچ تغییری در اطلاعات پرداخت ایجاد نشده است.'
+            );
+        }
+
+
+        /*
+         * Safe correction only:
+         * amount, paid date and paid status remain unchanged.
+         */
+        $order->update_meta_data(
+            '_hom_manual_payment_reference',
+            $reference
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_notes',
+            $notes
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_corrected_at',
+            current_time('mysql')
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_corrected_by',
+            $actor_user_id
+        );
+
+
+        /*
+         * Keep WooCommerce transaction ID synchronized
+         * with our corrected manual-payment reference.
+         */
+        $order->set_transaction_id(
+            $reference
+        );
+
+
+        HOM_Order_Audit::record(
+            $order,
+            'payment_corrected',
+            $actor_user_id,
+            'اطلاعات ثبت‌شده پرداخت دستی اصلاح شد.',
+            [
+                'source' =>
+                    'owner-panel',
+
+                'reason' =>
+                    $correction_reason,
+
+                'changes' =>
+                    $changes,
+            ]
+        );
+
+
+        $actor =
+            get_userdata(
+                $actor_user_id
+            );
+
+
+        $order->add_order_note(
+            sprintf(
+                'اطلاعات پرداخت دستی توسط %s اصلاح شد. دلیل: %s',
+                $actor
+                    ? (
+                        $actor->display_name
+                        ?: $actor->user_login
+                    )
+                    : 'کاربر فروش',
+                $correction_reason
+            )
+        );
+
+
+        $order->save();
+
+
+        return $order;
+    }
+
+
     private static function normalize_decimal(
         $value
     ) {
@@ -2144,6 +2417,95 @@ final class HOM_Orders {
                 is_wp_error($result)
                     ? 'payment-error'
                     : 'payment-confirmed',
+                self::detail_url(
+                    $order_id
+                )
+            )
+        );
+
+        exit;
+    }
+
+
+    public static function handle_correct_manual_payment() {
+
+        if (
+            !is_user_logged_in() ||
+            !current_user_can(
+                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+            )
+        ) {
+
+            wp_die(
+                'دسترسی غیرمجاز.',
+                '',
+                [
+                    'response' =>
+                        403,
+                ]
+            );
+        }
+
+
+        $order_id =
+            isset($_POST['order_id'])
+                ? absint(
+                    $_POST['order_id']
+                )
+                : 0;
+
+
+        check_admin_referer(
+            'hom_correct_manual_payment_' .
+            $order_id
+        );
+
+
+        $result =
+            self::correct_manual_payment(
+                $order_id,
+                [
+                    'reference' =>
+                        isset(
+                            $_POST[
+                                'payment_reference'
+                            ]
+                        )
+                            ? wp_unslash(
+                                $_POST[
+                                    'payment_reference'
+                                ]
+                            )
+                            : '',
+
+                    'notes' =>
+                        isset(
+                            $_POST[
+                                'payment_notes'
+                            ]
+                        )
+                            ? wp_unslash(
+                                $_POST[
+                                    'payment_notes'
+                                ]
+                            )
+                            : '',
+                ],
+                get_current_user_id(),
+                isset($_POST['correction_reason'])
+                    ? wp_unslash(
+                        $_POST['correction_reason']
+                    )
+                    : ''
+            );
+
+
+        wp_safe_redirect(
+            add_query_arg(
+                'notice',
+                is_wp_error($result)
+                    ? 'payment-correction-error'
+                    : 'payment-corrected',
                 self::detail_url(
                     $order_id
                 )

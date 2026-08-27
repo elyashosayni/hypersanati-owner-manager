@@ -825,6 +825,25 @@ final class HOM_Order_Detail_View {
                 پرداخت را بررسی کنید.
             </div>
 
+        <?php elseif ('payment-corrected' === $payment_notice) : ?>
+
+            <div
+                class="hom-alert hom-alert-success"
+                style="margin-top:20px"
+            >
+                اطلاعات پرداخت با موفقیت اصلاح و در سوابق
+                تغییرات ثبت شد.
+            </div>
+
+        <?php elseif ('payment-correction-error' === $payment_notice) : ?>
+
+            <div
+                class="hom-alert hom-alert-error"
+                style="margin-top:20px"
+            >
+                اصلاح اطلاعات پرداخت انجام نشد.
+            </div>
+
         <?php endif; ?>
 
 
@@ -1057,6 +1076,147 @@ final class HOM_Order_Detail_View {
                         );
                         ?>
                     </p>
+
+                <?php endif; ?>
+
+
+                <?php
+                if (
+                    current_user_can(
+                        HOM_Capabilities::CAP_MANAGE_PREINVOICES
+                    ) &&
+                    HOM_Orders::can_correct_manual_payment(
+                        $order
+                    )
+                ) :
+                    ?>
+
+                    <hr
+                        style="
+                            margin:20px 0;
+                            border:0;
+                            border-top:1px solid #e5e7eb
+                        "
+                    >
+
+                    <h3>
+                        اصلاح اطلاعات پرداخت
+                    </h3>
+
+                    <p class="hom-muted">
+                        مبلغ و وضعیت پرداخت قابل تغییر نیستند.
+                        فقط مرجع و توضیحات پرداخت را در صورت
+                        ثبت اشتباه اصلاح کنید.
+                    </p>
+
+
+                    <form
+                        method="post"
+                        action="<?php
+                        echo esc_url(
+                            HOM_Router::panel_url()
+                        );
+                        ?>"
+                    >
+
+                        <input
+                            type="hidden"
+                            name="hom_action"
+                            value="hom_correct_manual_payment"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="order_id"
+                            value="<?php
+                            echo esc_attr(
+                                $order->get_id()
+                            );
+                            ?>"
+                        >
+
+                        <?php
+                        wp_nonce_field(
+                            'hom_correct_manual_payment_' .
+                            $order->get_id()
+                        );
+                        ?>
+
+
+                        <label class="hom-field">
+
+                            <span>
+                                شماره پیگیری / مرجع پرداخت
+                            </span>
+
+                            <input
+                                type="text"
+                                name="payment_reference"
+                                dir="ltr"
+                                required
+                                value="<?php
+                                echo esc_attr(
+                                    $manual_payment[
+                                        'reference'
+                                    ]
+                                );
+                                ?>"
+                            >
+
+                        </label>
+
+
+                        <label
+                            class="hom-field"
+                            style="margin-top:14px"
+                        >
+
+                            <span>
+                                توضیحات پرداخت
+                            </span>
+
+                            <textarea
+                                name="payment_notes"
+                                rows="3"
+                            ><?php
+                            echo esc_textarea(
+                                $manual_payment[
+                                    'notes'
+                                ]
+                            );
+                            ?></textarea>
+
+                        </label>
+
+
+                        <label
+                            class="hom-field"
+                            style="margin-top:14px"
+                        >
+
+                            <span>
+                                دلیل اصلاح
+                            </span>
+
+                            <textarea
+                                name="correction_reason"
+                                rows="3"
+                                required
+                                placeholder="دلیل اصلاح اطلاعات پرداخت را بنویسید..."
+                            ></textarea>
+
+                        </label>
+
+
+                        <button
+                            type="submit"
+                            class="hom-button hom-button-secondary"
+                            style="margin-top:16px"
+                        >
+                            ثبت اصلاح اطلاعات پرداخت
+                        </button>
+
+                    </form>
 
                 <?php endif; ?>
 

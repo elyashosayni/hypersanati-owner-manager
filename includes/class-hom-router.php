@@ -124,6 +124,12 @@ class HOM_Router {
                     'handle_confirm_manual_payment',
                 ],
 
+            'hom_correct_manual_payment' =>
+                [
+                    HOM_Orders::class,
+                    'handle_correct_manual_payment',
+                ],
+
             'hom_save_b2b_customer' =>
                 [
                     HOM_Orders::class,
