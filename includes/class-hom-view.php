@@ -105,6 +105,216 @@ class HOM_View {
 
     private static function document_end() {
         ?>
+
+<script>
+/* HOM GLOBAL FIELD STATE UI */
+(function () {
+
+    'use strict';
+
+
+    function shouldHandle(field) {
+
+        if (!field) {
+            return false;
+        }
+
+
+        var tag =
+            String(
+                field.tagName || ''
+            ).toLowerCase();
+
+
+        if (
+            tag !== 'input' &&
+            tag !== 'select' &&
+            tag !== 'textarea'
+        ) {
+            return false;
+        }
+
+
+        var type =
+            String(
+                field.type || ''
+            ).toLowerCase();
+
+
+        return ![
+            'hidden',
+            'submit',
+            'button',
+            'reset',
+            'checkbox',
+            'radio',
+            'file',
+            'image'
+        ].includes(type);
+    }
+
+
+    function hasValue(field) {
+
+        if (
+            field.tagName &&
+            field.tagName.toLowerCase() === 'select'
+        ) {
+
+            return String(
+                field.value || ''
+            ).trim() !== '';
+        }
+
+
+        return String(
+            field.value || ''
+        ).trim() !== '';
+    }
+
+
+    function updateField(field) {
+
+        if (!shouldHandle(field)) {
+            return;
+        }
+
+
+        var filled =
+            hasValue(field);
+
+        var requiredEmpty =
+            field.required &&
+            !filled;
+
+
+        field.classList.toggle(
+            'hom-field-is-filled',
+            filled
+        );
+
+
+        field.classList.toggle(
+            'hom-field-is-required-empty',
+            requiredEmpty
+        );
+    }
+
+
+    function scan(root) {
+
+        var context =
+            root &&
+            root.querySelectorAll
+                ? root
+                : document;
+
+
+        context
+            .querySelectorAll(
+                'input, select, textarea'
+            )
+            .forEach(
+                updateField
+            );
+    }
+
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+
+            scan(document);
+
+
+            document.addEventListener(
+                'input',
+                function (event) {
+
+                    updateField(
+                        event.target
+                    );
+                }
+            );
+
+
+            document.addEventListener(
+                'change',
+                function (event) {
+
+                    updateField(
+                        event.target
+                    );
+                }
+            );
+
+
+            document.addEventListener(
+                'blur',
+                function (event) {
+
+                    updateField(
+                        event.target
+                    );
+                },
+                true
+            );
+
+
+            var observer =
+                new MutationObserver(
+                    function (mutations) {
+
+                        mutations.forEach(
+                            function (mutation) {
+
+                                mutation
+                                    .addedNodes
+                                    .forEach(
+                                        function (node) {
+
+                                            if (
+                                                node.nodeType !== 1
+                                            ) {
+                                                return;
+                                            }
+
+
+                                            if (
+                                                node.matches &&
+                                                node.matches(
+                                                    'input, select, textarea'
+                                                )
+                                            ) {
+
+                                                updateField(
+                                                    node
+                                                );
+                                            }
+
+
+                                            scan(node);
+                                        }
+                                    );
+                            }
+                        );
+                    }
+                );
+
+
+            observer.observe(
+                document.body,
+                {
+                    childList: true,
+                    subtree: true
+                }
+            );
+        }
+    );
+
+})();
+</script>
+
 </body>
 </html>
         <?php
