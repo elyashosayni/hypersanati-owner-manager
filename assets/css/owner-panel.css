@@ -5839,3 +5839,54 @@ input[type="range"] {
     color: #6b7280;
     font-size: 11px;
 }
+
+
+/* HOM ORDER AUDIT */
+
+.hom-order-audit h2 {
+    margin-top: 0;
+}
+
+.hom-order-audit__list {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.hom-order-audit__item {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(150px, 220px)
+        130px;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.hom-order-audit__item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.hom-order-audit__item span,
+.hom-order-audit__item small,
+.hom-order-audit__item time {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.hom-order-audit__actor strong {
+    color: #111827;
+}
+
+@media (max-width: 720px) {
+
+    .hom-order-audit__item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}

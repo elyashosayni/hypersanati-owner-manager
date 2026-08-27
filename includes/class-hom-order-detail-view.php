@@ -416,6 +416,13 @@ final class HOM_Order_Detail_View {
 
 
         <?php
+        HOM_Order_Audit::render(
+            $order
+        );
+        ?>
+
+
+        <?php
         $timeline =
             HOM_Orders::timeline(
                 $order

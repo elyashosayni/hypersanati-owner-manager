@@ -1183,6 +1183,14 @@ final class HOM_Orders {
         }
 
 
+        HOM_Order_Audit::record(
+            $order,
+            'price_updated',
+            $actor_user_id,
+            'قیمت اقلام پیش‌فاکتور به‌روزرسانی شد.'
+        );
+
+
         $order->add_order_note(
             'قیمت اقلام پیش‌فاکتور توسط مدیر فروشگاه به‌روزرسانی شد.'
         );
@@ -1256,6 +1264,14 @@ final class HOM_Orders {
             absint(
                 $actor_user_id
             )
+        );
+
+
+        HOM_Order_Audit::record(
+            $order,
+            'preinvoice_approved',
+            $actor_user_id,
+            'پیش‌فاکتور برای پرداخت مشتری تأیید شد.'
         );
 
 
@@ -1813,6 +1829,48 @@ final class HOM_Orders {
                 'تحویل سفارش به مشتری ثبت شد.'
             );
         }
+
+
+        $audit_event = [
+
+            'save' =>
+                'shipping_updated',
+
+            'ready' =>
+                'order_ready',
+
+            'shipped' =>
+                'order_shipped',
+
+            'delivered' =>
+                'order_delivered',
+
+        ][$transition] ?? 'shipping_updated';
+
+
+        $audit_description = [
+
+            'save' =>
+                'اطلاعات ارسال سفارش ویرایش شد.',
+
+            'ready' =>
+                'سفارش آماده ارسال اعلام شد.',
+
+            'shipped' =>
+                'ارسال سفارش ثبت شد.',
+
+            'delivered' =>
+                'تحویل سفارش به مشتری ثبت شد.',
+
+        ][$transition] ?? '';
+
+
+        HOM_Order_Audit::record(
+            $order,
+            $audit_event,
+            $actor_user_id,
+            $audit_description
+        );
 
 
         $order->save();
