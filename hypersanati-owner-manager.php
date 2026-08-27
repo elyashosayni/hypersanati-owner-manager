@@ -5,7 +5,7 @@
  * Author URI: https://elyashosayni.com/
  * Plugin URI: https://olfatbearing.com
  * Description: Scalable frontend business management panel for HyperSanati WooCommerce.
- * Version: 0.4.0
+ * Version: 0.4.1
  * Text Domain: hypersanati-owner-manager
  * Requires PHP: 8.0
  * Requires Plugins: woocommerce, hsb-auth
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('HOM_VERSION', '0.4.0');
+define('HOM_VERSION', '0.4.1');
 define('HOM_PATH', plugin_dir_path(__FILE__));
 define('HOM_URL', plugin_dir_url(__FILE__));
 define('HOM_BASENAME', plugin_basename(__FILE__));
