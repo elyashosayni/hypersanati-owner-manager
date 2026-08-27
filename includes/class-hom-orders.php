@@ -26,6 +26,25 @@ final class HOM_Orders {
             [self::class, 'add_paid_statuses']
         );
 
+        add_filter(
+            'woocommerce_valid_order_statuses_for_payment_complete',
+            [self::class, 'allow_preinvoice_payment_complete'],
+            20,
+            2
+        );
+
+        add_filter(
+            'woocommerce_payment_complete_order_status',
+            [self::class, 'manual_payment_processing_status'],
+            20,
+            3
+        );
+
+        add_action(
+            'admin_post_hom_confirm_manual_payment',
+            [self::class, 'handle_confirm_manual_payment']
+        );
+
         add_action(
             'admin_post_hom_save_preinvoice_prices',
             [self::class, 'handle_save_preinvoice_prices']
@@ -998,6 +1017,438 @@ final class HOM_Orders {
     }
 
 
+    public static function allow_preinvoice_payment_complete(
+        $statuses,
+        $order
+    ) {
+
+        if (
+            $order instanceof WC_Order &&
+            'yes' ===
+                $order->get_meta(
+                    '_hsb_is_preinvoice',
+                    true
+                )
+        ) {
+
+            $statuses[] =
+                'preinv-approved';
+        }
+
+
+        return
+            array_values(
+                array_unique(
+                    $statuses
+                )
+            );
+    }
+
+
+    public static function manual_payment_processing_status(
+        $status,
+        $order_id,
+        $order
+    ) {
+
+        unset($order_id);
+
+
+        if (
+            $order instanceof WC_Order &&
+            'yes' ===
+                $order->get_meta(
+                    '_hsb_is_preinvoice',
+                    true
+                ) &&
+            'hom_manual_transfer' ===
+                $order->get_payment_method()
+        ) {
+
+            return 'processing';
+        }
+
+
+        return $status;
+    }
+
+
+    public static function can_confirm_manual_payment(
+        $order
+    ) {
+
+        return
+            $order instanceof WC_Order &&
+            'yes' ===
+                $order->get_meta(
+                    '_hsb_is_preinvoice',
+                    true
+                ) &&
+            'preinv-approved' ===
+                $order->get_status() &&
+            !$order->is_paid() &&
+            (float)
+                $order->get_total()
+                > 0;
+    }
+
+
+    public static function manual_payment_data(
+        $order
+    ) {
+
+        if (!($order instanceof WC_Order)) {
+
+            return [
+
+                'amount' =>
+                    '',
+
+                'reference' =>
+                    '',
+
+                'notes' =>
+                    '',
+
+                'confirmed_at' =>
+                    '',
+
+                'confirmed_by' =>
+                    0,
+            ];
+        }
+
+
+        return [
+
+            'amount' =>
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_manual_payment_amount',
+                        true
+                    )
+                ),
+
+            'reference' =>
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_manual_payment_reference',
+                        true
+                    )
+                ),
+
+            'notes' =>
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_manual_payment_notes',
+                        true
+                    )
+                ),
+
+            'confirmed_at' =>
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_manual_payment_confirmed_at',
+                        true
+                    )
+                ),
+
+            'confirmed_by' =>
+                absint(
+                    $order->get_meta(
+                        '_hom_manual_payment_confirmed_by',
+                        true
+                    )
+                ),
+        ];
+    }
+
+
+    public static function confirm_manual_payment(
+        $order_id,
+        array $data,
+        $actor_user_id = 0
+    ) {
+
+        $order =
+            self::get_order(
+                $order_id
+            );
+
+
+        if (!$order) {
+
+            return new WP_Error(
+                'order_missing',
+                'سفارش پیدا نشد.'
+            );
+        }
+
+
+        if (
+            !self::can_confirm_manual_payment(
+                $order
+            )
+        ) {
+
+            return new WP_Error(
+                'manual_payment_not_allowed',
+                'این سفارش در وضعیت قابل تأیید پرداخت دستی نیست.'
+            );
+        }
+
+
+        $actor_user_id =
+            absint(
+                $actor_user_id
+            );
+
+
+        if ($actor_user_id < 1) {
+
+            return new WP_Error(
+                'payment_actor_required',
+                'کاربر تأییدکننده پرداخت مشخص نیست.'
+            );
+        }
+
+
+        $amount =
+            self::normalize_decimal(
+                $data['amount']
+                ?? ''
+            );
+
+
+        $order_total =
+            (float)
+            $order->get_total();
+
+
+        if ($amount <= 0) {
+
+            return new WP_Error(
+                'payment_amount_required',
+                'مبلغ پرداخت را وارد کنید.'
+            );
+        }
+
+
+        if (
+            abs(
+                $amount
+                -
+                $order_total
+            ) >= 0.01
+        ) {
+
+            return new WP_Error(
+                'payment_amount_mismatch',
+                'مبلغ تأییدشده باید دقیقاً برابر مبلغ نهایی سفارش باشد.'
+            );
+        }
+
+
+        $reference =
+            sanitize_text_field(
+                (string)
+                ($data['reference'] ?? '')
+            );
+
+
+        if ('' === $reference) {
+
+            return new WP_Error(
+                'payment_reference_required',
+                'شماره پیگیری / مرجع پرداخت الزامی است.'
+            );
+        }
+
+
+        $notes =
+            sanitize_textarea_field(
+                (string)
+                ($data['notes'] ?? '')
+            );
+
+
+        /*
+         * All validation is complete.
+         * From here WooCommerce owns the paid-state transition.
+         */
+        $order->set_payment_method(
+            'hom_manual_transfer'
+        );
+
+
+        $order->set_payment_method_title(
+            'کارت‌به‌کارت / واریز دستی'
+        );
+
+
+        $order->update_meta_data(
+            '_hom_payment_source',
+            'manual'
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_amount',
+            wc_format_decimal(
+                $amount
+            )
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_reference',
+            $reference
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_notes',
+            $notes
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_confirmed_at',
+            current_time('mysql')
+        );
+
+
+        $order->update_meta_data(
+            '_hom_manual_payment_confirmed_by',
+            $actor_user_id
+        );
+
+
+        $completed =
+            $order->payment_complete(
+                $reference
+            );
+
+
+        if (!$completed) {
+
+            return new WP_Error(
+                'payment_complete_failed',
+                'ثبت پرداخت در ووکامرس کامل نشد.'
+            );
+        }
+
+
+        /*
+         * The manual payment filter above forces this B2B
+         * workflow into processing, even for unusual products.
+         */
+        if (
+            'processing' !==
+            $order->get_status()
+        ) {
+
+            return new WP_Error(
+                'payment_status_failed',
+                'پرداخت ثبت شد اما سفارش وارد وضعیت آماده‌سازی نشد.'
+            );
+        }
+
+
+        HOM_Order_Audit::record(
+            $order,
+            'payment_confirmed',
+            $actor_user_id,
+            'دریافت کامل وجه سفارش به‌صورت دستی تأیید شد.',
+            [
+                'source' =>
+                    'owner-panel',
+
+                'changes' => [
+
+                    [
+                        'field' =>
+                            'وضعیت پرداخت',
+
+                        'before' =>
+                            'تأیید نشده',
+
+                        'after' =>
+                            'پرداخت کامل تأیید شد',
+                    ],
+
+                    [
+                        'field' =>
+                            'روش پرداخت',
+
+                        'before' =>
+                            '—',
+
+                        'after' =>
+                            'کارت‌به‌کارت / واریز دستی',
+                    ],
+
+                    [
+                        'field' =>
+                            'مبلغ پرداخت',
+
+                        'before' =>
+                            '—',
+
+                        'after' =>
+                            wc_format_decimal(
+                                $amount
+                            )
+                            . ' '
+                            . $order->get_currency(),
+                    ],
+
+                    [
+                        'field' =>
+                            'مرجع پرداخت',
+
+                        'before' =>
+                            '—',
+
+                        'after' =>
+                            $reference,
+                    ],
+                ],
+            ]
+        );
+
+
+        $actor =
+            get_userdata(
+                $actor_user_id
+            );
+
+
+        $order->add_order_note(
+            sprintf(
+                'دریافت کامل وجه به‌صورت کارت‌به‌کارت / واریز دستی توسط %s تأیید شد. مرجع پرداخت: %s',
+                $actor
+                    ? (
+                        $actor->display_name
+                        ?: $actor->user_login
+                    )
+                    : 'کاربر فروش',
+                $reference
+            )
+        );
+
+
+        $order->save();
+
+
+        return $order;
+    }
+
+
     private static function normalize_decimal(
         $value
     ) {
@@ -1623,6 +2074,85 @@ final class HOM_Orders {
 
         exit;
     }
+
+    public static function handle_confirm_manual_payment() {
+
+        if (
+            !is_user_logged_in() ||
+            !current_user_can(
+                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+            )
+        ) {
+
+            wp_die(
+                'دسترسی غیرمجاز.',
+                '',
+                [
+                    'response' =>
+                        403,
+                ]
+            );
+        }
+
+
+        $order_id =
+            isset($_POST['order_id'])
+                ? absint(
+                    $_POST['order_id']
+                )
+                : 0;
+
+
+        check_admin_referer(
+            'hom_confirm_manual_payment_' .
+            $order_id
+        );
+
+
+        $result =
+            self::confirm_manual_payment(
+                $order_id,
+                [
+                    'amount' =>
+                        isset($_POST['payment_amount'])
+                            ? wp_unslash(
+                                $_POST['payment_amount']
+                            )
+                            : '',
+
+                    'reference' =>
+                        isset($_POST['payment_reference'])
+                            ? wp_unslash(
+                                $_POST['payment_reference']
+                            )
+                            : '',
+
+                    'notes' =>
+                        isset($_POST['payment_notes'])
+                            ? wp_unslash(
+                                $_POST['payment_notes']
+                            )
+                            : '',
+                ],
+                get_current_user_id()
+            );
+
+
+        wp_safe_redirect(
+            add_query_arg(
+                'notice',
+                is_wp_error($result)
+                    ? 'payment-error'
+                    : 'payment-confirmed',
+                self::detail_url(
+                    $order_id
+                )
+            )
+        );
+
+        exit;
+    }
+
 
     public static function register_fulfillment_statuses() {
 

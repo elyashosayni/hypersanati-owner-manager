@@ -778,6 +778,293 @@ final class HOM_Order_Detail_View {
 
         </section>
 
+        <?php
+        $can_confirm_manual_payment =
+            current_user_can(
+                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+            ) &&
+            HOM_Orders::can_confirm_manual_payment(
+                $order
+            );
+
+
+        $manual_payment =
+            HOM_Orders::manual_payment_data(
+                $order
+            );
+
+
+        $payment_notice =
+            isset($_GET['notice'])
+                ? sanitize_key(
+                    wp_unslash(
+                        $_GET['notice']
+                    )
+                )
+                : '';
+        ?>
+
+
+        <?php if ('payment-confirmed' === $payment_notice) : ?>
+
+            <div
+                class="hom-alert hom-alert-success"
+                style="margin-top:20px"
+            >
+                دریافت کامل وجه با موفقیت تأیید شد و سفارش
+                وارد مرحله آماده‌سازی گردید.
+            </div>
+
+        <?php elseif ('payment-error' === $payment_notice) : ?>
+
+            <div
+                class="hom-alert hom-alert-error"
+                style="margin-top:20px"
+            >
+                تأیید پرداخت انجام نشد. اطلاعات مبلغ و مرجع
+                پرداخت را بررسی کنید.
+            </div>
+
+        <?php endif; ?>
+
+
+        <?php if ($can_confirm_manual_payment) : ?>
+
+            <section
+                class="hom-card hom-manual-payment-card"
+                style="margin-top:20px"
+            >
+
+                <h2>
+                    تأیید پرداخت دستی
+                </h2>
+
+                <p class="hom-muted">
+                    فقط پس از مشاهده و تأیید قطعی واریز بانکی،
+                    دریافت کامل وجه را ثبت کنید.
+                </p>
+
+
+                <form
+                    method="post"
+                    action="<?php
+                    echo esc_url(
+                        HOM_Router::panel_url()
+                    );
+                    ?>"
+                >
+
+                    <input
+                        type="hidden"
+                        name="hom_action"
+                        value="hom_confirm_manual_payment"
+                    >
+
+                    <input
+                        type="hidden"
+                        name="order_id"
+                        value="<?php
+                        echo esc_attr(
+                            $order->get_id()
+                        );
+                        ?>"
+                    >
+
+                    <?php
+                    wp_nonce_field(
+                        'hom_confirm_manual_payment_' .
+                        $order->get_id()
+                    );
+                    ?>
+
+
+                    <label class="hom-field">
+
+                        <span>
+                            مبلغ واریزشده
+                        </span>
+
+                        <input
+                            type="text"
+                            inputmode="decimal"
+                            name="payment_amount"
+                            required
+                            value="<?php
+                            echo esc_attr(
+                                wc_format_decimal(
+                                    $order->get_total()
+                                )
+                            );
+                            ?>"
+                        >
+
+                    </label>
+
+                    <small>
+                        باید دقیقاً برابر مبلغ نهایی سفارش باشد.
+                    </small>
+
+
+                    <label
+                        class="hom-field"
+                        style="margin-top:14px"
+                    >
+
+                        <span>
+                            شماره پیگیری / مرجع پرداخت
+                        </span>
+
+                        <input
+                            type="text"
+                            name="payment_reference"
+                            dir="ltr"
+                            required
+                        >
+
+                    </label>
+
+
+                    <label
+                        class="hom-field"
+                        style="margin-top:14px"
+                    >
+
+                        <span>
+                            توضیحات پرداخت
+                        </span>
+
+                        <textarea
+                            name="payment_notes"
+                            rows="3"
+                            placeholder="در صورت نیاز توضیح تکمیلی بنویسید..."
+                        ></textarea>
+
+                    </label>
+
+
+                    <button
+                        type="submit"
+                        class="hom-button hom-button-primary"
+                        style="margin-top:16px"
+                    >
+                        تأیید دریافت کامل وجه
+                    </button>
+
+                </form>
+
+            </section>
+
+
+        <?php elseif (
+            !empty(
+                $manual_payment['confirmed_at']
+            )
+        ) : ?>
+
+            <?php
+            $payment_actor =
+                !empty(
+                    $manual_payment['confirmed_by']
+                )
+                    ? get_userdata(
+                        $manual_payment['confirmed_by']
+                    )
+                    : false;
+            ?>
+
+            <section
+                class="hom-card hom-manual-payment-card"
+                style="margin-top:20px"
+            >
+
+                <h2>
+                    اطلاعات پرداخت
+                </h2>
+
+                <p>
+                    روش:
+                    <strong>
+                        کارت‌به‌کارت / واریز دستی
+                    </strong>
+                </p>
+
+                <p>
+                    مبلغ:
+                    <strong>
+                        <?php
+                        echo wp_kses_post(
+                            wc_price(
+                                (float)
+                                $manual_payment['amount'],
+                                [
+                                    'currency' =>
+                                        $order->get_currency(),
+                                ]
+                            )
+                        );
+                        ?>
+                    </strong>
+                </p>
+
+                <p>
+                    مرجع پرداخت:
+                    <strong dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $manual_payment['reference']
+                            ?: '—'
+                        );
+                        ?>
+                    </strong>
+                </p>
+
+                <p>
+                    تأییدکننده:
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $payment_actor
+                                ? (
+                                    $payment_actor->display_name
+                                    ?: $payment_actor->user_login
+                                )
+                                : '—'
+                        );
+                        ?>
+                    </strong>
+                </p>
+
+                <p>
+                    زمان تأیید:
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $manual_payment['confirmed_at']
+                            ?: '—'
+                        );
+                        ?>
+                    </strong>
+                </p>
+
+
+                <?php if (!empty($manual_payment['notes'])) : ?>
+
+                    <p>
+                        توضیحات:
+                        <?php
+                        echo esc_html(
+                            $manual_payment['notes']
+                        );
+                        ?>
+                    </p>
+
+                <?php endif; ?>
+
+            </section>
+
+        <?php endif; ?>
+
+
         <section
             class="hom-card hom-order-document-actions"
             style="margin-top:20px"
