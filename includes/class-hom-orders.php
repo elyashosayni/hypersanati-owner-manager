@@ -42,11 +42,6 @@ final class HOM_Orders {
         );
 
         add_action(
-            'admin_post_hom_assign_order',
-            [self::class, 'handle_assign_order']
-        );
-
-        add_action(
             'admin_post_hom_save_b2b_customer',
             [self::class, 'handle_save_b2b_customer']
         );
@@ -1288,6 +1283,12 @@ final class HOM_Orders {
         );
 
 
+        self::auto_assign(
+            $order,
+            $actor_user_id
+        );
+
+
         HOM_Order_Audit::record(
             $order,
             'preinvoice_approved',
@@ -2466,7 +2467,10 @@ final class HOM_Orders {
             );
 
 
-        if ($current > 0) {
+        if (
+            $current ===
+            absint($actor_user_id)
+        ) {
             return;
         }
 
@@ -2551,7 +2555,7 @@ final class HOM_Orders {
 
         $description =
             $automatic
-                ? 'پرونده به‌صورت خودکار به مسئول اولین اقدام فروش اختصاص یافت.'
+                ? 'مسئول جاری پرونده به‌صورت خودکار بر اساس آخرین اقدام قیمت‌گذاری یا تأیید پیش‌فاکتور به‌روزرسانی شد.'
                 : 'مسئول جاری پرونده تغییر کرد.';
 
 

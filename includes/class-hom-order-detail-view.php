@@ -413,9 +413,6 @@ final class HOM_Order_Detail_View {
             HOM_Orders::assignee_data(
                 $order
             );
-
-        $sales_users =
-            HOM_Orders::sales_users();
         ?>
 
         <section
@@ -434,107 +431,24 @@ final class HOM_Order_Detail_View {
             </strong>
 
             <?php if (!empty($assignee['login'])) : ?>
+
                 <span dir="ltr">
-                    (@<?php echo esc_html($assignee['login']); ?>)
+                    (@<?php
+                    echo esc_html(
+                        $assignee['login']
+                    );
+                    ?>)
                 </span>
-            <?php endif; ?>
-
-
-            <?php if ($sales_users) : ?>
-
-                <form
-                    method="post"
-                    action="<?php
-                    echo esc_url(
-                        HOM_Router::panel_url()
-                    );
-                    ?>"
-                    style="
-                        display:flex;
-                        flex-wrap:wrap;
-                        gap:10px;
-                        align-items:end;
-                        margin-top:14px
-                    "
-                >
-
-                    <input
-                        type="hidden"
-                        name="hom_action"
-                        value="hom_assign_order"
-                    >
-
-                    <input
-                        type="hidden"
-                        name="order_id"
-                        value="<?php
-                        echo esc_attr(
-                            $order->get_id()
-                        );
-                        ?>"
-                    >
-
-                    <?php
-                    wp_nonce_field(
-                        'hom_assign_order_' .
-                        $order->get_id()
-                    );
-                    ?>
-
-                    <label class="hom-field">
-
-                        <span>
-                            واگذاری به مسئول فروش
-                        </span>
-
-                        <select
-                            name="assignee_user_id"
-                            required
-                        >
-
-                            <?php foreach ($sales_users as $sales_user) : ?>
-
-                                <option
-                                    value="<?php
-                                    echo esc_attr(
-                                        $sales_user['id']
-                                    );
-                                    ?>"
-                                    <?php
-                                    selected(
-                                        absint($assignee['id']),
-                                        absint($sales_user['id'])
-                                    );
-                                    ?>
-                                >
-                                    <?php
-                                    echo esc_html(
-                                        $sales_user['name']
-                                    );
-                                    ?>
-                                    (@<?php
-                                    echo esc_html(
-                                        $sales_user['login']
-                                    );
-                                    ?>)
-                                </option>
-
-                            <?php endforeach; ?>
-
-                        </select>
-
-                    </label>
-
-                    <button
-                        type="submit"
-                        class="hom-button hom-button-secondary"
-                    >
-                        ثبت مسئول پرونده
-                    </button>
-
-                </form>
 
             <?php endif; ?>
+
+            <p
+                class="hom-muted"
+                style="margin:8px 0 0"
+            >
+                مسئول پرونده به‌صورت خودکار بر اساس آخرین
+                قیمت‌گذاری یا تأیید پیش‌فاکتور ثبت می‌شود.
+            </p>
 
         </section>
 

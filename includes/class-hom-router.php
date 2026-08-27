@@ -118,12 +118,6 @@ class HOM_Router {
                     'handle_save_order_fulfillment',
                 ],
 
-            'hom_assign_order' =>
-                [
-                    HOM_Orders::class,
-                    'handle_assign_order',
-                ],
-
             'hom_save_b2b_customer' =>
                 [
                     HOM_Orders::class,
