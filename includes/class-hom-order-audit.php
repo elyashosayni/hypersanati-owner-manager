@@ -161,6 +161,9 @@ final class HOM_Order_Audit {
             'assignee_changed' =>
                 'تغییر مسئول پرونده',
 
+            'b2b_customer_updated' =>
+                'ویرایش اطلاعات حقوقی خریدار',
+
             'price_updated' =>
                 'قیمت‌گذاری پیش‌فاکتور',
 

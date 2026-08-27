@@ -45,6 +45,11 @@ final class HOM_Orders {
             'admin_post_hom_assign_order',
             [self::class, 'handle_assign_order']
         );
+
+        add_action(
+            'admin_post_hom_save_b2b_customer',
+            [self::class, 'handle_save_b2b_customer']
+        );
     }
 
 
@@ -2679,6 +2684,349 @@ final class HOM_Orders {
                 is_wp_error($result)
                     ? 'assignee-error'
                     : 'assignee-saved',
+                self::detail_url(
+                    $order_id
+                )
+            )
+        );
+
+        exit;
+    }
+
+
+
+    public static function b2b_customer_data(
+        $order
+    ) {
+
+        if (!($order instanceof WC_Order)) {
+
+            return [
+                'legal_name' =>
+                    '',
+                'national_id' =>
+                    '',
+                'economic_code' =>
+                    '',
+                'registration_no' =>
+                    '',
+                'postcode' =>
+                    '',
+                'address' =>
+                    '',
+            ];
+        }
+
+
+        $legal_name =
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_b2b_legal_name',
+                    true
+                )
+            );
+
+
+        if ('' === $legal_name) {
+
+            $legal_name =
+                trim(
+                    (string)
+                    $order->get_billing_company()
+                );
+        }
+
+
+        $postcode =
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_b2b_postcode',
+                    true
+                )
+            );
+
+
+        if ('' === $postcode) {
+
+            $postcode =
+                trim(
+                    (string)
+                    $order->get_billing_postcode()
+                );
+        }
+
+
+        $address =
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_b2b_address',
+                    true
+                )
+            );
+
+
+        if ('' === $address) {
+
+            $address =
+                trim(
+                    wp_strip_all_tags(
+                        $order
+                            ->get_formatted_billing_address()
+                    )
+                );
+        }
+
+
+        return [
+
+            'legal_name' =>
+                $legal_name,
+
+            'national_id' =>
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_b2b_national_id',
+                        true
+                    )
+                ),
+
+            'economic_code' =>
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_b2b_economic_code',
+                        true
+                    )
+                ),
+
+            'registration_no' =>
+                trim(
+                    (string)
+                    $order->get_meta(
+                        '_hom_b2b_registration_no',
+                        true
+                    )
+                ),
+
+            'postcode' =>
+                $postcode,
+
+            'address' =>
+                $address,
+        ];
+    }
+
+
+    public static function save_b2b_customer(
+        $order_id,
+        array $data,
+        $actor_user_id
+    ) {
+
+        $order =
+            self::get_order(
+                $order_id
+            );
+
+
+        if (!$order) {
+
+            return new WP_Error(
+                'order_missing',
+                'سفارش پیدا نشد.'
+            );
+        }
+
+
+        $actor_user_id =
+            absint(
+                $actor_user_id
+            );
+
+
+        self::auto_assign(
+            $order,
+            $actor_user_id
+        );
+
+
+        $fields = [
+
+            '_hom_b2b_legal_name' =>
+                sanitize_text_field(
+                    (string)
+                    ($data['legal_name'] ?? '')
+                ),
+
+            '_hom_b2b_national_id' =>
+                sanitize_text_field(
+                    (string)
+                    ($data['national_id'] ?? '')
+                ),
+
+            '_hom_b2b_economic_code' =>
+                sanitize_text_field(
+                    (string)
+                    ($data['economic_code'] ?? '')
+                ),
+
+            '_hom_b2b_registration_no' =>
+                sanitize_text_field(
+                    (string)
+                    ($data['registration_no'] ?? '')
+                ),
+
+            '_hom_b2b_postcode' =>
+                sanitize_text_field(
+                    (string)
+                    ($data['postcode'] ?? '')
+                ),
+
+            '_hom_b2b_address' =>
+                sanitize_textarea_field(
+                    (string)
+                    ($data['address'] ?? '')
+                ),
+        ];
+
+
+        foreach (
+            $fields
+            as $meta_key => $value
+        ) {
+
+            $order->update_meta_data(
+                $meta_key,
+                $value
+            );
+        }
+
+
+        $order->update_meta_data(
+            '_hom_b2b_updated_at',
+            current_time('mysql')
+        );
+
+
+        $order->update_meta_data(
+            '_hom_b2b_updated_by',
+            $actor_user_id
+        );
+
+
+        HOM_Order_Audit::record(
+            $order,
+            'b2b_customer_updated',
+            $actor_user_id,
+            'اطلاعات حقوقی خریدار ویرایش شد.'
+        );
+
+
+        $order->save();
+
+
+        return $order;
+    }
+
+
+    public static function handle_save_b2b_customer() {
+
+        if (
+            !is_user_logged_in() ||
+            !current_user_can(
+                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+            )
+        ) {
+
+            wp_die(
+                'دسترسی غیرمجاز.',
+                '',
+                [
+                    'response' =>
+                        403,
+                ]
+            );
+        }
+
+
+        $order_id =
+            isset($_POST['order_id'])
+                ? absint(
+                    $_POST['order_id']
+                )
+                : 0;
+
+
+        check_admin_referer(
+            'hom_save_b2b_customer_' .
+            $order_id
+        );
+
+
+        $data = [
+
+            'legal_name' =>
+                isset($_POST['legal_name'])
+                    ? wp_unslash(
+                        $_POST['legal_name']
+                    )
+                    : '',
+
+            'national_id' =>
+                isset($_POST['national_id'])
+                    ? wp_unslash(
+                        $_POST['national_id']
+                    )
+                    : '',
+
+            'economic_code' =>
+                isset($_POST['economic_code'])
+                    ? wp_unslash(
+                        $_POST['economic_code']
+                    )
+                    : '',
+
+            'registration_no' =>
+                isset($_POST['registration_no'])
+                    ? wp_unslash(
+                        $_POST['registration_no']
+                    )
+                    : '',
+
+            'postcode' =>
+                isset($_POST['postcode'])
+                    ? wp_unslash(
+                        $_POST['postcode']
+                    )
+                    : '',
+
+            'address' =>
+                isset($_POST['b2b_address'])
+                    ? wp_unslash(
+                        $_POST['b2b_address']
+                    )
+                    : '',
+        ];
+
+
+        $result =
+            self::save_b2b_customer(
+                $order_id,
+                $data,
+                get_current_user_id()
+            );
+
+
+        wp_safe_redirect(
+            add_query_arg(
+                'notice',
+                is_wp_error($result)
+                    ? 'b2b-error'
+                    : 'b2b-saved',
                 self::detail_url(
                     $order_id
                 )
