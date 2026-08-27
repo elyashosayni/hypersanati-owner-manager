@@ -40,6 +40,7 @@ final class HOM_Plugin {
         HOM_Product_Images::register();
         HOM_Orders::register();
         HOM_Order_Documents::register();
+        HOM_Seller_Settings::register();
         HOM_My_Account::register();
 
         /**
