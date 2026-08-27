@@ -279,6 +279,7 @@ class HOM_View {
             'products',
             'product-images',
             'orders',
+            'seller-settings',
             'help',
         ];
 
@@ -435,6 +436,36 @@ class HOM_View {
                     پیش‌فاکتورها و سفارش‌ها
                 </span>
             </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
+                        'seller-settings',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo 'seller-settings' === $current_view
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ⚙
+                </span>
+
+                <span>
+                    اطلاعات فروشنده
+                </span>
+            </a>
+
 
 
             <a
@@ -652,7 +683,11 @@ class HOM_View {
 
             <?php
 
-            if ('help' === $current_view) {
+            if ('seller-settings' === $current_view) {
+
+                HOM_Seller_Settings_View::render();
+
+            } elseif ('help' === $current_view) {
 
                 self::render_help_content();
 
