@@ -5,7 +5,7 @@
  * Author URI: https://elyashosayni.com/
  * Plugin URI: https://olfatbearing.com
  * Description: Scalable frontend business management panel for HyperSanati WooCommerce.
- * Version: 0.4.2
+ * Version: 0.5.0
  * Text Domain: hypersanati-owner-manager
  * Requires PHP: 8.0
  * Requires Plugins: woocommerce, hsb-auth
@@ -15,7 +15,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('HOM_VERSION', '0.4.2');
+define('HOM_VERSION', '0.5.0');
 define('HOM_PATH', plugin_dir_path(__FILE__));
 define('HOM_URL', plugin_dir_url(__FILE__));
 define('HOM_BASENAME', plugin_basename(__FILE__));
@@ -30,6 +30,8 @@ require_once HOM_PATH . 'includes/class-hom-order-audit.php';
 require_once HOM_PATH . 'includes/class-hom-order-detail-view.php';
 require_once HOM_PATH . 'includes/class-hom-order-fulfillment-view.php';
 require_once HOM_PATH . 'includes/class-hom-warehouse-verification.php';
+require_once HOM_PATH . 'includes/class-hom-warehouse-staff.php';
+require_once HOM_PATH . 'includes/class-hom-warehouse-staff-view.php';
 require_once HOM_PATH . 'includes/class-hom-order-documents.php';
 require_once HOM_PATH . 'includes/class-hom-seller-settings.php';
 require_once HOM_PATH . 'includes/class-hom-seller-settings-view.php';

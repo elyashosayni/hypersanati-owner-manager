@@ -124,6 +124,18 @@ class HOM_Router {
                     'handle_confirm',
                 ],
 
+            'hom_create_warehouse_staff' =>
+                [
+                    HOM_Warehouse_Staff::class,
+                    'handle_create',
+                ],
+
+            'hom_toggle_warehouse_staff' =>
+                [
+                    HOM_Warehouse_Staff::class,
+                    'handle_toggle',
+                ],
+
             'hom_confirm_manual_payment' =>
                 [
                     HOM_Orders::class,

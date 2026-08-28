@@ -11787,3 +11787,961 @@ input[type="range"] {
         padding: 12px 10px;
     }
 }
+
+
+/* ==========================================================
+   HOM WAREHOUSE STAFF MANAGEMENT
+   ========================================================== */
+
+.hom-warehouse-staff-summary {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+
+    margin: 20px 0;
+}
+
+.hom-warehouse-staff-summary > div {
+    padding: 16px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+
+    background: #fff;
+}
+
+.hom-warehouse-staff-summary span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-staff-summary strong {
+    color: #0f172a;
+    font-size: 26px;
+}
+
+.hom-warehouse-staff-summary .is-active {
+    border-color: #bbf7d0;
+}
+
+.hom-warehouse-staff-summary .is-active strong {
+    color: #15803d;
+}
+
+.hom-warehouse-staff-summary .is-inactive {
+    border-color: #e2e8f0;
+}
+
+.hom-warehouse-staff-summary .is-inactive strong {
+    color: #64748b;
+}
+
+
+.hom-warehouse-staff-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(280px, 360px)
+        minmax(0, 1fr);
+
+    align-items: start;
+    gap: 18px;
+}
+
+
+.hom-warehouse-staff-section-head {
+    margin-bottom: 18px;
+}
+
+.hom-warehouse-staff-section-head span {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #64748b;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.hom-warehouse-staff-section-head h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 19px;
+}
+
+
+.hom-warehouse-staff-create .hom-field {
+    margin-bottom: 14px;
+}
+
+.hom-warehouse-staff-create .hom-field small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #64748b;
+    font-size: 11px;
+}
+
+
+.hom-warehouse-staff-future {
+    margin-top: 18px;
+    padding: 13px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+
+    background: #f8fafc;
+}
+
+.hom-warehouse-staff-future strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #334155;
+    font-size: 12px;
+}
+
+.hom-warehouse-staff-future p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+.hom-warehouse-staff-users {
+    display: grid;
+    gap: 10px;
+}
+
+
+.hom-warehouse-staff-user {
+    display: grid;
+    grid-template-columns:
+        minmax(180px, 1fr)
+        minmax(150px, .65fr)
+        auto;
+
+    align-items: center;
+    gap: 14px;
+
+    padding: 13px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+
+    background: #fff;
+}
+
+.hom-warehouse-staff-user.is-active {
+    border-right:
+        4px solid #22c55e;
+}
+
+.hom-warehouse-staff-user.is-inactive {
+    border-right:
+        4px solid #94a3b8;
+
+    background: #f8fafc;
+}
+
+
+.hom-warehouse-staff-user__identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.hom-warehouse-staff-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 38px;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 11px;
+
+    background: #0f172a;
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.hom-warehouse-staff-user__identity strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #0f172a;
+
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hom-warehouse-staff-user__identity span[dir="ltr"] {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #64748b;
+
+    font-size: 11px;
+    text-align: right;
+}
+
+
+.hom-warehouse-staff-user__meta {
+    min-width: 0;
+}
+
+.hom-warehouse-staff-user__meta small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+
+.hom-warehouse-staff-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.hom-warehouse-staff-status.is-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.hom-warehouse-staff-status.is-inactive {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+
+.hom-warehouse-staff-empty {
+    padding: 28px 18px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+
+    text-align: center;
+}
+
+.hom-warehouse-staff-empty strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #334155;
+}
+
+.hom-warehouse-staff-empty p {
+    margin: 0;
+
+    color: #64748b;
+    font-size: 12px;
+}
+
+
+@media (max-width: 1050px) {
+
+    .hom-warehouse-staff-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 720px) {
+
+    .hom-warehouse-staff-summary {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+    .hom-warehouse-staff-user {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-warehouse-staff-user form,
+    .hom-warehouse-staff-user form .hom-button {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .hom-warehouse-staff-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ==========================================================================
+   HOM WAREHOUSE HELP GUIDE
+   Scoped specifically to warehouse verifier management/help page.
+   ========================================================================== */
+
+.hom-warehouse-help-page {
+    --hom-warehouse-guide-text: #332d27;
+    --hom-warehouse-guide-muted: #62594f;
+    --hom-warehouse-guide-dark: #3f2d16;
+    --hom-warehouse-guide-border: #e5ddd1;
+    --hom-warehouse-guide-card: #ffffff;
+
+    display: grid;
+    gap: 18px;
+
+    color: var(--hom-warehouse-guide-text);
+}
+
+
+.hom-warehouse-help-page p,
+.hom-warehouse-help-page li {
+    color: var(--hom-warehouse-guide-muted);
+
+    font-size: 14px;
+    line-height: 2;
+
+    text-wrap: pretty;
+}
+
+
+.hom-warehouse-help-page strong {
+    color: var(--hom-warehouse-guide-dark);
+}
+
+
+.hom-warehouse-help-page ul {
+    margin-top: 9px;
+    margin-bottom: 9px;
+}
+
+
+/* --------------------------------------------------------------------------
+   HERO
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page .hom-help-hero__content {
+    position: relative;
+    z-index: 1;
+
+    min-width: 0;
+}
+
+
+.hom-warehouse-help-page .hom-help-hero__icon {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* --------------------------------------------------------------------------
+   MAIN TOPICS
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page .hom-help-topic {
+    display: grid;
+    gap: 16px;
+
+    margin: 0;
+    padding: 22px;
+
+    border:
+        1px solid
+        var(--hom-warehouse-guide-border);
+
+    border-radius: 16px;
+
+    background:
+        var(--hom-warehouse-guide-card);
+
+    box-shadow:
+        0 4px 16px
+        rgba(73, 52, 22, 0.035);
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic
++
+.hom-help-topic {
+    margin-top: 0;
+    padding-top: 22px;
+
+    border-top:
+        1px solid
+        var(--hom-warehouse-guide-border);
+}
+
+
+/* New warehouse HTML uses __heading. */
+
+.hom-warehouse-help-page
+.hom-help-topic__heading {
+    display: grid;
+
+    grid-template-columns:
+        50px
+        minmax(0, 1fr);
+
+    gap: 13px;
+    align-items: center;
+
+    padding-bottom: 14px;
+
+    border-bottom:
+        1px solid #eee8df;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic__icon {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: #f7eedf;
+
+    font-size: 22px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic__eyebrow {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #8b6a35;
+
+    font-size: 11px;
+    font-weight: 850;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic__heading h2 {
+    margin: 0;
+
+    color:
+        var(--hom-warehouse-guide-dark);
+
+    font-size: 19px;
+    line-height: 1.7;
+}
+
+
+/* --------------------------------------------------------------------------
+   IMPORTANT BOXES
+   -------------------------------------------------------------------------- */
+
+/*
+ * Most warehouse help callouts are plain text and do not have an icon.
+ * Override the old global two-column grid for those boxes.
+ */
+
+.hom-warehouse-help-page
+.hom-help-important {
+    display: block;
+
+    margin: 0;
+    padding: 15px 17px;
+
+    border: 1px solid #ead7aa;
+    border-right: 4px solid #c38d28;
+    border-radius: 11px;
+
+    background: #fff9ec;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-important strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #5b4015;
+
+    font-size: 14px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-important p {
+    margin: 4px 0;
+
+    color: #554b3e;
+
+    font-size: 13px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-important p + p {
+    margin-top: 8px;
+}
+
+
+/*
+ * The first security callout intentionally has an icon.
+ */
+
+.hom-warehouse-help-page
+.hom-warehouse-help-important-featured {
+    display: grid;
+
+    grid-template-columns:
+        52px
+        minmax(0, 1fr);
+
+    gap: 16px;
+    align-items: start;
+}
+
+
+.hom-warehouse-help-page
+.hom-warehouse-help-important-featured
+.hom-help-important__icon {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: #f0e3cb;
+    color: #5e4420;
+
+    font-size: 21px;
+    font-weight: 900;
+}
+
+
+/* --------------------------------------------------------------------------
+   WORKFLOW
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-flow {
+    display: grid;
+    gap: 8px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow article {
+    display: grid;
+
+    grid-template-columns:
+        32px
+        minmax(0, 1fr);
+
+    gap: 12px;
+    align-items: flex-start;
+
+    min-width: 0;
+
+    padding: 13px 14px;
+
+    border: 1px solid #e6dfd6;
+    border-radius: 10px;
+
+    background: #fbfaf8;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow article > span {
+    width: 31px;
+    height: 31px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ede0c9;
+    color: #654718;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow strong {
+    display: block;
+
+    color: #3d3023;
+
+    font-size: 14px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow p {
+    margin: 3px 0 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   TWO COLUMN STATUS CARDS
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-two-column {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 11px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-info-panel {
+    min-width: 0;
+
+    padding: 17px;
+
+    border: 1px solid #e4ddd3;
+    border-radius: 12px;
+
+    background: #faf9f7;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-info-panel h3 {
+    margin: 0 0 8px;
+
+    color: #463419;
+
+    font-size: 16px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-info-panel p {
+    margin: 6px 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   ACCESS: DO / DON'T
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-do-dont {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont > div {
+    min-width: 0;
+
+    padding: 15px 17px;
+
+    border-radius: 11px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-good {
+    border: 1px solid #bcd8c4;
+
+    background: #f3faf5;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-bad {
+    border: 1px solid #e5c7c7;
+
+    background: #fff6f6;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-good strong {
+    color: #2f6641;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-bad strong {
+    color: #8b4747;
+}
+
+
+/* --------------------------------------------------------------------------
+   AUDIT / STORED DATA
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-customer-help-principles {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 11px;
+}
+
+
+.hom-warehouse-help-page
+.hom-customer-help-principles article {
+    min-width: 0;
+
+    padding: 16px;
+
+    border: 1px solid #e7dfd3;
+    border-radius: 12px;
+
+    background: #faf8f4;
+}
+
+
+.hom-warehouse-help-page
+.hom-customer-help-principles strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+
+.hom-warehouse-help-page
+.hom-customer-help-principles p {
+    margin: 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   PLAIN WARNING
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-warning {
+    display: block;
+
+    margin: 0;
+    padding: 14px 16px;
+
+    border: 1px solid #e5cb91;
+    border-radius: 11px;
+
+    background: #fff8e7;
+    color: #56472f;
+
+    font-size: 13px;
+    line-height: 2;
+}
+
+
+/* --------------------------------------------------------------------------
+   CHECKLIST
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-daily-checklist {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    counter-reset:
+        hom-warehouse-guide-step;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-daily-checklist li {
+    position: relative;
+
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    margin: 0 0 7px;
+
+    padding:
+        10px
+        48px
+        10px
+        13px;
+
+    border: 1px solid #e5ded5;
+    border-radius: 9px;
+
+    background: #faf9f7;
+
+    counter-increment:
+        hom-warehouse-guide-step;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-daily-checklist li::before {
+    position: absolute;
+
+    top: 50%;
+    right: 11px;
+
+    width: 27px;
+    height: 27px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ebdec6;
+    color: #624517;
+
+    content:
+        counter(
+            hom-warehouse-guide-step
+        );
+
+    font-size: 11px;
+    font-weight: 900;
+
+    transform:
+        translateY(-50%);
+}
+
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+
+    .hom-warehouse-help-page
+    .hom-help-two-column,
+
+    .hom-warehouse-help-page
+    .hom-help-do-dont,
+
+    .hom-warehouse-help-page
+    .hom-customer-help-principles {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 560px) {
+
+    .hom-warehouse-help-page
+    .hom-help-topic {
+        padding: 17px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-help-topic__heading {
+        grid-template-columns:
+            42px
+            minmax(0, 1fr);
+
+        gap: 10px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-help-topic__icon {
+        width: 40px;
+        height: 40px;
+
+        font-size: 18px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-help-topic__heading h2 {
+        font-size: 17px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-warehouse-help-important-featured {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-warehouse-help-page p,
+    .hom-warehouse-help-page li {
+        font-size: 13px;
+    }
+}

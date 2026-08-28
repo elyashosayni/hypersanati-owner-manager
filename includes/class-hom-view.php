@@ -626,10 +626,12 @@ class HOM_View {
             'product-images',
             'orders',
             'warehouse-check',
+            'warehouse-staff',
             'seller-settings',
             'help',
             'help-customers',
             'help-product-images',
+            'help-warehouse-staff',
         ];
 
         return in_array(
@@ -830,6 +832,35 @@ class HOM_View {
                 echo esc_url(
                     add_query_arg(
                         'view',
+                        'warehouse-staff',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo 'warehouse-staff' === $current_view
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ✓
+                </span>
+
+                <span>
+                    مسئولین تأیید انبار
+                </span>
+            </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
                         'seller-settings',
                         HOM_Router::panel_url()
                     )
@@ -877,6 +908,7 @@ class HOM_View {
                         'help',
                         'help-customers',
                         'help-product-images',
+                        'help-warehouse-staff',
                     ],
                     true
                 )
@@ -1083,7 +1115,11 @@ class HOM_View {
 
             <?php
 
-            if ('seller-settings' === $current_view) {
+            if ('warehouse-staff' === $current_view) {
+
+                HOM_Warehouse_Staff_View::render();
+
+            } elseif ('seller-settings' === $current_view) {
 
                 HOM_Seller_Settings_View::render();
 
@@ -1104,6 +1140,13 @@ class HOM_View {
             ) {
 
                 self::render_help_product_images_content();
+
+            } elseif (
+                'help-warehouse-staff' ===
+                $current_view
+            ) {
+
+                self::render_help_warehouse_staff_content();
 
             } elseif ('product-images' === $current_view) {
 
@@ -3425,6 +3468,14 @@ class HOM_View {
                 HOM_Router::panel_url()
             );
 
+
+        $warehouse_help_url =
+            add_query_arg(
+                'view',
+                'help-warehouse-staff',
+                HOM_Router::panel_url()
+            );
+
         ?>
 
         <div class="hom-help-page">
@@ -3526,6 +3577,45 @@ class HOM_View {
                             جستجوی محصول، تصویر اصلی،
                             گالری، ویرایش تصویر، واترمارک،
                             آپلود و ذخیره نهایی.
+                        </p>
+
+                    </div>
+
+                    <span class="hom-help-branch-card__arrow">
+                        ←
+                    </span>
+
+                </a>
+
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $warehouse_help_url
+                    );
+                    ?>"
+                    class="hom-help-branch-card"
+                >
+
+                    <span class="hom-help-branch-card__icon">
+                        📦
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            انبار و کنترل نهایی
+                        </span>
+
+                        <h2>
+                            راهنمای مسئولین تأیید انبار
+                        </h2>
+
+                        <p>
+                            ساخت حساب مستقل، فعال و غیرفعال کردن
+                            دسترسی، ورود از QR، کنترل اقلام،
+                            تأیید نهایی و نکات امنیتی انبار.
                         </p>
 
                     </div>
@@ -5356,6 +5446,772 @@ class HOM_View {
             <?php
             self::render_help_security_content();
             ?>
+
+        </div>
+
+        <?php
+    }
+
+
+
+    private static function render_help_warehouse_staff_content() {
+
+        $staff_url =
+            add_query_arg(
+                'view',
+                'warehouse-staff',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_index_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+        ?>
+
+        <div class="hom-help-page hom-warehouse-help-page">
+
+            <section class="hom-help-hero">
+
+                <div class="hom-help-hero__icon">
+                    📦
+                </div>
+
+                <div class="hom-help-hero__content">
+
+                    <span class="hom-help-kicker">
+                        راهنمای انبار و کنترل نهایی
+                    </span>
+
+                    <h1>
+                        راهنمای مسئولین تأیید انبار
+                    </h1>
+
+                    <p>
+                        این بخش نحوه تعریف مسئول انبار،
+                        جداسازی حساب او از مدیر فروشگاه،
+                        ورود از QR، کنترل تمام اقلام سفارش
+                        و ثبت تأیید نهایی انبار را توضیح می‌دهد.
+                    </p>
+
+                    <div class="hom-help-hero__actions">
+
+                        <a
+                            href="<?php echo esc_url($staff_url); ?>"
+                            class="hom-help-action hom-help-action-primary"
+                        >
+                            مدیریت مسئولین انبار
+                        </a>
+
+                        <a
+                            href="<?php echo esc_url($help_index_url); ?>"
+                            class="hom-help-action hom-help-action-secondary"
+                        >
+                            ← بازگشت به راهنمای پنل
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🔐
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            اصل امنیتی
+                        </span>
+
+                        <h2>
+                            حساب مدیر فروشگاه و مسئول انبار باید جدا باشد
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-important hom-warehouse-help-important-featured">
+
+                    <div class="hom-help-important__icon">
+                        !
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            مدیر فروشگاه نمی‌تواند با همان حساب
+                            مسئول تأیید انبار باشد.
+                        </strong>
+
+                        <p>
+                            برای هر مسئول تأیید انبار باید یک
+                            نام کاربری و رمز عبور مستقل ساخته شود.
+                            حتی اگر خود مدیر فروشگاه بخواهد عملیات
+                            انبار را انجام دهد، باید برای این کار
+                            یک حساب مستقل انبار داشته باشد.
+                        </p>
+
+                        <p>
+                            این جداسازی باعث می‌شود در گزارش‌ها
+                            و سوابق سفارش دقیقاً مشخص باشد
+                            چه حسابی کنترل نهایی انبار را انجام داده است.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        👤
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            تعریف کاربر
+                        </span>
+
+                        <h2>
+                            مسئول جدید انبار را چگونه ایجاد کنیم؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+
+                        <span>۱</span>
+
+                        <div>
+
+                            <strong>
+                                وارد «مسئولین تأیید انبار» شوید
+                            </strong>
+
+                            <p>
+                                این بخش فقط در اختیار مدیر فروشگاه
+                                و مدیر سیستم قرار دارد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۲</span>
+
+                        <div>
+
+                            <strong>
+                                نام و نام خانوادگی را وارد کنید
+                            </strong>
+
+                            <p>
+                                نام واقعی فرد را ثبت کنید تا
+                                در سوابق تأیید سفارش قابل شناسایی باشد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۳</span>
+
+                        <div>
+
+                            <strong>
+                                نام کاربری مستقل تعیین کنید
+                            </strong>
+
+                            <p>
+                                نام کاربری نباید متعلق به مدیر فروشگاه
+                                یا حساب موجود دیگری باشد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۴</span>
+
+                        <div>
+
+                            <strong>
+                                رمز عبور اولیه بسازید
+                            </strong>
+
+                            <p>
+                                رمز باید حداقل ۸ کاراکتر باشد و
+                                فقط در اختیار همان مسئول انبار قرار گیرد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ⚡
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            مدیریت دسترسی
+                        </span>
+
+                        <h2>
+                            فعال و غیرفعال کردن مسئول انبار
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-two-column">
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            وضعیت فعال
+                        </h3>
+
+                        <p>
+                            کاربر فعال اجازه ورود به لینک QR
+                            و تأیید سفارش‌های مجاز انبار را دارد.
+                        </p>
+
+                    </article>
+
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            وضعیت غیرفعال
+                        </h3>
+
+                        <p>
+                            با غیرفعال کردن دسترسی، حساب WordPress
+                            حذف نمی‌شود؛ اما مجوز تأیید انبار
+                            بلافاصله از آن حساب گرفته می‌شود.
+                        </p>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        غیرفعال کردن با حذف حساب متفاوت است.
+                    </strong>
+
+                    <p>
+                        اگر مسئول انبار موقتاً نباید دسترسی داشته باشد،
+                        فقط دسترسی او را غیرفعال کنید.
+                        در صورت نیاز می‌توان همان حساب را دوباره فعال کرد.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        📱
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            ورود از QR
+                        </span>
+
+                        <h2>
+                            مسئول انبار چگونه وارد صفحه کنترل می‌شود؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+
+                        <span>۱</span>
+
+                        <div>
+
+                            <strong>
+                                QR روی برگه انبار اسکن می‌شود
+                            </strong>
+
+                            <p>
+                                هر سفارش لینک و Token اختصاصی خود را دارد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۲</span>
+
+                        <div>
+
+                            <strong>
+                                در صورت نیاز وارد حساب شوید
+                            </strong>
+
+                            <p>
+                                اگر مسئول هنوز وارد نشده باشد،
+                                سیستم او را به صفحه ورود هدایت می‌کند.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۳</span>
+
+                        <div>
+
+                            <strong>
+                                بعد از ورود به همان سفارش برگردید
+                            </strong>
+
+                            <p>
+                                لینک امن سفارش نگهداری می‌شود و
+                                کاربر مجاز بعد از ورود دوباره
+                                به همان صفحه کنترل انبار بازمی‌گردد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۴</span>
+
+                        <div>
+
+                            <strong>
+                                فقط صفحه مخصوص انبار نمایش داده می‌شود
+                            </strong>
+
+                            <p>
+                                مسئول انبار به داشبورد مدیریت فروشگاه،
+                                مدیریت محصولات یا پرونده مشتریان
+                                دسترسی ندارد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ✅
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            کنترل فیزیکی سفارش
+                        </span>
+
+                        <h2>
+                            مراحل تأیید نهایی انبار
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <ol class="hom-help-daily-checklist">
+
+                    <li>
+                        شماره سفارش و اطلاعات کلی صفحه را کنترل کنید.
+                    </li>
+
+                    <li>
+                        هر کالا را با کالای واقعی آماده‌شده تطبیق دهید.
+                    </li>
+
+                    <li>
+                        نام محصول، SKU، Part Number و تعداد را بررسی کنید.
+                    </li>
+
+                    <li>
+                        فقط بعد از کنترل واقعی هر ردیف، تیک همان ردیف را بزنید.
+                    </li>
+
+                    <li>
+                        تا زمانی که تمام اقلام تیک نخورند،
+                        تأیید نهایی انجام نمی‌شود.
+                    </li>
+
+                    <li>
+                        پس از اطمینان از تمام اقلام،
+                        دکمه تأیید نهایی انبار را بزنید.
+                    </li>
+
+                    <li>
+                        بعد از ثبت موفق، وضعیت سفارش باید
+                        به «آماده ارسال» تغییر کند.
+                    </li>
+
+                </ol>
+
+
+                <div class="hom-help-warning">
+                    هیچ ردیفی را قبل از مشاهده و کنترل کالای واقعی
+                    تیک نزنید. تیک هر کالا به معنی تأیید فیزیکی
+                    همان ردیف توسط مسئول انبار است.
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        👁
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            محدوده دسترسی
+                        </span>
+
+                        <h2>
+                            مسئول انبار چه چیزهایی را می‌بیند؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-do-dont">
+
+                    <div class="is-good">
+
+                        <strong>
+                            دسترسی دارد
+                        </strong>
+
+                        <ul>
+                            <li>صفحه کنترل QR سفارش مجاز</li>
+                            <li>نام کالا</li>
+                            <li>SKU</li>
+                            <li>Part Number</li>
+                            <li>تعداد</li>
+                            <li>تیک کنترل هر ردیف</li>
+                            <li>تأیید نهایی انبار</li>
+                        </ul>
+
+                    </div>
+
+
+                    <div class="is-bad">
+
+                        <strong>
+                            دسترسی ندارد
+                        </strong>
+
+                        <ul>
+                            <li>قیمت کالاها</li>
+                            <li>داشبورد مدیر فروشگاه</li>
+                            <li>مدیریت مشتریان و سفارش‌ها</li>
+                            <li>مدیریت تصاویر محصولات</li>
+                            <li>اطلاعات فروشگاه</li>
+                            <li>مدیریت سایر مسئولین انبار</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🧾
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            ثبت سابقه
+                        </span>
+
+                        <h2>
+                            بعد از تأیید انبار چه اطلاعاتی ثبت می‌شود؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-customer-help-principles">
+
+                    <article>
+
+                        <strong>
+                            زمان تأیید
+                        </strong>
+
+                        <p>
+                            زمان انجام کنترل نهایی روی سفارش ذخیره می‌شود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            مسئول انجام‌دهنده
+                        </strong>
+
+                        <p>
+                            شناسه حسابی که تأیید را انجام داده
+                            روی سفارش ثبت می‌شود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            اقلام کنترل‌شده
+                        </strong>
+
+                        <p>
+                            Item ID تمام ردیف‌هایی که کنترل شده‌اند
+                            در سابقه سفارش نگهداری می‌شود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            Audit و Order Note
+                        </strong>
+
+                        <p>
+                            رخداد تأیید انبار و توضیح آن
+                            در سوابق عملیاتی سفارش ثبت می‌شود.
+                        </p>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        تأیید نهایی قابل تکرار نیست.
+                    </strong>
+
+                    <p>
+                        بعد از تأیید موفق و انتقال سفارش
+                        به مرحله «آماده ارسال»، همان کنترل نهایی
+                        دوباره قابل ثبت نیست.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🛡️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            نکات امنیتی
+                        </span>
+
+                        <h2>
+                            چه مواردی را همیشه رعایت کنیم؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <ol class="hom-help-daily-checklist">
+
+                    <li>
+                        حساب مدیر فروشگاه را برای تأیید انبار استفاده نکنید.
+                    </li>
+
+                    <li>
+                        برای هر مسئول، حساب مستقل تعریف کنید.
+                    </li>
+
+                    <li>
+                        رمز عبور یک مسئول را در اختیار فرد دیگری قرار ندهید.
+                    </li>
+
+                    <li>
+                        لینک یا تصویر QR سفارش را برای افراد غیرمجاز ارسال نکنید.
+                    </li>
+
+                    <li>
+                        در صورت قطع همکاری یا توقف دسترسی،
+                        حساب مسئول را فوراً غیرفعال کنید.
+                    </li>
+
+                    <li>
+                        تأیید نهایی را فقط بعد از کنترل فیزیکی
+                        تمام اقلام انجام دهید.
+                    </li>
+
+                </ol>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        📲
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            احراز هویت
+                        </span>
+
+                        <h2>
+                            وضعیت فعلی ورود و OTP
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <p>
+                        در نسخه فعلی، مسئولین انبار با
+                        نام کاربری و رمز عبور مستقل وارد می‌شوند.
+                    </p>
+
+                    <p>
+                        اتصال شماره موبایل و OTP در مرحله بعد
+                        روی همین حساب‌ها اضافه خواهد شد؛
+                        بنابراین نیازی به ساخت مجدد ساختار
+                        نقش و دسترسی انبار نخواهد بود.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <div class="hom-help-page-back">
+
+                <a
+                    href="<?php echo esc_url($help_index_url); ?>"
+                    class="hom-help-action hom-help-action-secondary"
+                >
+                    <span aria-hidden="true">←</span>
+                    بازگشت به راهنمای پنل
+                </a>
+
+            </div>
 
         </div>
 

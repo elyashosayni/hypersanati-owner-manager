@@ -37,7 +37,7 @@ class HOM_Capabilities {
 
 
     public const ROLE_VERSION =
-        '4';
+        '6';
 
 
     public const CAP_ACCESS_PANEL =
@@ -61,6 +61,9 @@ class HOM_Capabilities {
 
     public const CAP_VERIFY_WAREHOUSE =
         'hom_verify_warehouse_orders';
+
+    public const CAP_MANAGE_WAREHOUSE_STAFF =
+        'hom_manage_warehouse_staff';
 
 
     /*
@@ -96,7 +99,7 @@ class HOM_Capabilities {
 
             self::CAP_MANAGE_FULFILLMENT => true,
 
-            self::CAP_VERIFY_WAREHOUSE => true,
+            self::CAP_MANAGE_WAREHOUSE_STAFF => true,
         ];
     }
 
@@ -129,6 +132,8 @@ class HOM_Capabilities {
             self::CAP_MANAGE_FULFILLMENT,
 
             self::CAP_VERIFY_WAREHOUSE,
+
+            self::CAP_MANAGE_WAREHOUSE_STAFF,
 
             self::CAP_MANAGE_PRODUCT_PRICES,
 
@@ -182,6 +187,21 @@ class HOM_Capabilities {
                 $grant
             );
         }
+
+
+        /*
+         * Strict separation of duties:
+         *
+         * A Shop Owner account manages warehouse staff but
+         * must not itself act as a warehouse verifier.
+         * A separate Warehouse Verifier account is required.
+         *
+         * remove_cap() is intentional here because previous
+         * role versions granted this permission to owners.
+         */
+        $role->remove_cap(
+            self::CAP_VERIFY_WAREHOUSE
+        );
 
 
         /*
@@ -266,6 +286,46 @@ class HOM_Capabilities {
             $role->remove_cap(
                 $capability
             );
+        }
+    }
+
+
+
+    private static function enforce_role_separation() {
+
+        /*
+         * Defensive cleanup for accounts whose roles may have
+         * been changed outside this module.
+         *
+         * Any account that can access the Owner Panel must not
+         * simultaneously hold the Warehouse Verifier role.
+         */
+        $warehouse_users =
+            get_users(
+                [
+                    'role' =>
+                        self::WAREHOUSE_ROLE,
+
+                    'fields' =>
+                        'all',
+                ]
+            );
+
+
+        foreach ($warehouse_users as $user) {
+
+            if (
+                $user instanceof WP_User &&
+                user_can(
+                    $user,
+                    self::CAP_ACCESS_PANEL
+                )
+            ) {
+
+                $user->remove_role(
+                    self::WAREHOUSE_ROLE
+                );
+            }
         }
     }
 
@@ -359,6 +419,9 @@ class HOM_Capabilities {
                 );
             }
         }
+
+
+        self::enforce_role_separation();
 
 
         update_option(
