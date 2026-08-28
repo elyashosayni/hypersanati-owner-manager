@@ -7,6 +7,107 @@ if (!defined('ABSPATH')) {
 class HOM_View {
 
 
+    private static function store_name() {
+
+        $name =
+            trim(
+                wp_strip_all_tags(
+                    (string)
+                    get_bloginfo('name')
+                )
+            );
+
+        return '' !== $name
+            ? $name
+            : 'صنعت گستران الفت';
+    }
+
+
+    private static function store_label() {
+
+        return
+            'فروشگاه ' .
+            self::store_name();
+    }
+
+
+    private static function brand_logo_url() {
+
+        $logo_id =
+            absint(
+                get_theme_mod(
+                    'custom_logo'
+                )
+            );
+
+
+        if (!$logo_id) {
+
+            $logo_id =
+                absint(
+                    get_option(
+                        'site_icon'
+                    )
+                );
+        }
+
+
+        if (!$logo_id) {
+            return '';
+        }
+
+
+        $url =
+            wp_get_attachment_image_url(
+                $logo_id,
+                'full'
+            );
+
+
+        return $url
+            ? (string) $url
+            : '';
+    }
+
+
+
+    private static function sidebar_logo_url() {
+
+        /*
+         * The compact white/orange Site Icon is better suited
+         * to the dark and narrow management sidebar than the
+         * horizontal website logo.
+         */
+
+        $site_icon_id =
+            absint(
+                get_option(
+                    'site_icon'
+                )
+            );
+
+
+        if ($site_icon_id) {
+
+            $url =
+                wp_get_attachment_image_url(
+                    $site_icon_id,
+                    'full'
+                );
+
+
+            if ($url) {
+                return (string) $url;
+            }
+        }
+
+
+        return self::brand_logo_url();
+    }
+
+
+
+
     public static function render() {
 
         if (HOM_Auth::is_owner_logged_in()) {
@@ -324,8 +425,12 @@ class HOM_View {
     private static function render_login() {
 
         self::document_start(
-            'ورود به پنل مدیریت فروشگاه'
+            'ورود به پنل مدیریت ' .
+            self::store_label()
         );
+
+        $brand_logo_url =
+            self::brand_logo_url();
 
         $error = HOM_Auth::get_error();
 
@@ -334,18 +439,44 @@ class HOM_View {
 
     <section class="hom-login-brand">
 
-        <div class="hom-brand-mark">
-            H
-        </div>
+        <div class="hom-login-store-brand">
 
-        <div>
-            <div class="hom-brand-name">
-                هایپر صنعتی
-            </div>
+            <?php if ($brand_logo_url) : ?>
 
-            <div class="hom-brand-subtitle">
-                پنل مدیریت فروشگاه
-            </div>
+                <img
+                    src="<?php
+                    echo esc_url(
+                        $brand_logo_url
+                    );
+                    ?>"
+                    alt="<?php
+                    echo esc_attr(
+                        self::store_name()
+                    );
+                    ?>"
+                    class="hom-store-logo hom-store-logo--login"
+                >
+
+            <?php else : ?>
+
+                <strong class="hom-store-logo-fallback">
+                    <?php
+                    echo esc_html(
+                        self::store_name()
+                    );
+                    ?>
+                </strong>
+
+            <?php endif; ?>
+
+            <span>
+                <?php
+                echo esc_html(
+                    self::store_label()
+                );
+                ?>
+            </span>
+
         </div>
 
     </section>
@@ -362,7 +493,12 @@ class HOM_View {
                 </span>
 
                 <h1>
-                    ورود به پنل مدیریت فروشگاه
+                    ورود به پنل مدیریت
+                    <?php
+                    echo esc_html(
+                        self::store_label()
+                    );
+                    ?>
                 </h1>
 
                 <p>
@@ -515,8 +651,12 @@ class HOM_View {
 
 
         self::document_start(
-            'پنل مدیریت فروشگاه'
+            'پنل مدیریت ' .
+            self::store_label()
         );
+
+        $brand_logo_url =
+            self::sidebar_logo_url();
 
         ?>
 <div class="hom-app">
@@ -525,18 +665,45 @@ class HOM_View {
 
         <div class="hom-sidebar-brand">
 
-            <div class="hom-brand-mark">
-                H
-            </div>
+            <div class="hom-sidebar-store-brand">
 
-            <div>
-                <strong>
-                    هایپر صنعتی
-                </strong>
+                <?php if ($brand_logo_url) : ?>
 
-                <span>
-                    مدیریت فروشگاه
+                    <img
+                        src="<?php
+                        echo esc_url(
+                            $brand_logo_url
+                        );
+                        ?>"
+                        alt="<?php
+                        echo esc_attr(
+                            self::store_name()
+                        );
+                        ?>"
+                        class="hom-store-logo hom-store-logo--sidebar"
+                    >
+
+                <?php else : ?>
+
+                    <strong class="hom-store-logo-fallback">
+                        <?php
+                        echo esc_html(
+                            self::store_name()
+                        );
+                        ?>
+                    </strong>
+
+                <?php endif; ?>
+
+
+                <span class="hom-sidebar-store-label">
+                    <?php
+                    echo esc_html(
+                        self::store_label()
+                    );
+                    ?>
                 </span>
+
             </div>
 
         </div>
@@ -580,7 +747,7 @@ class HOM_View {
                 </span>
 
                 <span>
-                    صفحه اصلی
+                    داشبورد مدیریت فروشگاه
                 </span>
             </a>
 
@@ -674,7 +841,12 @@ class HOM_View {
                 </span>
 
                 <span>
-                    اطلاعات فروشنده
+                    اطلاعات
+                    <?php
+                    echo esc_html(
+                        self::store_name()
+                    );
+                    ?>
                 </span>
             </a>
 
@@ -957,84 +1129,1365 @@ class HOM_View {
 
     private static function render_dashboard_content() {
 
+        global $wpdb;
+
+
+        /*
+         * ---------------------------------------------------------
+         * SALES OVERVIEW
+         * ---------------------------------------------------------
+         */
+
+        $counts =
+            HOM_Orders::summary_counts();
+
+
+        $active_statuses = [
+            'preinvoice-review',
+            'preinv-approved',
+            'pending',
+            'on-hold',
+            'processing',
+            'hom-ready',
+            'hom-shipped',
+        ];
+
+
+        $active_orders = 0;
+
+
+        foreach (
+            $active_statuses
+            as $active_status
+        ) {
+
+            $active_orders +=
+                absint(
+                    $counts[
+                        $active_status
+                    ] ?? 0
+                );
+        }
+
+
+        /*
+         * ---------------------------------------------------------
+         * RECENT ORDERS
+         * ---------------------------------------------------------
+         */
+
+        $recent_result =
+            HOM_Orders::query(
+                'all',
+                1,
+                ''
+            );
+
+
+        $recent_orders =
+            array_slice(
+                $recent_result['items'] ?? [],
+                0,
+                5
+            );
+
+
+        /*
+         * ---------------------------------------------------------
+         * PRODUCT IMAGE HEALTH
+         * ---------------------------------------------------------
+         */
+
+        $product_post_counts =
+            wp_count_posts(
+                'product'
+            );
+
+
+        $total_products =
+            isset(
+                $product_post_counts->publish
+            )
+                ? absint(
+                    $product_post_counts->publish
+                )
+                : 0;
+
+
+        $missing_main_images =
+            absint(
+                $wpdb->get_var(
+                    "
+                    SELECT
+                        COUNT(DISTINCT p.ID)
+
+                    FROM
+                        {$wpdb->posts} p
+
+                    LEFT JOIN
+                        {$wpdb->postmeta} pm
+
+                        ON
+                            pm.post_id = p.ID
+                            AND
+                            pm.meta_key = '_thumbnail_id'
+
+                    WHERE
+                        p.post_type = 'product'
+                        AND
+                        p.post_status = 'publish'
+                        AND
+                        (
+                            pm.meta_id IS NULL
+                            OR
+                            pm.meta_value = ''
+                            OR
+                            pm.meta_value = '0'
+                        )
+                    "
+                )
+            );
+
+
+        $products_with_image =
+            max(
+                0,
+                $total_products
+                -
+                $missing_main_images
+            );
+
+
+        $image_coverage =
+            $total_products > 0
+                ? round(
+                    (
+                        $products_with_image
+                        /
+                        $total_products
+                    )
+                    *
+                    100
+                )
+                : 0;
+
+
+        /*
+         * ---------------------------------------------------------
+         * SELLER DATA HEALTH
+         * ---------------------------------------------------------
+         */
+
+        $seller =
+            HOM_Seller_Settings::data();
+
+
+        $seller_required_fields = [
+            'legal_name',
+            'national_id',
+            'economic_code',
+            'registration_no',
+            'postcode',
+            'phone',
+            'address',
+        ];
+
+
+        $seller_missing = [];
+
+
+        foreach (
+            $seller_required_fields
+            as $seller_field
+        ) {
+
+            if (
+                '' ===
+                trim(
+                    (string)
+                    (
+                        $seller[
+                            $seller_field
+                        ] ?? ''
+                    )
+                )
+            ) {
+
+                $seller_missing[] =
+                    $seller_field;
+            }
+        }
+
+
+        /*
+         * ---------------------------------------------------------
+         * URLS
+         * ---------------------------------------------------------
+         */
+
+        $orders_url =
+            add_query_arg(
+                'view',
+                'orders',
+                HOM_Router::panel_url()
+            );
+
+
+        $products_url =
+            add_query_arg(
+                'view',
+                'products',
+                HOM_Router::panel_url()
+            );
+
+
+        $seller_url =
+            add_query_arg(
+                'view',
+                'seller-settings',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+
+        $status_url =
+            static function (
+                $status
+            ) {
+
+                return add_query_arg(
+                    [
+                        'view' =>
+                            'orders',
+
+                        'status' =>
+                            $status,
+                    ],
+                    HOM_Router::panel_url()
+                );
+            };
+
+
+        $action_cards = [
+
+            [
+                'status' =>
+                    'preinvoice-review',
+
+                'label' =>
+                    'پیش‌فاکتور جدید',
+
+                'description' =>
+                    'نیازمند بررسی و قیمت‌گذاری',
+
+                'icon' =>
+                    '🧾',
+            ],
+
+            [
+                'status' =>
+                    'preinv-approved',
+
+                'label' =>
+                    'تأیید شده',
+
+                'description' =>
+                    'منتظر ادامه فرایند پرداخت',
+
+                'icon' =>
+                    '✓',
+            ],
+
+            [
+                'status' =>
+                    'pending',
+
+                'label' =>
+                    'انتظار پرداخت',
+
+                'description' =>
+                    'پرونده‌های در انتظار پرداخت',
+
+                'icon' =>
+                    '💳',
+            ],
+
+            [
+                'status' =>
+                    'on-hold',
+
+                'label' =>
+                    'در انتظار بررسی',
+
+                'description' =>
+                    'نیازمند بررسی واحد فروش',
+
+                'icon' =>
+                    '!',
+            ],
+
+            [
+                'status' =>
+                    'processing',
+
+                'label' =>
+                    'در حال آماده‌سازی',
+
+                'description' =>
+                    'سفارش‌های وارد عملیات',
+
+                'icon' =>
+                    '📦',
+            ],
+
+            [
+                'status' =>
+                    'hom-ready',
+
+                'label' =>
+                    'آماده ارسال',
+
+                'description' =>
+                    'آماده ثبت ارسال و رهگیری',
+
+                'icon' =>
+                    '🚚',
+            ],
+        ];
+
         ?>
 
-        <div class="hom-page-heading">
 
-            <div>
+        <div class="hom-dashboard">
 
-                <span class="hom-eyebrow">
-                    DASHBOARD
-                </span>
 
-                <h1>
-                    پنل مدیریت فروشگاه
-                </h1>
+            <div class="hom-page-heading hom-dashboard-heading">
 
-                <p>
-                    از این پنل می‌توانید مشتریان و سفارش‌ها را پیگیری کنید
-                    و تصاویر محصولات فروشگاه را مدیریت نمایید.
-                </p>
+                <div>
+
+                    <span class="hom-eyebrow">
+                        DASHBOARD
+                    </span>
+
+                    <h1>
+                        داشبورد مدیریت
+                        <?php
+                        echo esc_html(
+                            self::store_label()
+                        );
+                        ?>
+                    </h1>
+
+                    <p>
+                        وضعیت فروش، پرونده‌های مشتریان،
+                        عملیات ارسال و تصاویر محصولات را
+                        از یک نقطه کنترل کنید.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $help_url
+                    );
+                    ?>"
+                    class="hom-dashboard-help"
+                >
+                    <span aria-hidden="true">
+                        ?
+                    </span>
+
+                    راهنمای پنل
+                </a>
 
             </div>
 
-        </div>
 
 
-        <section class="hom-grid">
+            <!-- ==================================================
+                 MAIN KPI
+                 ================================================== -->
 
-            <article class="hom-card hom-card-wide">
+            <section class="hom-dashboard-kpis">
 
-                <div class="hom-card-status">
-                    <span class="hom-status-dot"></span>
-                    سیستم فعال است
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $orders_url
+                    );
+                    ?>"
+                    class="hom-dashboard-kpi"
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        ◉
+                    </span>
+
+                    <div>
+
+                        <span>
+                            پرونده‌های فعال
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    $active_orders
+                                )
+                            );
+                            ?>
+                        </strong>
+
+                        <small>
+                            پرونده در جریان عملیات
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $status_url(
+                            'preinvoice-review'
+                        )
+                    );
+                    ?>"
+                    class="
+                        hom-dashboard-kpi
+                        is-attention
+                    "
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        🧾
+                    </span>
+
+                    <div>
+
+                        <span>
+                            پیش‌فاکتور جدید
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    absint(
+                                        $counts[
+                                            'preinvoice-review'
+                                        ] ?? 0
+                                    )
+                                )
+                            );
+                            ?>
+                        </strong>
+
+                        <small>
+                            نیازمند بررسی فروش
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $status_url(
+                            'hom-ready'
+                        )
+                    );
+                    ?>"
+                    class="hom-dashboard-kpi"
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        🚚
+                    </span>
+
+                    <div>
+
+                        <span>
+                            آماده ارسال
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    absint(
+                                        $counts[
+                                            'hom-ready'
+                                        ] ?? 0
+                                    )
+                                )
+                            );
+                            ?>
+                        </strong>
+
+                        <small>
+                            منتظر ثبت ارسال
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $products_url
+                    );
+                    ?>"
+                    class="hom-dashboard-kpi"
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        🖼️
+                    </span>
+
+                    <div>
+
+                        <span>
+                            پوشش تصویر محصولات
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    $image_coverage
+                                )
+                            );
+                            ?>%
+                        </strong>
+
+                        <small>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    $missing_main_images
+                                )
+                            );
+                            ?>
+                            محصول بدون تصویر اصلی
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 NEEDS ATTENTION
+                 ================================================== -->
+
+            <section class="hom-dashboard-section">
+
+                <div class="hom-dashboard-section__head">
+
+                    <div>
+
+                        <span>
+                            عملیات فروش
+                        </span>
+
+                        <h2>
+                            نیازمند اقدام
+                        </h2>
+
+                        <p>
+                            برای ورود مستقیم به هر مرحله،
+                            کارت مربوط را انتخاب کنید.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="<?php
+                        echo esc_url(
+                            $orders_url
+                        );
+                        ?>"
+                    >
+                        مشاهده همه پرونده‌ها
+                        ←
+                    </a>
+
                 </div>
 
-                <h2>
-                    پنل مدیریت فروشگاه آماده استفاده است
-                </h2>
 
-                <p>
-                    دسترسی این حساب محدود به امکانات اختصاصی مدیر کسب‌وکار است.
-                </p>
+                <div class="hom-dashboard-actions">
 
-            </article>
+                    <?php
+                    foreach (
+                        $action_cards
+                        as $action_card
+                    ) :
+
+                        $action_count =
+                            absint(
+                                $counts[
+                                    $action_card[
+                                        'status'
+                                    ]
+                                ] ?? 0
+                            );
+                        ?>
+
+                        <a
+                            href="<?php
+                            echo esc_url(
+                                $status_url(
+                                    $action_card[
+                                        'status'
+                                    ]
+                                )
+                            );
+                            ?>"
+                            class="
+                                hom-dashboard-action
+                                <?php
+                                echo $action_count > 0
+                                    ? 'has-items'
+                                    : '';
+                                ?>
+                            "
+                        >
+
+                            <span
+                                class="
+                                    hom-dashboard-action__icon
+                                "
+                                aria-hidden="true"
+                            >
+                                <?php
+                                echo esc_html(
+                                    $action_card[
+                                        'icon'
+                                    ]
+                                );
+                                ?>
+                            </span>
 
 
-            <article class="hom-card">
+                            <div>
 
-                <span class="hom-card-label">
-                    سطح دسترسی
-                </span>
+                                <strong>
+                                    <?php
+                                    echo esc_html(
+                                        number_format_i18n(
+                                            $action_count
+                                        )
+                                    );
+                                    ?>
+                                </strong>
 
-                <strong class="hom-card-value">
-                    Owner
-                </strong>
+                                <span>
+                                    <?php
+                                    echo esc_html(
+                                        $action_card[
+                                            'label'
+                                        ]
+                                    );
+                                    ?>
+                                </span>
 
-                <span class="hom-card-meta">
-                    دسترسی محدود و اختصاصی
-                </span>
+                                <small>
+                                    <?php
+                                    echo esc_html(
+                                        $action_card[
+                                            'description'
+                                        ]
+                                    );
+                                    ?>
+                                </small>
 
-            </article>
+                            </div>
+
+                            <span
+                                class="
+                                    hom-dashboard-action__arrow
+                                "
+                                aria-hidden="true"
+                            >
+                                ←
+                            </span>
+
+                        </a>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </section>
 
 
-            <article class="hom-card">
 
-                <span class="hom-card-label">
-                    بخش فعال
-                </span>
+            <!-- ==================================================
+                 OPERATIONAL CONTENT
+                 ================================================== -->
 
-                <strong class="hom-card-value hom-card-value-text">
-                    مدیریت فروشگاه
-                </strong>
+            <section class="hom-dashboard-main-grid">
 
-                <span class="hom-card-meta">
-                    پیگیری مشتریان و مدیریت تصاویر محصولات
-                </span>
 
-            </article>
+                <!-- RECENT CASES -->
 
-        </section>
+                <article
+                    class="
+                        hom-dashboard-panel
+                        hom-dashboard-recent
+                    "
+                >
+
+                    <div class="hom-dashboard-panel__head">
+
+                        <div>
+
+                            <span>
+                                آخرین فعالیت‌ها
+                            </span>
+
+                            <h2>
+                                پرونده‌های اخیر
+                            </h2>
+
+                        </div>
+
+
+                        <a
+                            href="<?php
+                            echo esc_url(
+                                $orders_url
+                            );
+                            ?>"
+                        >
+                            همه پرونده‌ها
+                        </a>
+
+                    </div>
+
+
+                    <?php
+                    if (!$recent_orders) :
+                        ?>
+
+                        <div class="hom-dashboard-empty">
+
+                            هنوز پرونده‌ای ثبت نشده است.
+
+                        </div>
+
+                    <?php else : ?>
+
+
+                        <div class="hom-dashboard-recent-list">
+
+                            <?php
+                            foreach (
+                                $recent_orders
+                                as $recent_item
+                            ) :
+
+                                $recent_order =
+                                    HOM_Orders::get_order(
+                                        $recent_item[
+                                            'id'
+                                        ]
+                                    );
+
+
+                                $recent_contact =
+                                    $recent_order
+                                        ? HOM_Orders::
+                                            customer_contact_data(
+                                                $recent_order
+                                            )
+                                        : [];
+
+
+                                $recent_name =
+                                    trim(
+                                        (string)
+                                        (
+                                            $recent_contact[
+                                                'display_name'
+                                            ]
+                                            ?? ''
+                                        )
+                                    );
+
+
+                                if (
+                                    '' === $recent_name ||
+                                    'مشتری بدون نام'
+                                        ===
+                                        $recent_name
+                                ) {
+
+                                    $recent_name =
+                                        trim(
+                                            (string)
+                                            (
+                                                $recent_item[
+                                                    'customer_name'
+                                                ]
+                                                ?? ''
+                                            )
+                                        );
+                                }
+
+
+                                if (
+                                    '' === $recent_name ||
+                                    'مشتری بدون نام'
+                                        ===
+                                        $recent_name
+                                ) {
+
+                                    $recent_name =
+                                        'نام ثبت نشده';
+                                }
+
+
+                                $recent_contact_value =
+                                    trim(
+                                        (string)
+                                        (
+                                            $recent_contact[
+                                                'phone'
+                                            ]
+                                            ?? ''
+                                        )
+                                    );
+
+
+                                if (
+                                    '' ===
+                                    $recent_contact_value
+                                ) {
+
+                                    $recent_contact_value =
+                                        trim(
+                                            (string)
+                                            (
+                                                $recent_contact[
+                                                    'email'
+                                                ]
+                                                ?? ''
+                                            )
+                                        );
+                                }
+                                ?>
+
+                                <a
+                                    href="<?php
+                                    echo esc_url(
+                                        HOM_Orders::detail_url(
+                                            $recent_item[
+                                                'id'
+                                            ]
+                                        )
+                                    );
+                                    ?>"
+                                    class="
+                                        hom-dashboard-recent-row
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            hom-dashboard-recent-number
+                                        "
+                                    >
+                                        <strong>
+                                            #<?php
+                                            echo esc_html(
+                                                $recent_item[
+                                                    'number'
+                                                ]
+                                            );
+                                            ?>
+                                        </strong>
+
+                                        <span>
+                                            <?php
+                                            echo esc_html(
+                                                $recent_item[
+                                                    'is_preinvoice'
+                                                ]
+                                                    ? 'پیش‌فاکتور'
+                                                    : 'سفارش'
+                                            );
+                                            ?>
+                                        </span>
+                                    </div>
+
+
+                                    <div
+                                        class="
+                                            hom-dashboard-recent-customer
+                                        "
+                                    >
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                $recent_name
+                                            );
+                                            ?>
+                                        </strong>
+
+
+                                        <?php
+                                        if (
+                                            $recent_contact_value
+                                        ) :
+                                            ?>
+
+                                            <span dir="ltr">
+                                                <?php
+                                                echo esc_html(
+                                                    $recent_contact_value
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+
+                                    <span
+                                        class="
+                                            hom-dashboard-recent-status
+                                        "
+                                    >
+                                        <?php
+                                        echo esc_html(
+                                            $recent_item[
+                                                'status_label'
+                                            ]
+                                        );
+                                        ?>
+                                    </span>
+
+
+                                    <strong
+                                        class="
+                                            hom-dashboard-recent-total
+                                        "
+                                    >
+                                        <?php
+                                        echo wp_kses_post(
+                                            $recent_item[
+                                                'total_html'
+                                            ]
+                                        );
+                                        ?>
+                                    </strong>
+
+
+                                    <span
+                                        class="
+                                            hom-dashboard-recent-arrow
+                                        "
+                                        aria-hidden="true"
+                                    >
+                                        ←
+                                    </span>
+
+                                </a>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    <?php endif; ?>
+
+                </article>
+
+
+
+                <!-- SIDE HEALTH PANELS -->
+
+                <div class="hom-dashboard-side">
+
+
+                    <article class="hom-dashboard-panel">
+
+                        <div class="hom-dashboard-panel__head">
+
+                            <div>
+
+                                <span>
+                                    وضعیت کاتالوگ
+                                </span>
+
+                                <h2>
+                                    تصاویر محصولات
+                                </h2>
+
+                            </div>
+
+                            <span
+                                class="
+                                    hom-dashboard-health-icon
+                                "
+                            >
+                                🖼️
+                            </span>
+
+                        </div>
+
+
+                        <div class="hom-dashboard-image-health">
+
+                            <div
+                                class="
+                                    hom-dashboard-progress
+                                "
+                                role="progressbar"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-valuenow="<?php
+                                echo esc_attr(
+                                    $image_coverage
+                                );
+                                ?>"
+                            >
+
+                                <span
+                                    style="<?php
+                                    echo esc_attr(
+                                        'width:' .
+                                        $image_coverage .
+                                        '%'
+                                    );
+                                    ?>"
+                                ></span>
+
+                            </div>
+
+
+                            <strong>
+                                <?php
+                                echo esc_html(
+                                    number_format_i18n(
+                                        $products_with_image
+                                    )
+                                );
+                                ?>
+                                از
+                                <?php
+                                echo esc_html(
+                                    number_format_i18n(
+                                        $total_products
+                                    )
+                                );
+                                ?>
+                                محصول دارای تصویر اصلی
+                            </strong>
+
+
+                            <p>
+                                <?php if (
+                                    $missing_main_images > 0
+                                ) : ?>
+
+                                    هنوز
+                                    <strong>
+                                        <?php
+                                        echo esc_html(
+                                            number_format_i18n(
+                                                $missing_main_images
+                                            )
+                                        );
+                                        ?>
+                                    </strong>
+                                    محصول بدون تصویر اصلی است.
+
+                                <?php else : ?>
+
+                                    همه محصولات منتشرشده
+                                    تصویر اصلی دارند.
+
+                                <?php endif; ?>
+                            </p>
+
+
+                            <a
+                                href="<?php
+                                echo esc_url(
+                                    $products_url
+                                );
+                                ?>"
+                                class="
+                                    hom-dashboard-panel-action
+                                "
+                            >
+                                مدیریت تصاویر محصولات
+                                ←
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <article class="hom-dashboard-panel">
+
+                        <div class="hom-dashboard-panel__head">
+
+                            <div>
+
+                                <span>
+                                    اطلاعات سازمانی
+                                </span>
+
+                                <h2>
+                                    اطلاعات
+                                    <?php
+                                    echo esc_html(
+                                        self::store_name()
+                                    );
+                                    ?>
+                                </h2>
+
+                            </div>
+
+                            <span
+                                class="
+                                    hom-dashboard-health-icon
+                                "
+                            >
+                                ⚙️
+                            </span>
+
+                        </div>
+
+
+                        <div class="hom-dashboard-seller-health">
+
+                            <?php if (
+                                empty(
+                                    $seller_missing
+                                )
+                            ) : ?>
+
+                                <div
+                                    class="
+                                        hom-dashboard-health-state
+                                        is-complete
+                                    "
+                                >
+                                    <span>✓</span>
+
+                                    <div>
+                                        <strong>
+                                            اطلاعات کامل است
+                                        </strong>
+
+                                        <small>
+                                            اطلاعات موردنیاز
+                                            اسناد فروش ثبت شده است.
+                                        </small>
+                                    </div>
+                                </div>
+
+                            <?php else : ?>
+
+                                <div
+                                    class="
+                                        hom-dashboard-health-state
+                                        is-warning
+                                    "
+                                >
+                                    <span>!</span>
+
+                                    <div>
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                number_format_i18n(
+                                                    count(
+                                                        $seller_missing
+                                                    )
+                                                )
+                                            );
+                                            ?>
+                                            مورد نیاز به تکمیل
+                                        </strong>
+
+                                        <small>
+                                            برای کامل بودن
+                                            اسناد فروش بررسی شود.
+                                        </small>
+                                    </div>
+                                </div>
+
+                            <?php endif; ?>
+
+
+                            <a
+                                href="<?php
+                                echo esc_url(
+                                    $seller_url
+                                );
+                                ?>"
+                                class="
+                                    hom-dashboard-panel-action
+                                "
+                            >
+                                بررسی اطلاعات
+                                <?php
+                                echo esc_html(
+                                    self::store_name()
+                                );
+                                ?>
+                                ←
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 QUICK ACCESS
+                 ================================================== -->
+
+            <section class="hom-dashboard-section">
+
+                <div class="hom-dashboard-section__head">
+
+                    <div>
+
+                        <span>
+                            میانبرها
+                        </span>
+
+                        <h2>
+                            دسترسی سریع
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-dashboard-shortcuts">
+
+
+                    <a href="<?php echo esc_url($orders_url); ?>">
+
+                        <span>☰</span>
+
+                        <div>
+                            <strong>
+                                مدیریت و پیگیری مشتریان
+                            </strong>
+
+                            <small>
+                                پیش‌فاکتورها، سفارش‌ها،
+                                پرداخت و ارسال
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                    <a href="<?php echo esc_url($products_url); ?>">
+
+                        <span>▦</span>
+
+                        <div>
+                            <strong>
+                                مدیریت تصاویر محصولات
+                            </strong>
+
+                            <small>
+                                تصویر اصلی و گالری محصولات
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                    <a href="<?php echo esc_url($seller_url); ?>">
+
+                        <span>⚙</span>
+
+                        <div>
+                            <strong>
+                                اطلاعات
+                                <?php
+                                echo esc_html(
+                                    self::store_name()
+                                );
+                                ?>
+                            </strong>
+
+                            <small>
+                                مشخصات مورد استفاده
+                                در اسناد فروش
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                    <a href="<?php echo esc_url($help_url); ?>">
+
+                        <span>?</span>
+
+                        <div>
+                            <strong>
+                                راهنمای پنل
+                            </strong>
+
+                            <small>
+                                آموزش استفاده از بخش‌های پنل
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                </div>
+
+            </section>
+
+
+        </div>
 
         <?php
     }

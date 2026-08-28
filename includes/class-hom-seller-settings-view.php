@@ -8,6 +8,23 @@ final class HOM_Seller_Settings_View {
 
     public static function render() {
 
+        $store_name =
+            trim(
+                wp_strip_all_tags(
+                    (string)
+                    get_bloginfo('name')
+                )
+            );
+
+        if ('' === $store_name) {
+            $store_name = 'صنعت گستران الفت';
+        }
+
+        $store_info_label =
+            'اطلاعات ' .
+            $store_name;
+
+
         if (
             !current_user_can(
                 HOM_Capabilities::CAP_MANAGE_PREINVOICES
@@ -15,7 +32,13 @@ final class HOM_Seller_Settings_View {
         ) {
             ?>
             <div class="hom-alert hom-alert-error">
-                شما اجازه ویرایش اطلاعات فروشنده را ندارید.
+                شما اجازه ویرایش
+                <?php
+                echo esc_html(
+                    $store_info_label
+                );
+                ?>
+                را ندارید.
             </div>
             <?php
             return;
@@ -46,7 +69,11 @@ final class HOM_Seller_Settings_View {
                 </span>
 
                 <h1>
-                    اطلاعات فروشنده
+                    <?php
+                    echo esc_html(
+                        $store_info_label
+                    );
+                    ?>
                 </h1>
 
                 <p>
@@ -61,13 +88,24 @@ final class HOM_Seller_Settings_View {
         <?php if ('seller-saved' === $notice) : ?>
 
             <div class="hom-alert hom-alert-success">
-                اطلاعات فروشنده با موفقیت ذخیره شد.
+                <?php
+                echo esc_html(
+                    $store_info_label
+                );
+                ?>
+                با موفقیت ذخیره شد.
             </div>
 
         <?php elseif ('seller-error' === $notice) : ?>
 
             <div class="hom-alert hom-alert-error">
-                ذخیره اطلاعات فروشنده انجام نشد.
+                ذخیره
+                <?php
+                echo esc_html(
+                    $store_info_label
+                );
+                ?>
+                انجام نشد.
             </div>
 
         <?php endif; ?>
@@ -258,7 +296,12 @@ final class HOM_Seller_Settings_View {
                         type="submit"
                         class="hom-button hom-button-primary"
                     >
-                        ذخیره اطلاعات فروشنده
+                        ذخیره
+                        <?php
+                        echo esc_html(
+                            $store_info_label
+                        );
+                        ?>
                     </button>
 
                 </div>
