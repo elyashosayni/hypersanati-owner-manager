@@ -7,6 +7,10 @@ if (!defined('ABSPATH')) {
 final class HOM_Order_Documents {
 
 
+    private const DOCUMENT_LOGO_FILENAME =
+        'logo-for-invoice';
+
+
     public static function register() {
 
         add_action(
@@ -63,6 +67,67 @@ final class HOM_Order_Documents {
             'warehouse',
             'shipping',
         ];
+    }
+
+
+    private static function document_logo_url() {
+
+        $attachments =
+            get_posts(
+                [
+                    'post_type' =>
+                        'attachment',
+
+                    'post_status' =>
+                        'inherit',
+
+                    'post_mime_type' =>
+                        'image',
+
+                    'posts_per_page' =>
+                        1,
+
+                    'fields' =>
+                        'ids',
+
+                    'orderby' =>
+                        'ID',
+
+                    'order' =>
+                        'DESC',
+
+                    'meta_query' =>
+                        [
+                            [
+                                'key' =>
+                                    '_wp_attached_file',
+
+                                'value' =>
+                                    self::DOCUMENT_LOGO_FILENAME,
+
+                                'compare' =>
+                                    'LIKE',
+                            ],
+                        ],
+                ]
+            );
+
+
+        if (empty($attachments)) {
+            return '';
+        }
+
+
+        $url =
+            wp_get_attachment_image_url(
+                absint($attachments[0]),
+                'full'
+            );
+
+
+        return $url
+            ? (string) $url
+            : '';
     }
 
 
@@ -139,6 +204,10 @@ final class HOM_Order_Documents {
 
         $seller =
             self::seller_data();
+
+
+        $logo_url =
+            self::document_logo_url();
 
 
         $created =
@@ -220,6 +289,28 @@ final class HOM_Order_Documents {
         .hom-print-header h1 {
             margin: 0 0 6px;
             font-size: 24px;
+        }
+
+
+        .hom-print-document-logo {
+            display: flex;
+            align-items: center;
+
+            min-height: 54px;
+
+            margin-bottom: 12px;
+        }
+
+        .hom-print-document-logo img {
+            display: block;
+
+            width: 200px;
+            max-width: 100%;
+
+            height: 40px;
+
+            object-fit: contain;
+            object-position: right center;
         }
 
         .hom-print-meta {
@@ -371,6 +462,28 @@ final class HOM_Order_Documents {
     <header class="hom-print-header">
 
         <div>
+
+            <?php if ($logo_url) : ?>
+
+                <div class="hom-print-document-logo">
+
+                    <img
+                        src="<?php
+                        echo esc_url(
+                            $logo_url
+                        );
+                        ?>"
+                        alt="<?php
+                        echo esc_attr(
+                            $seller['name']
+                        );
+                        ?>"
+                    >
+
+                </div>
+
+            <?php endif; ?>
+
 
             <h1>
                 <?php echo esc_html($title); ?>
