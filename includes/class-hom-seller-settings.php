@@ -41,7 +41,7 @@ final class HOM_Seller_Settings {
             );
 
 
-        [, $state] =
+        [$country, $state] =
             array_pad(
                 explode(
                     ':',
@@ -51,6 +51,37 @@ final class HOM_Seller_Settings {
                 2,
                 ''
             );
+
+
+        $state_label =
+            $state;
+
+
+        if (
+            $country &&
+            $state &&
+            class_exists('WC_Countries')
+        ) {
+
+            $countries =
+                new WC_Countries();
+
+            $states =
+                $countries->get_states(
+                    $country
+                );
+
+
+            if (
+                is_array($states) &&
+                isset($states[$state])
+            ) {
+
+                $state_label =
+                    (string)
+                    $states[$state];
+            }
+        }
 
 
         $woo_address =
@@ -74,7 +105,7 @@ final class HOM_Seller_Settings {
                                 ''
                             ),
 
-                            $state,
+                            $state_label,
                         ]
                     )
                 )
@@ -130,6 +161,32 @@ final class HOM_Seller_Settings {
                 trim(
                     (string)
                     ($data[$key] ?? $default)
+                );
+        }
+
+
+        /*
+         * Older saved seller addresses may contain the raw
+         * WooCommerce province code (for example THR).
+         * Convert it to the human-readable province name.
+         */
+        if (
+            $state &&
+            $state_label &&
+            $state !== $state_label &&
+            !empty($data['address'])
+        ) {
+
+            $data['address'] =
+                preg_replace(
+                    '/(?<![\pL\pN])' .
+                    preg_quote(
+                        $state,
+                        '/'
+                    ) .
+                    '(?![\pL\pN])/u',
+                    $state_label,
+                    $data['address']
                 );
         }
 
