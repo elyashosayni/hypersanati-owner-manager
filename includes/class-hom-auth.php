@@ -9,6 +9,421 @@ class HOM_Auth {
     private static $error = '';
 
 
+    private const WAREHOUSE_RETURN_COOKIE =
+        'hom_warehouse_return';
+
+    private const WAREHOUSE_RETURN_TTL =
+        1800;
+
+
+
+    private static function base64url_encode(
+        $value
+    ) {
+
+        return rtrim(
+            strtr(
+                base64_encode(
+                    (string) $value
+                ),
+                '+/',
+                '-_'
+            ),
+            '='
+        );
+    }
+
+
+
+    private static function base64url_decode(
+        $value
+    ) {
+
+        $value =
+            strtr(
+                (string) $value,
+                '-_',
+                '+/'
+            );
+
+
+        $padding =
+            strlen($value) % 4;
+
+
+        if ($padding) {
+
+            $value .=
+                str_repeat(
+                    '=',
+                    4 - $padding
+                );
+        }
+
+
+        $decoded =
+            base64_decode(
+                $value,
+                true
+            );
+
+
+        return false === $decoded
+            ? ''
+            : (string) $decoded;
+    }
+
+
+
+    private static function set_warehouse_return_cookie(
+        $url
+    ) {
+
+        $url =
+            esc_url_raw(
+                (string) $url
+            );
+
+
+        if ('' === $url) {
+            return;
+        }
+
+
+        $payload =
+            self::base64url_encode(
+                $url
+            );
+
+
+        $signature =
+            hash_hmac(
+                'sha256',
+                $payload,
+                wp_salt('auth')
+            );
+
+
+        $value =
+            $payload .
+            '.' .
+            $signature;
+
+
+        $options = [
+
+            'expires' =>
+                time() +
+                self::WAREHOUSE_RETURN_TTL,
+
+            'path' =>
+                defined('COOKIEPATH') &&
+                COOKIEPATH
+                    ? COOKIEPATH
+                    : '/',
+
+            'secure' =>
+                is_ssl(),
+
+            'httponly' =>
+                true,
+
+            'samesite' =>
+                'Lax',
+        ];
+
+
+        if (
+            defined('COOKIE_DOMAIN') &&
+            COOKIE_DOMAIN
+        ) {
+
+            $options['domain'] =
+                COOKIE_DOMAIN;
+        }
+
+
+        setcookie(
+            self::WAREHOUSE_RETURN_COOKIE,
+            $value,
+            $options
+        );
+
+
+        $_COOKIE[
+            self::WAREHOUSE_RETURN_COOKIE
+        ] =
+            $value;
+    }
+
+
+
+    private static function clear_warehouse_return_cookie() {
+
+        $options = [
+
+            'expires' =>
+                time() - HOUR_IN_SECONDS,
+
+            'path' =>
+                defined('COOKIEPATH') &&
+                COOKIEPATH
+                    ? COOKIEPATH
+                    : '/',
+
+            'secure' =>
+                is_ssl(),
+
+            'httponly' =>
+                true,
+
+            'samesite' =>
+                'Lax',
+        ];
+
+
+        if (
+            defined('COOKIE_DOMAIN') &&
+            COOKIE_DOMAIN
+        ) {
+
+            $options['domain'] =
+                COOKIE_DOMAIN;
+        }
+
+
+        setcookie(
+            self::WAREHOUSE_RETURN_COOKIE,
+            '',
+            $options
+        );
+
+
+        unset(
+            $_COOKIE[
+                self::WAREHOUSE_RETURN_COOKIE
+            ]
+        );
+    }
+
+
+
+    private static function read_warehouse_return_cookie() {
+
+        $raw =
+            isset(
+                $_COOKIE[
+                    self::WAREHOUSE_RETURN_COOKIE
+                ]
+            )
+                ? sanitize_text_field(
+                    wp_unslash(
+                        $_COOKIE[
+                            self::WAREHOUSE_RETURN_COOKIE
+                        ]
+                    )
+                )
+                : '';
+
+
+        if (
+            '' === $raw ||
+            false === strpos(
+                $raw,
+                '.'
+            )
+        ) {
+            return '';
+        }
+
+
+        [
+            $payload,
+            $signature,
+        ] =
+            array_pad(
+                explode(
+                    '.',
+                    $raw,
+                    2
+                ),
+                2,
+                ''
+            );
+
+
+        $expected =
+            hash_hmac(
+                'sha256',
+                $payload,
+                wp_salt('auth')
+            );
+
+
+        if (
+            '' === $signature ||
+            !hash_equals(
+                $expected,
+                $signature
+            )
+        ) {
+
+            self::clear_warehouse_return_cookie();
+
+            return '';
+        }
+
+
+        $url =
+            self::base64url_decode(
+                $payload
+            );
+
+
+        if ('' === $url) {
+
+            self::clear_warehouse_return_cookie();
+
+            return '';
+        }
+
+
+        $home =
+            wp_parse_url(
+                home_url('/')
+            );
+
+
+        $target =
+            wp_parse_url(
+                $url
+            );
+
+
+        if (
+            !$target ||
+            empty($target['host']) ||
+            empty($home['host']) ||
+            strtolower($target['host'])
+                !==
+            strtolower($home['host']) ||
+            (int) ($target['port'] ?? 0)
+                !==
+            (int) ($home['port'] ?? 0)
+        ) {
+
+            self::clear_warehouse_return_cookie();
+
+            return '';
+        }
+
+
+        $query = [];
+
+
+        parse_str(
+            (string)
+            ($target['query'] ?? ''),
+            $query
+        );
+
+
+        $view =
+            sanitize_key(
+                (string)
+                ($query['view'] ?? '')
+            );
+
+
+        $order_id =
+            absint(
+                $query['order_id']
+                ?? 0
+            );
+
+
+        $token =
+            sanitize_text_field(
+                (string)
+                (
+                    $query[
+                        'warehouse_token'
+                    ]
+                    ?? ''
+                )
+            );
+
+
+        if (
+            'warehouse-check' !== $view ||
+            !$order_id ||
+            '' === $token ||
+            !HOM_Warehouse_Verification::
+                is_valid_request(
+                    $order_id,
+                    $token
+                )
+        ) {
+
+            self::clear_warehouse_return_cookie();
+
+            return '';
+        }
+
+
+        return add_query_arg(
+            [
+                'view' =>
+                    'warehouse-check',
+
+                'order_id' =>
+                    $order_id,
+
+                'warehouse_token' =>
+                    $token,
+            ],
+            HOM_Router::panel_url()
+        );
+    }
+
+
+
+    private static function warehouse_return_for_user(
+        $user
+    ) {
+
+        $url =
+            self::read_warehouse_return_cookie();
+
+
+        if ('' === $url) {
+            return '';
+        }
+
+
+        if (
+            !($user instanceof WP_User) ||
+            !user_can(
+                $user,
+                HOM_Capabilities::
+                    CAP_VERIFY_WAREHOUSE
+            )
+        ) {
+
+            self::clear_warehouse_return_cookie();
+
+            return '';
+        }
+
+
+        self::clear_warehouse_return_cookie();
+
+
+        return $url;
+    }
+
+
+
 
     public static function register() {
 
@@ -88,6 +503,136 @@ class HOM_Auth {
 
 
 
+    public static function is_warehouse_check_page() {
+
+        if (
+            'GET' !==
+            strtoupper(
+                $_SERVER['REQUEST_METHOD']
+                ?? 'GET'
+            )
+        ) {
+            return false;
+        }
+
+
+        $view =
+            isset($_GET['view'])
+                ? sanitize_key(
+                    wp_unslash(
+                        $_GET['view']
+                    )
+                )
+                : '';
+
+
+        return
+            'warehouse-check'
+            ===
+            $view;
+    }
+
+
+
+    private static function is_warehouse_confirm_action() {
+
+        if (
+            'POST' !==
+            strtoupper(
+                $_SERVER['REQUEST_METHOD']
+                ?? ''
+            )
+        ) {
+            return false;
+        }
+
+
+        $action =
+            isset($_POST['hom_action'])
+                ? sanitize_key(
+                    wp_unslash(
+                        $_POST[
+                            'hom_action'
+                        ]
+                    )
+                )
+                : '';
+
+
+        return
+            'hom_confirm_warehouse'
+            ===
+            $action;
+    }
+
+
+
+    private static function is_warehouse_request() {
+
+        return
+            self::is_warehouse_check_page() ||
+            self::is_warehouse_confirm_action();
+    }
+
+
+
+    private static function current_warehouse_return_url() {
+
+        if (!self::is_warehouse_check_page()) {
+            return '';
+        }
+
+
+        $order_id =
+            isset($_GET['order_id'])
+                ? absint(
+                    $_GET['order_id']
+                )
+                : 0;
+
+
+        $token =
+            isset($_GET['warehouse_token'])
+                ? sanitize_text_field(
+                    wp_unslash(
+                        $_GET[
+                            'warehouse_token'
+                        ]
+                    )
+                )
+                : '';
+
+
+        if (
+            !$order_id ||
+            '' === $token ||
+            !HOM_Warehouse_Verification::
+                is_valid_request(
+                    $order_id,
+                    $token
+                )
+        ) {
+            return '';
+        }
+
+
+        return add_query_arg(
+            [
+                'view' =>
+                    'warehouse-check',
+
+                'order_id' =>
+                    $order_id,
+
+                'warehouse_token' =>
+                    $token,
+            ],
+            HOM_Router::panel_url()
+        );
+    }
+
+
+
     private static function is_restricted_owner_user(
         $user
     ) {
@@ -125,13 +670,52 @@ class HOM_Auth {
 
     public static function guard_owner_panel() {
 
-        /*
-         * Owner Panel is never a public login page anymore.
-         *
-         * Login happens through the normal website /
-         * WooCommerce My Account flow.
-         */
+        $warehouse_request =
+            self::is_warehouse_request();
+
+
         if (!is_user_logged_in()) {
+
+            if (
+                self::is_warehouse_check_page()
+            ) {
+
+                $return_url =
+                    self::current_warehouse_return_url();
+
+
+                if ($return_url) {
+
+                    self::set_warehouse_return_cookie(
+                        $return_url
+                    );
+                }
+            }
+
+
+            wp_safe_redirect(
+                self::account_url()
+            );
+
+            exit;
+        }
+
+
+        /*
+         * Warehouse verifiers may open ONLY the QR workflow.
+         * They do not receive access to the Owner dashboard.
+         */
+        if ($warehouse_request) {
+
+            if (
+                current_user_can(
+                    HOM_Capabilities::
+                        CAP_VERIFY_WAREHOUSE
+                )
+            ) {
+                return;
+            }
+
 
             wp_safe_redirect(
                 self::account_url()
@@ -162,6 +746,17 @@ class HOM_Auth {
         $user
     ) {
 
+        $warehouse_return =
+            self::warehouse_return_for_user(
+                $user
+            );
+
+
+        if ($warehouse_return) {
+            return $warehouse_return;
+        }
+
+
         if (
             self::is_restricted_owner_user(
                 $user
@@ -181,6 +776,17 @@ class HOM_Auth {
         $user
     ) {
 
+        $warehouse_return =
+            self::warehouse_return_for_user(
+                $user
+            );
+
+
+        if ($warehouse_return) {
+            return $warehouse_return;
+        }
+
+
         if (
             self::is_restricted_owner_user(
                 $user
@@ -199,6 +805,17 @@ class HOM_Auth {
         $requested_redirect_to,
         $user
     ) {
+
+        $warehouse_return =
+            self::warehouse_return_for_user(
+                $user
+            );
+
+
+        if ($warehouse_return) {
+            return $warehouse_return;
+        }
+
 
         if (
             self::is_restricted_owner_user(

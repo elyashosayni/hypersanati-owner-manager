@@ -179,6 +179,32 @@ final class HOM_Warehouse_Verification {
     }
 
 
+    public static function is_valid_request(
+        $order_id,
+        $token
+    ) {
+
+        $order =
+            HOM_Orders::get_order(
+                absint($order_id)
+            );
+
+
+        if (!$order) {
+            return false;
+        }
+
+
+        return self::token_is_valid(
+            $order,
+            sanitize_text_field(
+                (string) $token
+            )
+        );
+    }
+
+
+
     public static function confirm(
         $order_id,
         $token,
@@ -226,7 +252,7 @@ final class HOM_Warehouse_Verification {
             !user_can(
                 $actor_user_id,
                 HOM_Capabilities::
-                    CAP_MANAGE_FULFILLMENT
+                    CAP_VERIFY_WAREHOUSE
             )
         ) {
 
@@ -395,7 +421,7 @@ final class HOM_Warehouse_Verification {
             !is_user_logged_in() ||
             !current_user_can(
                 HOM_Capabilities::
-                    CAP_MANAGE_FULFILLMENT
+                    CAP_VERIFY_WAREHOUSE
             )
         ) {
 
@@ -498,12 +524,198 @@ final class HOM_Warehouse_Verification {
     }
 
 
+    public static function render_standalone() {
+
+        nocache_headers();
+
+        header(
+            'X-Robots-Tag: noindex, nofollow, noarchive, nosnippet',
+            true
+        );
+
+
+        $css_path =
+            HOM_PATH .
+            'assets/css/owner-panel.css';
+
+
+        $css_version =
+            file_exists($css_path)
+                ? (string) filemtime($css_path)
+                : HOM_VERSION;
+
+
+        $user =
+            wp_get_current_user();
+
+        ?>
+<!doctype html>
+
+<html <?php language_attributes(); ?> dir="rtl">
+
+<head>
+
+    <meta charset="<?php bloginfo('charset'); ?>">
+
+    <meta
+        name="viewport"
+        content="width=device-width,initial-scale=1"
+    >
+
+    <meta
+        name="robots"
+        content="noindex,nofollow,noarchive,nosnippet"
+    >
+
+    <title>
+        کنترل نهایی انبار
+        -
+        <?php echo esc_html(get_bloginfo('name')); ?>
+    </title>
+
+
+    <link
+        rel="stylesheet"
+        href="<?php
+        echo esc_url(
+            HOM_URL .
+            'assets/css/owner-panel.css?ver=' .
+            rawurlencode($css_version)
+        );
+        ?>"
+    >
+
+
+    <style>
+
+        body.hom-warehouse-standalone-body {
+            margin: 0;
+            min-height: 100vh;
+
+            background: #f8fafc;
+            color: #0f172a;
+        }
+
+        .hom-warehouse-standalone-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+
+            padding: 12px 20px;
+
+            border-bottom: 1px solid #e2e8f0;
+            background: #fff;
+        }
+
+        .hom-warehouse-standalone-topbar strong {
+            font-size: 14px;
+        }
+
+        .hom-warehouse-standalone-user {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .hom-warehouse-standalone-user a {
+            color: #b91c1c;
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .hom-warehouse-standalone-main {
+            width: min(940px, calc(100% - 28px));
+            margin: 24px auto 50px;
+        }
+
+
+        @media (max-width: 600px) {
+
+            .hom-warehouse-standalone-topbar {
+                padding: 10px 14px;
+            }
+
+            .hom-warehouse-standalone-main {
+                width: min(100% - 20px, 940px);
+                margin-top: 14px;
+            }
+
+            .hom-warehouse-standalone-user span {
+                display: none;
+            }
+        }
+
+    </style>
+
+</head>
+
+
+<body class="hom-warehouse-standalone-body">
+
+    <header class="hom-warehouse-standalone-topbar">
+
+        <strong>
+            کنترل و تأیید انبار
+        </strong>
+
+
+        <div class="hom-warehouse-standalone-user">
+
+            <span>
+                <?php
+                echo esc_html(
+                    $user instanceof WP_User
+                        ? (
+                            $user->display_name
+                            ?: $user->user_login
+                        )
+                        : ''
+                );
+                ?>
+            </span>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    wp_logout_url(
+                        HOM_Auth::account_url()
+                    )
+                );
+                ?>"
+            >
+                خروج
+            </a>
+
+        </div>
+
+    </header>
+
+
+    <main class="hom-warehouse-standalone-main">
+
+        <?php self::render(); ?>
+
+    </main>
+
+</body>
+
+</html>
+        <?php
+    }
+
+
+
     public static function render() {
 
         if (
             !current_user_can(
                 HOM_Capabilities::
-                    CAP_MANAGE_FULFILLMENT
+                    CAP_VERIFY_WAREHOUSE
             )
         ) {
 

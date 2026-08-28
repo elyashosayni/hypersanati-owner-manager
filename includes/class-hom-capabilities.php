@@ -21,6 +21,13 @@ class HOM_Capabilities {
         'مدیر پنل فروشگاه الفت';
 
 
+    public const WAREHOUSE_ROLE =
+        'olfatbearing_warehouse_verifier';
+
+    public const WAREHOUSE_ROLE_LABEL =
+        'مسئول تأیید انبار';
+
+
     /*
      * Previous role used by versions <= 0.2.0.
      * Existing users are automatically migrated.
@@ -30,7 +37,7 @@ class HOM_Capabilities {
 
 
     public const ROLE_VERSION =
-        '3';
+        '4';
 
 
     public const CAP_ACCESS_PANEL =
@@ -51,6 +58,9 @@ class HOM_Capabilities {
 
     public const CAP_MANAGE_FULFILLMENT =
         'hom_manage_order_fulfillment';
+
+    public const CAP_VERIFY_WAREHOUSE =
+        'hom_verify_warehouse_orders';
 
 
     /*
@@ -85,6 +95,19 @@ class HOM_Capabilities {
             self::CAP_MANAGE_PREINVOICES => true,
 
             self::CAP_MANAGE_FULFILLMENT => true,
+
+            self::CAP_VERIFY_WAREHOUSE => true,
+        ];
+    }
+
+
+
+    public static function warehouse_capabilities() {
+
+        return [
+            'read' => true,
+
+            self::CAP_VERIFY_WAREHOUSE => true,
         ];
     }
 
@@ -104,6 +127,8 @@ class HOM_Capabilities {
             self::CAP_MANAGE_PREINVOICES,
 
             self::CAP_MANAGE_FULFILLMENT,
+
+            self::CAP_VERIFY_WAREHOUSE,
 
             self::CAP_MANAGE_PRODUCT_PRICES,
 
@@ -180,6 +205,72 @@ class HOM_Capabilities {
 
 
 
+    private static function ensure_warehouse_role() {
+
+        $role =
+            get_role(
+                self::WAREHOUSE_ROLE
+            );
+
+
+        if (!$role) {
+
+            add_role(
+                self::WAREHOUSE_ROLE,
+                self::WAREHOUSE_ROLE_LABEL,
+                self::warehouse_capabilities()
+            );
+
+            $role =
+                get_role(
+                    self::WAREHOUSE_ROLE
+                );
+        }
+
+
+        if (!$role) {
+            return;
+        }
+
+
+        foreach (
+            self::warehouse_capabilities()
+            as $capability => $grant
+        ) {
+
+            $role->add_cap(
+                $capability,
+                $grant
+            );
+        }
+
+
+        /*
+         * Warehouse verifiers are deliberately isolated
+         * from every other Owner Manager permission.
+         */
+        foreach (
+            self::all_plugin_capabilities()
+            as $capability
+        ) {
+
+            if (
+                self::CAP_VERIFY_WAREHOUSE
+                ===
+                $capability
+            ) {
+                continue;
+            }
+
+
+            $role->remove_cap(
+                $capability
+            );
+        }
+    }
+
+
+
     private static function migrate_legacy_role() {
 
         $legacy_role =
@@ -241,6 +332,8 @@ class HOM_Capabilities {
     public static function sync_roles() {
 
         self::ensure_owner_role();
+
+        self::ensure_warehouse_role();
 
         self::migrate_legacy_role();
 

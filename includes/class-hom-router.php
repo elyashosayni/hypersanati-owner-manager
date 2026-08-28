@@ -218,6 +218,24 @@ class HOM_Router {
         self::handle_owner_action_request();
 
 
+        if (
+            HOM_Auth::is_warehouse_check_page() &&
+            !current_user_can(
+                HOM_Capabilities::CAP_ACCESS_PANEL
+            ) &&
+            current_user_can(
+                HOM_Capabilities::
+                    CAP_VERIFY_WAREHOUSE
+            )
+        ) {
+
+            HOM_Warehouse_Verification::
+                render_standalone();
+
+            exit;
+        }
+
+
         HOM_View::render();
 
         exit;
