@@ -491,6 +491,8 @@ class HOM_View {
             'orders',
             'seller-settings',
             'help',
+            'help-customers',
+            'help-product-images',
         ];
 
         return in_array(
@@ -614,7 +616,7 @@ class HOM_View {
                 </span>
 
                 <span>
-                    محصولات
+                    مدیریت تصاویر محصولات
                 </span>
             </a>
 
@@ -643,7 +645,7 @@ class HOM_View {
                 </span>
 
                 <span>
-                    پیش‌فاکتورها و سفارش‌ها
+                    مدیریت و پیگیری مشتریان
                 </span>
             </a>
 
@@ -689,7 +691,15 @@ class HOM_View {
                 );
                 ?>"
                 class="hom-nav-item <?php
-                echo 'help' === $current_view
+                echo in_array(
+                    $current_view,
+                    [
+                        'help',
+                        'help-customers',
+                        'help-product-images',
+                    ],
+                    true
+                )
                     ? 'is-active'
                     : '';
                 ?>"
@@ -899,7 +909,21 @@ class HOM_View {
 
             } elseif ('help' === $current_view) {
 
-                self::render_help_content();
+                self::render_help_index_content();
+
+            } elseif (
+                'help-customers' ===
+                $current_view
+            ) {
+
+                self::render_help_customers_content();
+
+            } elseif (
+                'help-product-images' ===
+                $current_view
+            ) {
+
+                self::render_help_product_images_content();
 
             } elseif ('product-images' === $current_view) {
 
@@ -948,7 +972,8 @@ class HOM_View {
                 </h1>
 
                 <p>
-                    از این بخش می‌توانید محصولات فروشگاه را مشاهده و جستجو کنید.
+                    از این پنل می‌توانید مشتریان و سفارش‌ها را پیگیری کنید
+                    و تصاویر محصولات فروشگاه را مدیریت نمایید.
                 </p>
 
             </div>
@@ -1000,11 +1025,11 @@ class HOM_View {
                 </span>
 
                 <strong class="hom-card-value hom-card-value-text">
-                    محصولات
+                    مدیریت فروشگاه
                 </strong>
 
                 <span class="hom-card-meta">
-                    مشاهده و جستجوی محصولات
+                    پیگیری مشتریان و مدیریت تصاویر محصولات
                 </span>
 
             </article>
@@ -1085,6 +1110,14 @@ class HOM_View {
             HOM_Orders::summary_counts();
 
 
+        $customer_help_url =
+            add_query_arg(
+                'view',
+                'help-customers',
+                HOM_Router::panel_url()
+            );
+
+
         $filters = [
             'all' =>
                 'همه',
@@ -1125,12 +1158,27 @@ class HOM_View {
                 </span>
 
                 <h1>
-                    پیش‌فاکتورها و سفارش‌ها
+                    مدیریت و پیگیری مشتریان
                 </h1>
 
                 <p>
-                    پیگیری یکپارچه درخواست پیش‌فاکتور، پرداخت، آماده‌سازی و ارسال سفارش‌ها
+                    مدیریت یکپارچه درخواست پیش‌فاکتور، اطلاعات مشتری،
+                    قیمت‌گذاری، پرداخت، آماده‌سازی، ارسال و تحویل سفارش‌ها
                 </p>
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $customer_help_url
+                    );
+                    ?>"
+                    class="hom-section-help-link"
+                >
+                    <span aria-hidden="true">👁</span>
+                    <span>
+                        راهنمای مدیریت و پیگیری مشتریان
+                    </span>
+                </a>
 
             </div>
 
@@ -1490,19 +1538,20 @@ class HOM_View {
 
 
 
-    private static function render_help_content() {
+    private static function render_help_index_content() {
 
-        $user =
-            wp_get_current_user();
-
-        $display_name =
-            $user->display_name
-                ?: $user->user_login;
-
-        $products_url =
+        $customer_help_url =
             add_query_arg(
                 'view',
-                'products',
+                'help-customers',
+                HOM_Router::panel_url()
+            );
+
+
+        $images_help_url =
+            add_query_arg(
+                'view',
+                'help-product-images',
                 HOM_Router::panel_url()
             );
 
@@ -1513,347 +1562,25 @@ class HOM_View {
             <section class="hom-help-hero">
 
                 <div class="hom-help-hero__icon">
-                    👋
+                    ?
                 </div>
 
                 <div class="hom-help-hero__content">
 
                     <span class="hom-help-kicker">
-                        راهنمای مدیر فروشگاه
+                        مرکز راهنمای پنل فروشگاه
                     </span>
 
                     <h1>
-                        <?php
-                        echo esc_html(
-                            $display_name
-                        );
-                        ?> عزیز، خوش آمدید
+                        راهنمای پنل مدیریت فروشگاه
                     </h1>
 
                     <p>
-                        از اینکه در مدیریت بهتر اطلاعات و تصاویر
-                        محصولات فروشگاه همکاری می‌کنید سپاسگزاریم.
-                        شناخت شما از محصولات، برندها و کدهای فنی
-                        باعث می‌شود تصاویر دقیق‌تر و مناسب‌تری
-                        برای هر محصول انتخاب شود.
-                    </p>
-
-                    <div class="hom-help-hero__actions">
-
-                        <a
-                            href="<?php
-                            echo esc_url(
-                                $products_url
-                            );
-                            ?>"
-                            class="hom-help-action hom-help-action-primary"
-                        >
-                            <span>▦</span>
-                            رفتن به محصولات
-                        </a>
-
-                        <a
-                            href="<?php
-                            echo esc_url(
-                                HOM_Auth::account_url()
-                            );
-                            ?>"
-                            class="hom-help-action hom-help-action-secondary"
-                        >
-                            <span>←</span>
-                            پنل کاربری
-                        </a>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-
-            <section class="hom-help-important">
-
-                <div class="hom-help-important__icon">
-                    ✓
-                </div>
-
-                <div>
-                    <strong>
-                        چرا همکاری شما مهم است؟
-                    </strong>
-
-                    <p>
-                        بهترین فرد برای تشخیص اینکه تصویر واقعاً
-                        متعلق به کدام محصول، برند و مدل است کسی است
-                        که با خود کالاها آشنایی دارد. کمک شما باعث
-                        افزایش دقت کاتالوگ، اعتماد مشتری و مدیریت
-                        بهتر وب‌سایت خواهد شد.
-                    </p>
-                </div>
-
-            </section>
-
-
-            <div class="hom-help-section-heading">
-
-                <span>
-                    راهنمای سریع
-                </span>
-
-                <h2>
-                    روش صحیح کار در پنل
-                </h2>
-
-                <p>
-                    مراحل زیر را به‌ترتیب انجام دهید.
-                </p>
-
-            </div>
-
-
-            <section class="hom-help-important">
-
-                <div class="hom-help-important__icon">
-                    ℹ️
-                </div>
-
-                <div>
-                    <strong>
-                        این کدها یعنی چه؟
-                    </strong>
-
-                    <p>
-                        <strong>شناسه محصول (ID):</strong>
-                        شماره داخلی محصول در همین سایت است که وردپرس/ووکامرس آن را می‌سازد. این شماره ممکن است در نسخه‌های مختلف سایت متفاوت باشد؛ بنابراین برای جستجوی روزمره بهتر است از SKU یا Part Number استفاده کنید.
-                    </p>
-
-                    <p>
-                        <strong>SKU:</strong>
-                        کد انبار یا کد فروش محصول است. معمولاً برای تشخیص نسخه‌های مختلف کالا استفاده می‌شود.
-                    </p>
-
-                    <p>
-                        <strong>Part Number:</strong>
-                        کد فنی یا شماره فنی محصول است که معمولاً روی خود کالا، جعبه، کاتالوگ یا اطلاعات فنی دیده می‌شود.
-                    </p>
-
-                    <p>
-                        در بخش «محصولات» می‌توانید با نام محصول، ID، SKU، Part Number یا برند جستجو کنید. اگر فقط یک عدد یا کد دارید، همان را دقیق وارد کنید.
-                    </p>
-                </div>
-
-            </section>
-
-            <section class="hom-help-steps">
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۱
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🔎
-                    </div>
-
-                    <h3>
-                        محصول را پیدا کنید
-                    </h3>
-
-                    <p>
-                        وارد بخش «محصولات» شوید و با نام محصول،
-                        ID، SKU، Part Number یا برند جستجو کنید.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۲
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🏷️
-                    </div>
-
-                    <h3>
-                        مشخصات را کنترل کنید
-                    </h3>
-
-                    <p>
-                        قبل از تغییر تصویر، نام محصول، شناسه،
-                        SKU، Part Number و برند را بررسی کنید
-                        تا تصویر روی محصول اشتباه قرار نگیرد.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۳
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🖼️
-                    </div>
-
-                    <h3>
-                        تصویر اصلی را انتخاب کنید
-                    </h3>
-
-                    <p>
-                        تصویر اصلی باید واضح، مرتبط با همان محصول
-                        و بهترین نمای کالا برای مشتری باشد. تصویر
-                        انتخاب‌شده، حتی اگر از قبل مربع باشد، قبل
-                        از آپلود وارد ویرایشگر تصویر می‌شود.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۴
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🗂️
-                    </div>
-
-                    <h3>
-                        گالری را تکمیل کنید
-                    </h3>
-
-                    <p>
-                        تصاویر تکمیلی، زوایای دیگر محصول،
-                        بسته‌بندی، نقشه یا ابعاد فنی را در گالری
-                        قرار دهید. تصاویر گالری نیز قبل از آپلود
-                        از همان ویرایشگر عبور می‌کنند.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۵
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        ✥
-                    </div>
-
-                    <h3>
-                        تصویر را تنظیم و تأیید کنید
-                    </h3>
-
-                    <p>
-                        در ویرایشگر می‌توانید تصویر را جابه‌جا،
-                        زوم، کوچک، بزرگ و آزادانه بچرخانید.
-                        خروجی همیشه مربع ۱:۱ است. بهتر است اطراف
-                        خود محصول کمی فضای سفید باقی بماند.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۶
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        ✅
-                    </div>
-
-                    <h3>
-                        آپلود و ذخیره نهایی را انجام دهید
-                    </h3>
-
-                    <p>
-                        پس از تأیید ویرایش، تصویر را آپلود کنید.
-                        واترمارک به‌صورت خودکار روی نسخه جدید
-                        اعمال می‌شود. در پایان حتماً دکمه
-                        «ذخیره تغییرات» را بزنید.
-                    </p>
-
-                </article>
-
-            </section>
-
-
-
-            <section class="hom-help-important hom-help-image-editor-guide">
-
-                <div class="hom-help-important__icon">
-                    !
-                </div>
-
-                <div>
-
-                    <strong>
-                        نکات مهم ویرایش و مدیریت تصاویر
-                    </strong>
-
-                    <p>
-                        تمام تصاویر محصول، چه از دستگاه و دوربین
-                        و چه از Media Library انتخاب شوند، قبل
-                        از آپلود وارد ویرایشگر می‌شوند. خروجی
-                        نهایی همیشه مربع با نسبت ۱:۱ است.
-                    </p>
-
-                    <p>
-                        برای نمایش حرفه‌ای محصول بهتر است کالا
-                        کاملاً به لبه‌های تصویر نچسبد. با ابزار
-                        «حاشیه سفید» می‌توانید کل محصول را با
-                        فضای مناسب داخل کادر نگه دارید و با
-                        «پر کردن کادر» تصویر را تا لبه‌های مربع
-                        گسترش دهید.
-                    </p>
-
-                    <p>
-                        امکان جابه‌جایی تصویر، زوم، چرخش آزاد،
-                        مشاهده درجه چرخش و صفر کردن زاویه وجود
-                        دارد. در موبایل ابزارهای اصلی در نوار
-                        ابزار کنار تصویر قرار دارند و زوم و
-                        چرخش با دو انگشت نیز امکان‌پذیر است.
-                    </p>
-
-                    <p>
-                        سیستم به‌صورت خودکار آرم
-                        «صنعت گستران الفت» را به‌عنوان واترمارک
-                        روی نسخه نهایی تولیدشده قرار می‌دهد.
-                        محل و ظاهر تقریبی واترمارک را قبل از
-                        آپلود در همان کادر ویرایش به‌صورت
-                        پیش‌نمایش مشاهده می‌کنید.
-                    </p>
-
-                    <p>
-                        فایل اصلی انتخاب‌شده از Media Library
-                        تغییر نمی‌کند. سیستم پس از ویرایش یک
-                        تصویر جدید می‌سازد و واترمارک روی همان
-                        نسخه جدید اعمال می‌شود.
-                    </p>
-
-                    <p>
-                        گزینه «جدا کردن از محصول» فقط ارتباط
-                        تصویر با محصول را حذف می‌کند و خود فایل
-                        تصویر از Media Library یا سرور حذف
-                        نمی‌شود. لغو تغییرات نیز هیچ فایل
-                        رسانه‌ای را حذف نمی‌کند.
-                    </p>
-
-                    <p>
-                        پس از آپلود تصاویر، برای ثبت قطعی تصویر
-                        اصلی و گالری روی محصول حتماً دکمه
-                        «ذخیره تغییرات» را بزنید.
+                        راهنمای بخش موردنظر را انتخاب کنید.
+                        هر راهنما در صفحه‌ای مستقل قرار دارد تا
+                        با اضافه شدن امکانات جدید، بتوان راهنماهای
+                        بیشتری بدون شلوغ شدن منوی اصلی به این بخش
+                        اضافه کرد.
                     </p>
 
                 </div>
@@ -1861,159 +1588,939 @@ class HOM_View {
             </section>
 
 
+            <section class="hom-help-branch-grid">
 
-            <div class="hom-help-section-heading">
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $customer_help_url
+                    );
+                    ?>"
+                    class="hom-help-branch-card is-primary"
+                >
 
-                <span>
-                    ابزارهای پنل
-                </span>
-
-                <h2>
-                    هر ابزار چه کاری انجام می‌دهد؟
-                </h2>
-
-            </div>
-
-
-            <section class="hom-help-tools">
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">📁</span>
-
-                    <div>
-                        <h3>انتخاب از دستگاه</h3>
-                        <p>
-                            انتخاب عکس از کامپیوتر، لپ‌تاپ یا
-                            حافظه موبایل.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">📷</span>
-
-                    <div>
-                        <h3>دوربین موبایل</h3>
-                        <p>
-                            گرفتن عکس مستقیم از محصول با دوربین
-                            دستگاه در صورت پشتیبانی مرورگر.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">▦</span>
-
-                    <div>
-                        <h3>رسانه‌های سایت</h3>
-                        <p>
-                            استفاده از تصویری که قبلاً در سایت
-                            وجود دارد، بدون نیاز به آپلود دوباره.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">⬆️</span>
-
-                    <div>
-                        <h3>آپلود همه تصاویر</h3>
-                        <p>
-                            تصاویر آماده‌شده برای گالری را
-                            به سایت منتقل می‌کند.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">↺</span>
-
-                    <div>
-                        <h3>بازنشانی</h3>
-                        <p>
-                            اگر هنوز ذخیره نهایی نکرده‌اید،
-                            تغییرات صفحه را به وضعیت اولیه
-                            برمی‌گرداند.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">✓</span>
-
-                    <div>
-                        <h3>ذخیره تغییرات</h3>
-                        <p>
-                            مرحله نهایی اتصال تصویر اصلی و
-                            تصاویر گالری به محصول است.
-                        </p>
-                    </div>
-                </article>
-
-            </section>
-
-
-            <section class="hom-help-warning">
-
-                <div class="hom-help-warning__head">
-
-                    <span class="hom-help-warning__icon">
-                        ⚠️
+                    <span class="hom-help-branch-card__icon">
+                        👥
                     </span>
 
                     <div>
-                        <span>
-                            قبل از هر تغییر
+
+                        <span class="hom-help-kicker">
+                            پیش‌فاکتور و سفارش
                         </span>
 
                         <h2>
-                            چند نکته بسیار مهم
+                            راهنمای مدیریت و پیگیری مشتریان
                         </h2>
+
+                        <p>
+                            اطلاعات مشتری، قیمت‌گذاری،
+                            تأیید پیش‌فاکتور، پرداخت،
+                            آماده‌سازی، ارسال، تحویل،
+                            اصلاحات، اسناد و رخدادها.
+                        </p>
+
                     </div>
 
-                </div>
+                    <span class="hom-help-branch-card__arrow">
+                        ←
+                    </span>
 
-                <ul>
-                    <li>
-                        قبل از انتخاب تصویر، حتماً کد و برند
-                        محصول را با تصویر تطبیق دهید.
-                    </li>
+                </a>
 
-                    <li>
-                        اگر درباره تصویر یا محصول مطمئن نیستید،
-                        تغییر را ذخیره نکنید.
-                    </li>
 
-                    <li>
-                        هنگام آپلود، صفحه را نبندید و تا پایان
-                        کامل انتقال تصاویر صبر کنید.
-                    </li>
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $images_help_url
+                    );
+                    ?>"
+                    class="hom-help-branch-card"
+                >
 
-                    <li>
-                        از قرار دادن تصویر نامرتبط، تصویر محصول
-                        برند دیگر یا عکس بی‌کیفیت خودداری کنید.
-                    </li>
+                    <span class="hom-help-branch-card__icon">
+                        🖼️
+                    </span>
 
-                    <li>
-                        قبل از «ذخیره تغییرات» پیش‌نمایش تصویر
-                        اصلی و گالری را یک بار دیگر بررسی کنید.
-                    </li>
+                    <div>
 
-                    <li>
-                        تصاویر موجود در «رسانه‌های سایت» ممکن است
-                        در بخش‌های دیگری نیز استفاده شده باشند؛
-                        فقط تصویر مناسب را انتخاب کنید و از
-                        ایجاد نسخه‌های تکراری غیرضروری بپرهیزید.
-                    </li>
-                </ul>
+                        <span class="hom-help-kicker">
+                            محصولات
+                        </span>
+
+                        <h2>
+                            راهنمای مدیریت تصاویر محصولات
+                        </h2>
+
+                        <p>
+                            جستجوی محصول، تصویر اصلی،
+                            گالری، ویرایش تصویر، واترمارک،
+                            آپلود و ذخیره نهایی.
+                        </p>
+
+                    </div>
+
+                    <span class="hom-help-branch-card__arrow">
+                        ←
+                    </span>
+
+                </a>
 
             </section>
 
+        </div>
+
+        <?php
+    }
+
+
+
+    private static function render_help_customers_content() {
+
+        $orders_url =
+            add_query_arg(
+                'view',
+                'orders',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_index_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+        ?>
+
+        <div class="hom-help-page">
+
+            <section class="hom-help-hero">
+
+                <div class="hom-help-hero__icon">
+                    👥
+                </div>
+
+                <div class="hom-help-hero__content">
+
+                    <span class="hom-help-kicker">
+                        راهنمای مدیریت و پیگیری مشتریان
+                    </span>
+
+                    <h1>
+                        راهنمای کامل مدیریت و پیگیری مشتریان
+                    </h1>
+
+                    <p>
+                        در این صفحه تمام مراحل رسیدگی به درخواست
+                        پیش‌فاکتور، تکمیل اطلاعات مشتری، قیمت‌گذاری،
+                        تأیید، پرداخت، آماده‌سازی، ارسال، تحویل،
+                        اصلاح اطلاعات، چاپ اسناد و بررسی سوابق
+                        توضیح داده شده است.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <div class="hom-help-page-back">
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $help_index_url
+                    );
+                    ?>"
+                    class="hom-help-action hom-help-action-secondary"
+                >
+                    <span aria-hidden="true">←</span>
+                    بازگشت به راهنمای پنل
+                </a>
+
+            </div>
+
+
+            <section
+                id="hom-help-customers"
+                class="hom-help-topic"
+            >
+
+                <div class="hom-help-topic__head">
+
+                    <div class="hom-help-topic__icon">
+                        👥
+                    </div>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            راهنمای مدیریت و پیگیری مشتریان
+                        </span>
+
+                        <h2>
+                            مسیر کامل رسیدگی به مشتری
+                        </h2>
+
+                        <p>
+                            از ورود درخواست پیش‌فاکتور تا قیمت‌گذاری،
+                            پرداخت، آماده‌سازی، ارسال و تحویل نهایی.
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="<?php
+                        echo esc_url(
+                            $orders_url
+                        );
+                        ?>"
+                        class="hom-help-action hom-help-action-primary"
+                    >
+                        رفتن به مدیریت و پیگیری مشتریان
+                    </a>
+
+                </div>
+
+
+                <div class="hom-help-section-heading">
+
+                    <span>
+                        مسیر استاندارد کار
+                    </span>
+
+                    <h2>
+                        مراحل رسیدگی به پیش‌فاکتور و سفارش
+                    </h2>
+
+                    <p>
+                        برای جلوگیری از خطا، مراحل را به ترتیب انجام دهید.
+                    </p>
+
+                </div>
+
+
+                <section class="hom-help-steps">
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۱</div>
+                        <div class="hom-help-step__icon">🔎</div>
+                        <h3>مشتری یا سفارش را پیدا کنید</h3>
+                        <p>
+                            با شماره سفارش، نام، موبایل یا کد رهگیری
+                            جستجو کنید و در صورت نیاز از فیلتر وضعیت
+                            برای محدود کردن نتایج استفاده کنید.
+                        </p>
+                    </article>
+
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۲</div>
+                        <div class="hom-help-step__icon">👤</div>
+                        <h3>اطلاعات مشتری را بررسی کنید</h3>
+                        <p>
+                            مشخصات مشتری و اطلاعات حقوقی خریدار شامل
+                            نام حقوقی، شناسه ملی، کد اقتصادی، شماره ثبت،
+                            کدپستی و نشانی را کنترل و در صورت نیاز تکمیل کنید.
+                        </p>
+                    </article>
+
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۳</div>
+                        <div class="hom-help-step__icon">💰</div>
+                        <h3>قیمت‌گذاری را انجام دهید</h3>
+                        <p>
+                            قیمت واحد اقلام و هزینه ارسال را بررسی
+                            و ثبت کنید و سپس «ذخیره قیمت‌ها» را بزنید.
+                            اصلاح قیمت ثبت‌شده نیازمند دلیل اصلاح است.
+                        </p>
+                    </article>
+
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۴</div>
+                        <div class="hom-help-step__icon">✓</div>
+                        <h3>پیش‌فاکتور را تأیید کنید</h3>
+                        <p>
+                            پس از کنترل نهایی قیمت‌ها، دکمه
+                            «تأیید و آماده‌سازی برای پرداخت»
+                            را بزنید تا مشتری بتواند مرحله پرداخت
+                            را ادامه دهد.
+                        </p>
+                    </article>
+
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۵</div>
+                        <div class="hom-help-step__icon">💳</div>
+                        <h3>پرداخت را تأیید کنید</h3>
+                        <p>
+                            فقط پس از مشاهده قطعی واریز، مبلغ،
+                            شماره پیگیری یا مرجع پرداخت و توضیحات
+                            را ثبت کرده و «تأیید دریافت کامل وجه»
+                            را بزنید.
+                        </p>
+                    </article>
+
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۶</div>
+                        <div class="hom-help-step__icon">📦</div>
+                        <h3>سفارش را آماده ارسال کنید</h3>
+                        <p>
+                            روش ارسال، شرکت یا باربری، کد رهگیری،
+                            وضعیت کرایه و توضیحات را تکمیل کنید و
+                            پس از آماده شدن کالا وضعیت «آماده ارسال»
+                            را ثبت نمایید.
+                        </p>
+                    </article>
+
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۷</div>
+                        <div class="hom-help-step__icon">🚚</div>
+                        <h3>ارسال را ثبت کنید</h3>
+                        <p>
+                            پس از تحویل واقعی کالا به باربری یا
+                            شرکت حمل، سفارش را به وضعیت
+                            «ارسال شده» منتقل کنید.
+                        </p>
+                    </article>
+
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۸</div>
+                        <div class="hom-help-step__icon">✅</div>
+                        <h3>تحویل را نهایی کنید</h3>
+                        <p>
+                            پس از اطمینان از رسیدن کالا به مشتری،
+                            وضعیت «تحویل شده» را ثبت کنید.
+                        </p>
+                    </article>
+
+                </section>
+
+
+                <div class="hom-help-section-heading">
+                    <span>وضعیت پرونده</span>
+                    <h2>وضعیت‌ها چه معنایی دارند؟</h2>
+                </div>
+
+
+                <section class="hom-help-tools">
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">🆕</span>
+                        <div>
+                            <h3>پیش‌فاکتور جدید</h3>
+                            <p>درخواست تازه‌ای که باید بررسی و قیمت‌گذاری شود.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">✓</span>
+                        <div>
+                            <h3>تأیید شده</h3>
+                            <p>پیش‌فاکتور تأیید و برای پرداخت آماده شده است.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">⌛</span>
+                        <div>
+                            <h3>انتظار پرداخت</h3>
+                            <p>پرونده در انتظار انجام یا تأیید پرداخت است.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">🔍</span>
+                        <div>
+                            <h3>در انتظار بررسی</h3>
+                            <p>سفارش پیش از ادامه کار به بررسی نیاز دارد.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">⚙️</span>
+                        <div>
+                            <h3>در حال آماده‌سازی</h3>
+                            <p>سفارش وارد مرحله آماده‌سازی کالا شده است.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">📦</span>
+                        <div>
+                            <h3>آماده ارسال</h3>
+                            <p>کالا آماده تحویل به باربری یا شرکت حمل است.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">🚚</span>
+                        <div>
+                            <h3>ارسال شده</h3>
+                            <p>کالا ارسال و اطلاعات حمل ثبت شده است.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">✅</span>
+                        <div>
+                            <h3>تحویل شده</h3>
+                            <p>سفارش تحویل مشتری شده و عملیات پایان یافته است.</p>
+                        </div>
+                    </article>
+
+                </section>
+
+
+                <section class="hom-help-important">
+
+                    <div class="hom-help-important__icon">
+                        ✎
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            دلیل اصلاح چه زمانی لازم است؟
+                        </strong>
+
+                        <p>
+                            زمانی که اطلاعاتی قبلاً ثبت شده و اکنون
+                            قصد تغییر آن را دارید، سیستم ممکن است
+                            «دلیل اصلاح» درخواست کند. دلیل واضح و
+                            واقعی بنویسید تا سابقه تغییر قابل پیگیری باشد.
+                        </p>
+
+                        <p>
+                            در اطلاعات پرداخت پس از تأیید دریافت وجه،
+                            مبلغ و وضعیت پرداخت قابل تغییر نیستند.
+                            فقط مرجع و توضیحات پرداخت را می‌توان با
+                            ثبت دلیل اصلاح کرد.
+                        </p>
+
+                        <p>
+                            اصلاح اطلاعات ثبت‌شده مشتری، قیمت‌ها
+                            و اطلاعات ارسال نیز در سوابق عملیات
+                            ثبت می‌شود.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <div class="hom-help-section-heading">
+                    <span>اسناد و سوابق</span>
+                    <h2>ابزارهای تکمیلی پرونده مشتری</h2>
+                </div>
+
+
+                <section class="hom-help-tools">
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">🧾</span>
+                        <div>
+                            <h3>چاپ فاکتور</h3>
+                            <p>
+                                نسخه چاپی فاکتور شامل اطلاعات طرفین،
+                                اقلام و مبالغ سفارش.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">📦</span>
+                        <div>
+                            <h3>برگه انبار بدون قیمت</h3>
+                            <p>
+                                نسخه مناسب انبار و آماده‌سازی کالا
+                                بدون نمایش قیمت فروش.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">🏷️</span>
+                        <div>
+                            <h3>برچسب ارسال</h3>
+                            <p>
+                                اطلاعات موردنیاز برای شناسایی مرسوله
+                                و مقصد ارسال.
+                            </p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">🕘</span>
+                        <div>
+                            <h3>رخدادها و سوابق</h3>
+                            <p>
+                                سابقه قیمت‌گذاری، تأیید، اصلاح،
+                                پرداخت و مراحل ارسال را نشان می‌دهد.
+                            </p>
+                        </div>
+                    </article>
+
+                </section>
+
+
+                <section class="hom-help-warning">
+
+                    <div class="hom-help-warning__head">
+
+                        <span class="hom-help-warning__icon">⚠️</span>
+
+                        <div>
+                            <span>قبل از ثبت نهایی</span>
+                            <h2>نکات مهم رسیدگی به مشتری</h2>
+                        </div>
+
+                    </div>
+
+                    <ul>
+                        <li>
+                            قیمت اقلام و هزینه ارسال را پیش از
+                            تأیید پیش‌فاکتور دوباره کنترل کنید.
+                        </li>
+
+                        <li>
+                            پرداخت را فقط پس از مشاهده قطعی واریز
+                            تأیید کنید.
+                        </li>
+
+                        <li>
+                            برای اصلاح اطلاعات قبلی، دلیل واقعی
+                            و قابل فهم ثبت کنید.
+                        </li>
+
+                        <li>
+                            پیش از ارسال، مقصد، روش حمل، باربری
+                            و کد رهگیری را کنترل کنید.
+                        </li>
+
+                        <li>
+                            وضعیت ارسال یا تحویل را پیش از انجام
+                            واقعی آن مرحله ثبت نکنید.
+                        </li>
+
+                        <li>
+                            اطلاعات آزمایشی یا غیرواقعی در پرونده
+                            مشتری ثبت نکنید؛ رخدادها سابقه رسمی
+                            عملیات پنل هستند.
+                        </li>
+                    </ul>
+
+                </section>
+
+            </section>
+
+
+            <?php
+            self::render_help_security_content();
+            ?>
+
+        </div>
+
+        <?php
+    }
+
+
+
+    private static function render_help_product_images_content() {
+
+        $products_url =
+            add_query_arg(
+                'view',
+                'products',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_index_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+        ?>
+
+        <div class="hom-help-page">
+
+            <section class="hom-help-hero">
+
+                <div class="hom-help-hero__icon">
+                    🖼️
+                </div>
+
+                <div class="hom-help-hero__content">
+
+                    <span class="hom-help-kicker">
+                        راهنمای مدیریت تصاویر محصولات
+                    </span>
+
+                    <h1>
+                        راهنمای کامل مدیریت تصاویر محصولات
+                    </h1>
+
+                    <p>
+                        در این صفحه روش پیدا کردن محصول صحیح،
+                        کنترل کدهای فنی، انتخاب تصویر اصلی،
+                        مدیریت گالری، کار با ویرایشگر، واترمارک،
+                        آپلود و ذخیره نهایی تصاویر توضیح داده شده است.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <div class="hom-help-page-back">
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $help_index_url
+                    );
+                    ?>"
+                    class="hom-help-action hom-help-action-secondary"
+                >
+                    <span aria-hidden="true">←</span>
+                    بازگشت به راهنمای پنل
+                </a>
+
+            </div>
+
+
+            <section
+                id="hom-help-product-images"
+                class="hom-help-topic"
+            >
+
+                <div class="hom-help-topic__head">
+
+                    <div class="hom-help-topic__icon">
+                        🖼️
+                    </div>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            راهنمای مدیریت تصاویر محصولات
+                        </span>
+
+                        <h2>
+                            روش صحیح اصلاح تصویر اصلی و گالری
+                        </h2>
+
+                        <p>
+                            محصول صحیح را پیدا کنید، تصاویر را
+                            انتخاب و ویرایش کنید و در پایان تغییرات
+                            را روی محصول ثبت نمایید.
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="<?php
+                        echo esc_url(
+                            $products_url
+                        );
+                        ?>"
+                        class="hom-help-action hom-help-action-primary"
+                    >
+                        رفتن به مدیریت تصاویر محصولات
+                    </a>
+
+                </div>
+
+
+                <section class="hom-help-important">
+
+                    <div class="hom-help-important__icon">
+                        ℹ️
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            کدهای محصول را بشناسید
+                        </strong>
+
+                        <p>
+                            <strong>ID:</strong>
+                            شناسه داخلی محصول در وردپرس و ووکامرس.
+                        </p>
+
+                        <p>
+                            <strong>SKU:</strong>
+                            کد انبار یا کد فروش محصول.
+                        </p>
+
+                        <p>
+                            <strong>Part Number:</strong>
+                            کد یا شماره فنی محصول که معمولاً روی
+                            کالا، جعبه یا کاتالوگ دیده می‌شود.
+                        </p>
+
+                        <p>
+                            محصول را می‌توانید با نام، ID، SKU،
+                            Part Number یا برند جستجو کنید.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <div class="hom-help-section-heading">
+                    <span>مسیر استاندارد کار</span>
+                    <h2>مراحل مدیریت تصاویر</h2>
+                </div>
+
+
+                <section class="hom-help-steps">
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۱</div>
+                        <div class="hom-help-step__icon">🔎</div>
+                        <h3>محصول را پیدا کنید</h3>
+                        <p>
+                            با نام، ID، SKU، Part Number یا برند
+                            محصول صحیح را جستجو کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۲</div>
+                        <div class="hom-help-step__icon">🏷️</div>
+                        <h3>مشخصات را کنترل کنید</h3>
+                        <p>
+                            نام، برند و کدهای محصول را قبل از
+                            تغییر تصویر بررسی کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۳</div>
+                        <div class="hom-help-step__icon">🖼️</div>
+                        <h3>تصویر اصلی را انتخاب کنید</h3>
+                        <p>
+                            واضح‌ترین و مناسب‌ترین نمای همان کالا
+                            را به‌عنوان تصویر اصلی انتخاب کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۴</div>
+                        <div class="hom-help-step__icon">🗂️</div>
+                        <h3>گالری را تکمیل کنید</h3>
+                        <p>
+                            تصاویر تکمیلی، زوایای دیگر، بسته‌بندی،
+                            نقشه یا ابعاد فنی را اضافه کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۵</div>
+                        <div class="hom-help-step__icon">✥</div>
+                        <h3>تصویر را تنظیم کنید</h3>
+                        <p>
+                            تصویر را جابه‌جا، زوم و بچرخانید.
+                            خروجی نهایی مربع ۱:۱ است.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۶</div>
+                        <div class="hom-help-step__icon">✅</div>
+                        <h3>آپلود و ذخیره کنید</h3>
+                        <p>
+                            پس از آماده‌سازی تصاویر، آپلود را
+                            انجام دهید و در پایان حتماً
+                            «ذخیره تغییرات» را بزنید.
+                        </p>
+                    </article>
+
+                </section>
+
+
+                <section class="hom-help-important hom-help-image-editor-guide">
+
+                    <div class="hom-help-important__icon">
+                        !
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            نکات مهم ویرایشگر تصویر
+                        </strong>
+
+                        <p>
+                            تصاویر انتخاب‌شده از دستگاه، دوربین
+                            یا Media Library قبل از آپلود وارد
+                            ویرایشگر می‌شوند.
+                        </p>
+
+                        <p>
+                            امکان جابه‌جایی، زوم، چرخش آزاد،
+                            مشاهده درجه چرخش و صفر کردن زاویه وجود
+                            دارد. در موبایل زوم و چرخش با دو انگشت
+                            نیز قابل انجام است.
+                        </p>
+
+                        <p>
+                            خروجی نهایی همیشه مربع ۱:۱ است.
+                            بهتر است اطراف کالا فضای مناسب باقی بماند.
+                        </p>
+
+                        <p>
+                            ابزار «حاشیه سفید» کل کالا را با فضای
+                            مناسب داخل کادر نگه می‌دارد و
+                            «پر کردن کادر» تصویر را تا لبه‌های
+                            مربع گسترش می‌دهد.
+                        </p>
+
+                        <p>
+                            واترمارک «صنعت گستران الفت» به‌صورت
+                            خودکار روی نسخه جدید اعمال می‌شود.
+                        </p>
+
+                        <p>
+                            فایل اصلی Media Library تغییر نمی‌کند؛
+                            سیستم نسخه جدید ویرایش‌شده ایجاد می‌کند.
+                        </p>
+
+                        <p>
+                            «جدا کردن از محصول» فایل را حذف نمی‌کند
+                            و فقط ارتباط آن تصویر با محصول را برمی‌دارد.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <div class="hom-help-section-heading">
+                    <span>ابزارهای تصاویر</span>
+                    <h2>هر دکمه چه کاری انجام می‌دهد؟</h2>
+                </div>
+
+
+                <section class="hom-help-tools">
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">📁</span>
+                        <div>
+                            <h3>انتخاب از دستگاه</h3>
+                            <p>انتخاب عکس از کامپیوتر یا موبایل.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">📷</span>
+                        <div>
+                            <h3>دوربین موبایل</h3>
+                            <p>گرفتن مستقیم عکس با دوربین دستگاه.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">▦</span>
+                        <div>
+                            <h3>رسانه‌های سایت</h3>
+                            <p>انتخاب تصویر موجود در Media Library.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">⬆️</span>
+                        <div>
+                            <h3>آپلود همه تصاویر</h3>
+                            <p>انتقال تصاویر آماده‌شده به سایت.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">↺</span>
+                        <div>
+                            <h3>لغو تغییرات</h3>
+                            <p>بازگشت تغییرات ذخیره‌نشده به وضعیت اولیه.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">✓</span>
+                        <div>
+                            <h3>ذخیره تغییرات</h3>
+                            <p>ثبت نهایی تصویر اصلی و گالری روی محصول.</p>
+                        </div>
+                    </article>
+
+                </section>
+
+
+                <section class="hom-help-warning">
+
+                    <div class="hom-help-warning__head">
+
+                        <span class="hom-help-warning__icon">⚠️</span>
+
+                        <div>
+                            <span>قبل از ذخیره</span>
+                            <h2>نکات مهم تصاویر محصولات</h2>
+                        </div>
+
+                    </div>
+
+                    <ul>
+                        <li>
+                            کد، برند و مدل محصول را با تصویر تطبیق دهید.
+                        </li>
+                        <li>
+                            اگر درباره تصویر مطمئن نیستید، آن را ذخیره نکنید.
+                        </li>
+                        <li>
+                            هنگام آپلود صفحه را نبندید.
+                        </li>
+                        <li>
+                            تصویر محصول یا برند دیگری را استفاده نکنید.
+                        </li>
+                        <li>
+                            از تصاویر بی‌کیفیت و نامرتبط خودداری کنید.
+                        </li>
+                        <li>
+                            قبل از ذخیره نهایی، تصویر اصلی و گالری
+                            را دوباره کنترل کنید.
+                        </li>
+                    </ul>
+
+                </section>
+
+            </section>
+
+
+            <?php
+            self::render_help_security_content();
+            ?>
+
+        </div>
+
+        <?php
+    }
+
+
+
+    private static function render_help_security_content() {
+
+        ?>
 
             <section class="hom-help-security">
 
@@ -2032,119 +2539,39 @@ class HOM_View {
                     </h2>
 
                     <p>
-                        این حساب امکان انجام تغییرات واقعی در
-                        محصولات فروشگاه را دارد. نام کاربری،
-                        رمز عبور و اطلاعات یا لینک‌های دسترسی
-                        مدیریتی را در اختیار افراد غیرمجاز
-                        قرار ندهید.
+                        این حساب امکان ایجاد تغییرات واقعی در
+                        فروشگاه را دارد. نام کاربری، رمز عبور
+                        و لینک‌های مدیریتی را در اختیار افراد
+                        غیرمجاز قرار ندهید.
                     </p>
 
                     <div class="hom-help-security__rules">
 
                         <div>
                             <strong>رمز عبور</strong>
-                            <span>
-                                آن را برای دیگران ارسال نکنید.
-                            </span>
+                            <span>آن را برای دیگران ارسال نکنید.</span>
                         </div>
 
                         <div>
                             <strong>دستگاه مشترک</strong>
-                            <span>
-                                پس از پایان کار حتماً از حساب
-                                خارج شوید.
-                            </span>
+                            <span>پس از پایان کار از حساب خارج شوید.</span>
                         </div>
 
                         <div>
-                            <strong>لینک مدیریتی</strong>
-                            <span>
-                                آن را عمومی منتشر نکنید و فقط
-                                با افراد مجاز به اشتراک بگذارید.
-                            </span>
+                            <strong>ثبت اطلاعات</strong>
+                            <span>پیش از ذخیره هر تغییر، اطلاعات را کنترل کنید.</span>
                         </div>
 
                         <div>
                             <strong>فعالیت مشکوک</strong>
-                            <span>
-                                در صورت مشاهده مورد غیرعادی،
-                                موضوع را سریعاً به مدیر اصلی
-                                سایت اطلاع دهید.
-                            </span>
+                            <span>موضوع را سریعاً به مدیر اصلی سایت اطلاع دهید.</span>
                         </div>
 
                     </div>
 
-                    <div class="hom-help-security__note">
-                        توجه: محرمانه نگه‌داشتن آدرس پنل به‌تنهایی
-                        جایگزین رمز عبور قوی و حفاظت از حساب
-                        کاربری نیست.
-                    </div>
-
                 </div>
 
             </section>
-
-
-            <section class="hom-help-navigation">
-
-                <article>
-                    <span>←</span>
-
-                    <div>
-                        <strong>
-                            بازگشت به پنل کاربری
-                        </strong>
-
-                        <p>
-                            شما را به My Account برمی‌گرداند
-                            و همچنان وارد حساب باقی می‌مانید.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article>
-                    <span>↪</span>
-
-                    <div>
-                        <strong>
-                            خروج از حساب
-                        </strong>
-
-                        <p>
-                            نشست کاربری را کاملاً پایان می‌دهد.
-                            روی دستگاه‌های مشترک حتماً از این
-                            گزینه استفاده کنید.
-                        </p>
-                    </div>
-                </article>
-
-            </section>
-
-
-            <section class="hom-help-thanks">
-
-                <div class="hom-help-thanks__icon">
-                    ★
-                </div>
-
-                <div>
-                    <h2>
-                        از همکاری شما سپاسگزاریم
-                    </h2>
-
-                    <p>
-                        مشارکت شما در تکمیل و کنترل تصاویر
-                        محصولات، بخش مهمی از مدیریت حرفه‌ای
-                        فروشگاه است و به ارائه اطلاعات دقیق‌تر
-                        و تجربه بهتر مشتریان کمک می‌کند.
-                    </p>
-                </div>
-
-            </section>
-
-        </div>
 
         <?php
     }
@@ -2198,6 +2625,14 @@ class HOM_View {
         $items =
             $result['items'];
 
+
+        $images_help_url =
+            add_query_arg(
+                'view',
+                'help-product-images',
+                HOM_Router::panel_url()
+            );
+
         ?>
 
         <div class="hom-page-heading hom-products-heading">
@@ -2209,12 +2644,28 @@ class HOM_View {
                 </span>
 
                 <h1>
-                    محصولات
+                    مدیریت تصاویر محصولات
                 </h1>
 
                 <p>
-                    جستجو بر اساس نام محصول، شناسه محصول (ID)، کد SKU، Part Number یا برند. اگر فقط شماره یا کد دارید، همان را وارد کنید.
+                    محصول را با نام، شناسه محصول (ID)، کد SKU،
+                    Part Number یا برند پیدا کنید و تصویر اصلی
+                    و گالری آن را مدیریت نمایید.
                 </p>
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $images_help_url
+                    );
+                    ?>"
+                    class="hom-section-help-link"
+                >
+                    <span aria-hidden="true">👁</span>
+                    <span>
+                        راهنمای مدیریت تصاویر محصولات
+                    </span>
+                </a>
 
             </div>
 
