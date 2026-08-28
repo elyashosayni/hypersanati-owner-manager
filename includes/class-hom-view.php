@@ -1349,7 +1349,7 @@ class HOM_View {
 
                         <thead>
                             <tr>
-                                <th>شماره</th>
+                                <th>پرونده</th>
                                 <th>نوع</th>
                                 <th>مشتری</th>
                                 <th>شهر</th>
@@ -1358,6 +1358,7 @@ class HOM_View {
                                 <th>مبلغ</th>
                                 <th>ارسال</th>
                                 <th>تاریخ</th>
+                                <th>دسترسی سریع</th>
                             </tr>
                         </thead>
 
@@ -1368,73 +1369,381 @@ class HOM_View {
                             $result['items']
                             as $item
                         ) :
+
+                            $row_order =
+                                HOM_Orders::get_order(
+                                    $item['id']
+                                );
+
+
+                            $detail_url =
+                                HOM_Orders::detail_url(
+                                    $item['id']
+                                );
+
+
+                            $contact =
+                                $row_order
+                                    ? HOM_Orders::customer_contact_data(
+                                        $row_order
+                                    )
+                                    : [
+                                        'display_name' => '',
+                                        'phone' => '',
+                                        'email' => '',
+                                        'billing' => [
+                                            'city' => '',
+                                        ],
+                                    ];
+
+
+                            $customer_name =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['display_name']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            if (
+                                '' === $customer_name ||
+                                'مشتری بدون نام'
+                                    ===
+                                    $customer_name
+                            ) {
+
+                                $customer_name =
+                                    trim(
+                                        (string)
+                                        (
+                                            $item['customer_name']
+                                            ?? ''
+                                        )
+                                    );
+                            }
+
+
+                            if (
+                                '' === $customer_name ||
+                                'مشتری بدون نام'
+                                    ===
+                                    $customer_name
+                            ) {
+
+                                $customer_name =
+                                    'نام ثبت نشده';
+                            }
+
+
+                            $customer_phone =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['phone']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            if (
+                                '' === $customer_phone
+                            ) {
+
+                                $customer_phone =
+                                    trim(
+                                        (string)
+                                        (
+                                            $item['phone']
+                                            ?? ''
+                                        )
+                                    );
+                            }
+
+
+                            $customer_email =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['email']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            $customer_city =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['billing']['city']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            if (
+                                '' === $customer_city
+                            ) {
+
+                                $customer_city =
+                                    trim(
+                                        (string)
+                                        (
+                                            $item['city']
+                                            ?? ''
+                                        )
+                                    );
+                            }
+
+
+                            $tracking_code =
+                                $row_order
+                                    ? trim(
+                                        (string)
+                                        $row_order->get_meta(
+                                            '_hom_shipping_tracking_code',
+                                            true
+                                        )
+                                    )
+                                    : '';
+
+
+                            $invoice_url =
+                                $row_order
+                                    ? HOM_Order_Documents::url(
+                                        $item['id'],
+                                        'invoice'
+                                    )
+                                    : '';
+
+
+                            $warehouse_url =
+                                $row_order
+                                    ? HOM_Order_Documents::url(
+                                        $item['id'],
+                                        'warehouse'
+                                    )
+                                    : '';
+
+
+                            $shipping_url =
+                                $row_order
+                                    ? HOM_Order_Documents::url(
+                                        $item['id'],
+                                        'shipping'
+                                    )
+                                    : '';
                             ?>
 
-                            <tr>
+                            <tr
+                                class="hom-order-row"
+                                data-href="<?php
+                                echo esc_url(
+                                    $detail_url
+                                );
+                                ?>"
+                                tabindex="0"
+                                aria-label="<?php
+                                echo esc_attr(
+                                    'باز کردن پرونده شماره ' .
+                                    $item['number']
+                                );
+                                ?>"
+                            >
 
-                                <td
-                                    data-label="شماره"
-                                >
-                                    <strong>
-                                        <a href="<?php
-                                        echo esc_url(
-                                            HOM_Orders::detail_url(
-                                                $item['id']
-                                            )
+                                <td data-label="پرونده">
+
+                                    <div class="hom-order-number-cell">
+
+                                        <strong>
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $detail_url
+                                                );
+                                                ?>"
+                                                class="hom-order-number-link"
+                                            >
+                                                #<?php
+                                                echo esc_html(
+                                                    $item['number']
+                                                );
+                                                ?>
+                                            </a>
+
+                                        </strong>
+
+                                        <span>
+                                            مشاهده پرونده
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td data-label="نوع">
+
+                                    <span class="hom-order-type-badge">
+                                        <?php
+                                        echo esc_html(
+                                            $item['is_preinvoice']
+                                                ? 'پیش‌فاکتور'
+                                                : 'سفارش'
                                         );
-                                        ?>">
-                                            #<?php
-                                            echo esc_html(
-                                                $item['number']
-                                            );
-                                            ?>
-                                        </a>
-                                    </strong>
+                                        ?>
+                                    </span>
+
                                 </td>
 
-                                <td
-                                    data-label="نوع"
-                                >
-                                    <?php
-                                    echo esc_html(
-                                        $item[
-                                            'is_preinvoice'
-                                        ]
-                                            ? 'پیش‌فاکتور'
-                                            : 'سفارش'
-                                    );
-                                    ?>
-                                </td>
 
-                                <td
-                                    data-label="مشتری"
-                                >
+                                <td data-label="مشتری">
+
                                     <div class="hom-order-customer">
 
                                         <strong>
                                             <?php
                                             echo esc_html(
-                                                $item[
-                                                    'customer_name'
-                                                ]
+                                                $customer_name
                                             );
                                             ?>
                                         </strong>
 
+
                                         <?php
-                                        if (
-                                            !empty(
-                                                $item['phone']
-                                            )
-                                        ) :
+                                        if ($customer_phone) :
                                             ?>
 
-                                            <span dir="ltr">
+                                            <span
+                                                dir="ltr"
+                                                class="hom-order-customer__phone"
+                                            >
                                                 <?php
                                                 echo esc_html(
-                                                    $item[
-                                                        'phone'
-                                                    ]
+                                                    $customer_phone
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php
+                                        elseif ($customer_email) :
+                                            ?>
+
+                                            <span
+                                                dir="ltr"
+                                                class="hom-order-customer__email"
+                                            >
+                                                <?php
+                                                echo esc_html(
+                                                    $customer_email
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php else : ?>
+
+                                            <span class="hom-order-customer__missing">
+                                                اطلاعات تماس تکمیل نشده
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td data-label="شهر">
+
+                                    <?php if ($customer_city) : ?>
+
+                                        <?php
+                                        echo esc_html(
+                                            $customer_city
+                                        );
+                                        ?>
+
+                                    <?php else : ?>
+
+                                        <span class="hom-order-list-muted">
+                                            —
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+
+                                <td data-label="وضعیت">
+
+                                    <span class="hom-order-status-badge">
+                                        <?php
+                                        echo esc_html(
+                                            $item['status_label']
+                                        );
+                                        ?>
+                                    </span>
+
+                                </td>
+
+
+                                <td data-label="مسئول">
+
+                                    <div class="hom-order-assignee">
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                !empty(
+                                                    $item['assignee']['name']
+                                                )
+                                                    ? $item['assignee']['name']
+                                                    : 'تعیین نشده'
+                                            );
+                                            ?>
+                                        </strong>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td data-label="مبلغ">
+
+                                    <strong class="hom-order-list-total">
+                                        <?php
+                                        echo wp_kses_post(
+                                            $item['total_html']
+                                        );
+                                        ?>
+                                    </strong>
+
+                                </td>
+
+
+                                <td data-label="ارسال">
+
+                                    <div class="hom-order-shipping-summary">
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                $item['shipping_method']
+                                                    ?: 'تعیین نشده'
+                                            );
+                                            ?>
+                                        </strong>
+
+
+                                        <?php if ($tracking_code) : ?>
+
+                                            <span dir="ltr">
+                                                رهگیری:
+                                                <?php
+                                                echo esc_html(
+                                                    $tracking_code
                                                 );
                                                 ?>
                                             </span>
@@ -1442,81 +1751,89 @@ class HOM_View {
                                         <?php endif; ?>
 
                                     </div>
+
                                 </td>
 
-                                <td
-                                    data-label="شهر"
-                                >
-                                    <?php
-                                    echo esc_html(
-                                        $item['city']
-                                            ?: '—'
-                                    );
-                                    ?>
-                                </td>
 
-                                <td
-                                    data-label="وضعیت"
-                                >
-                                    <span class="hom-order-status-badge">
+                                <td data-label="تاریخ">
+
+                                    <span
+                                        class="hom-order-list-date"
+                                        dir="ltr"
+                                    >
                                         <?php
                                         echo esc_html(
-                                            $item[
-                                                'status_label'
-                                            ]
+                                            $item['date']
                                         );
                                         ?>
                                     </span>
-                                </td>
 
-                                <td
-                                    data-label="مسئول"
-                                >
-                                    <?php
-                                    echo esc_html(
-                                        !empty(
-                                            $item['assignee']['name']
-                                        )
-                                            ? $item['assignee']['name']
-                                            : 'تعیین نشده'
-                                    );
-                                    ?>
                                 </td>
 
 
-                                <td
-                                    data-label="مبلغ"
-                                >
-                                    <?php
-                                    echo wp_kses_post(
-                                        $item[
-                                            'total_html'
-                                        ]
-                                    );
-                                    ?>
-                                </td>
+                                <td data-label="دسترسی سریع">
 
-                                <td
-                                    data-label="ارسال"
-                                >
-                                    <?php
-                                    echo esc_html(
-                                        $item[
-                                            'shipping_method'
-                                        ]
-                                            ?: 'تعیین نشده'
-                                    );
-                                    ?>
-                                </td>
+                                    <?php if ($row_order) : ?>
 
-                                <td
-                                    data-label="تاریخ"
-                                >
-                                    <?php
-                                    echo esc_html(
-                                        $item['date']
-                                    );
-                                    ?>
+                                        <div class="hom-order-row-actions">
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $invoice_url
+                                                );
+                                                ?>"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="hom-order-row-action"
+                                                title="مشاهده فاکتور"
+                                                aria-label="مشاهده فاکتور"
+                                            >
+                                                فاکتور
+                                            </a>
+
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $warehouse_url
+                                                );
+                                                ?>"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="hom-order-row-action"
+                                                title="برگه انبار بدون قیمت"
+                                                aria-label="برگه انبار بدون قیمت"
+                                            >
+                                                انبار
+                                            </a>
+
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $shipping_url
+                                                );
+                                                ?>"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="hom-order-row-action"
+                                                title="برچسب ارسال"
+                                                aria-label="برچسب ارسال"
+                                            >
+                                                برچسب
+                                            </a>
+
+                                        </div>
+
+                                    <?php else : ?>
+
+                                        <span class="hom-order-list-muted">
+                                            —
+                                        </span>
+
+                                    <?php endif; ?>
+
                                 </td>
 
                             </tr>
@@ -1526,6 +1843,91 @@ class HOM_View {
                         </tbody>
 
                     </table>
+
+
+                    <script>
+                    (function () {
+
+                        if (
+                            window.homOrderRowsReady
+                        ) {
+                            return;
+                        }
+
+                        window.homOrderRowsReady = true;
+
+
+                        function interactiveTarget(
+                            target
+                        ) {
+
+                            return target.closest(
+                                'a, button, input, select, textarea, label, summary, details'
+                            );
+
+                        }
+
+
+                        document.addEventListener(
+                            'click',
+                            function (event) {
+
+                                var row =
+                                    event.target.closest(
+                                        '.hom-order-row[data-href]'
+                                    );
+
+
+                                if (
+                                    !row ||
+                                    interactiveTarget(
+                                        event.target
+                                    )
+                                ) {
+                                    return;
+                                }
+
+
+                                window.location.href =
+                                    row.dataset.href;
+
+                            }
+                        );
+
+
+                        document.addEventListener(
+                            'keydown',
+                            function (event) {
+
+                                if (
+                                    event.key !== 'Enter' &&
+                                    event.key !== ' '
+                                ) {
+                                    return;
+                                }
+
+
+                                var row =
+                                    event.target.closest(
+                                        '.hom-order-row[data-href]'
+                                    );
+
+
+                                if (!row) {
+                                    return;
+                                }
+
+
+                                event.preventDefault();
+
+                                window.location.href =
+                                    row.dataset.href;
+
+                            }
+                        );
+
+                    }());
+                    </script>
 
                 </div>
 
@@ -1675,6 +2077,7 @@ class HOM_View {
 
 
 
+
     private static function render_help_customers_content() {
 
         $orders_url =
@@ -1694,30 +2097,478 @@ class HOM_View {
 
         ?>
 
-        <div class="hom-help-page">
+        <div class="hom-help-page hom-customer-help-page">
+
 
             <section class="hom-help-hero">
 
-                <div class="hom-help-hero__icon">
-                    👥
-                </div>
+                <div>
 
-                <div class="hom-help-hero__content">
-
-                    <span class="hom-help-kicker">
-                        راهنمای مدیریت و پیگیری مشتریان
+                    <span class="hom-help-hero__eyebrow">
+                        راهنمای کار روزانه واحد فروش
                     </span>
 
                     <h1>
-                        راهنمای کامل مدیریت و پیگیری مشتریان
+                        راهنمای مدیریت و پیگیری مشتریان
                     </h1>
 
                     <p>
-                        در این صفحه تمام مراحل رسیدگی به درخواست
-                        پیش‌فاکتور، تکمیل اطلاعات مشتری، قیمت‌گذاری،
-                        تأیید، پرداخت، آماده‌سازی، ارسال، تحویل،
-                        اصلاح اطلاعات، چاپ اسناد و بررسی سوابق
-                        توضیح داده شده است.
+                        این بخش برای مدیریت پرونده مشتری از زمان
+                        ثبت پیش‌فاکتور تا قیمت‌گذاری، پرداخت،
+                        آماده‌سازی، ارسال و تحویل طراحی شده است.
+                        لازم نیست همه قسمت‌های صفحه را همیشه باز کنید؛
+                        فقط بخشی را باز کنید که برای اقدام فعلی شما لازم است.
+                    </p>
+
+                </div>
+
+
+                <div class="hom-help-hero__actions">
+
+                    <a
+                        href="<?php echo esc_url($orders_url); ?>"
+                        class="hom-help-action hom-help-action-primary"
+                    >
+                        رفتن به مدیریت مشتریان
+                    </a>
+
+                    <a
+                        href="<?php echo esc_url($help_index_url); ?>"
+                        class="hom-help-action hom-help-action-secondary"
+                    >
+                        ← بازگشت به راهنمای پنل
+                    </a>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🧭
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            قبل از شروع
+                        </span>
+
+                        <h2>
+                            منطق صفحه را در یک نگاه بشناسید
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-customer-help-principles">
+
+                    <article>
+
+                        <strong>
+                            اطلاعات مهم همیشه دیده می‌شوند
+                        </strong>
+
+                        <p>
+                            وضعیت پرونده، مشتری، مسئول پرونده،
+                            مبلغ و خلاصه عملیات بدون باز کردن
+                            فرم‌ها قابل مشاهده هستند.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            فرم‌ها فقط هنگام نیاز باز می‌شوند
+                        </strong>
+
+                        <p>
+                            قیمت‌گذاری، پرداخت، ارسال، اصلاحات
+                            و جزئیات اضافی داخل بخش‌های جمع‌شونده
+                            قرار دارند تا صفحه شلوغ نشود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            سوابق برای بازرسی است، نه کار روزانه
+                        </strong>
+
+                        <p>
+                            برای پیگیری سفارش از وضعیت و مراحل سفارش
+                            استفاده کنید. «سوابق و رخدادها» فقط برای
+                            بررسی اتفاقات گذشته است.
+                        </p>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🗺️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            نقشه صفحه
+                        </span>
+
+                        <h2>
+                            هر قسمت صفحه چه کاری انجام می‌دهد؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-customer-help-map">
+
+                    <article>
+                        <span>۱</span>
+
+                        <div>
+                            <strong>
+                                سربرگ پرونده
+                            </strong>
+
+                            <p>
+                                شماره سفارش، وضعیت، مبلغ،
+                                مشتری، مسئول پرونده و دسترسی
+                                سریع به اسناد.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۲</span>
+
+                        <div>
+                            <strong>
+                                اطلاعات مشتری
+                            </strong>
+
+                            <p>
+                                نام، تلفن، ایمیل و مشخصات پایه
+                                برای شناسایی سریع مشتری.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۳</span>
+
+                        <div>
+                            <strong>
+                                اطلاعات حقوقی خریدار
+                            </strong>
+
+                            <p>
+                                اطلاعات موردنیاز فاکتور رسمی،
+                                شرکت، شناسه ملی، کد اقتصادی،
+                                کدپستی و آدرس.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۴</span>
+
+                        <div>
+                            <strong>
+                                اقلام و قیمت‌گذاری
+                            </strong>
+
+                            <p>
+                                مشاهده کالاها و در صورت نیاز
+                                ثبت یا اصلاح قیمت و هزینه ارسال.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۵</span>
+
+                        <div>
+                            <strong>
+                                پرداخت
+                            </strong>
+
+                            <p>
+                                مشاهده خلاصه پرداخت و در صورت
+                                نیاز ثبت یا اصلاح اطلاعات واریز.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۶</span>
+
+                        <div>
+                            <strong>
+                                ارسال و تحویل
+                            </strong>
+
+                            <p>
+                                ثبت روش ارسال، باربری،
+                                رهگیری، کرایه و پیشرفت
+                                وضعیت ارسال.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۷</span>
+
+                        <div>
+                            <strong>
+                                مراحل سفارش
+                            </strong>
+
+                            <p>
+                                مسیر کلی پرونده و مراحل طی‌شده
+                                را به‌صورت خلاصه نشان می‌دهد.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۸</span>
+
+                        <div>
+                            <strong>
+                                سوابق و رخدادها
+                            </strong>
+
+                            <p>
+                                برای بررسی دقیق اینکه چه کاری،
+                                چه زمانی و توسط چه کسی انجام شده است.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🚦
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            تشخیص اقدام بعدی
+                        </span>
+
+                        <h2>
+                            وضعیت پرونده به شما می‌گوید چه کاری لازم است
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-status-table">
+
+                    <div class="hom-help-status-row">
+                        <strong>پیش‌فاکتور جدید</strong>
+                        <span>
+                            اطلاعات مشتری را بررسی کنید،
+                            سپس اقلام را قیمت‌گذاری کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>تأیید شده</strong>
+                        <span>
+                            قیمت‌گذاری انجام شده و پرونده
+                            برای ادامه فرایند پرداخت آماده است.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>انتظار پرداخت</strong>
+                        <span>
+                            وضعیت پرداخت مشتری را بررسی کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>در انتظار بررسی</strong>
+                        <span>
+                            پرونده نیازمند بررسی واحد فروش است.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>در حال آماده‌سازی</strong>
+                        <span>
+                            سفارش وارد عملیات تأمین،
+                            جمع‌آوری یا بسته‌بندی شده است.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>آماده ارسال</strong>
+                        <span>
+                            اطلاعات ارسال را کنترل و
+                            ارسال سفارش را ثبت کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>ارسال شده</strong>
+                        <span>
+                            کد رهگیری و وضعیت تحویل
+                            را در صورت نیاز بررسی کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>تحویل شده</strong>
+                        <span>
+                            عملیات اصلی پرونده پایان یافته است.
+                            فقط در صورت نیاز سوابق را بررسی کنید.
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        👤
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            شناخت مشتری
+                        </span>
+
+                        <h2>
+                            اطلاعات مشتری و اطلاعات حقوقی
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-two-column">
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            اطلاعات مشتری
+                        </h3>
+
+                        <p>
+                            این قسمت برای شناسایی سریع شخصی است
+                            که پرونده به او مربوط می‌شود.
+                        </p>
+
+                        <ul>
+                            <li>نام مشتری</li>
+                            <li>شماره تماس</li>
+                            <li>ایمیل</li>
+                            <li>شناسه مشتری</li>
+                        </ul>
+
+                        <p>
+                            اگر اطلاعاتی موجود نباشد،
+                            عبارت «تکمیل نشده» نمایش داده می‌شود.
+                            این یک خطای سیستم نیست.
+                        </p>
+
+                    </article>
+
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            اطلاعات حقوقی خریدار
+                        </h3>
+
+                        <p>
+                            این اطلاعات برای فاکتور و امور
+                            مالی و حقوقی خریدار استفاده می‌شود.
+                        </p>
+
+                        <ul>
+                            <li>نام حقوقی یا شرکت</li>
+                            <li>شناسه ملی</li>
+                            <li>کد اقتصادی</li>
+                            <li>شماره ثبت</li>
+                            <li>کدپستی</li>
+                            <li>آدرس فاکتور</li>
+                        </ul>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        برای ویرایش اطلاعات چه کار کنم؟
+                    </strong>
+
+                    <p>
+                        روی «ویرایش اطلاعات حقوقی» کلیک کنید.
+                        فرم فقط در همان زمان باز می‌شود.
+                        پس از پایان کار آن را دوباره ببندید
+                        تا صفحه خلوت باقی بماند.
                     </p>
 
                 </div>
@@ -1725,14 +2576,924 @@ class HOM_View {
             </section>
 
 
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        💰
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            عملیات فروش
+                        </span>
+
+                        <h2>
+                            اقلام و قیمت‌گذاری پیش‌فاکتور
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+                        <span>۱</span>
+                        <div>
+                            <strong>
+                                آکاردئون اقلام و قیمت‌گذاری را باز کنید
+                            </strong>
+                            <p>
+                                در حالت عادی بسته است و فقط
+                                تعداد اقلام و مبلغ کل را نشان می‌دهد.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۲</span>
+                        <div>
+                            <strong>
+                                اقلام و تعداد را کنترل کنید
+                            </strong>
+                            <p>
+                                نام محصول، SKU، تعداد،
+                                قیمت واحد و جمع هر ردیف
+                                در جدول دیده می‌شود.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۳</span>
+                        <div>
+                            <strong>
+                                قیمت‌ها را وارد کنید
+                            </strong>
+                            <p>
+                                فقط در زمانی که پرونده نیازمند
+                                قیمت‌گذاری است قیمت واحد
+                                و هزینه ارسال را ثبت کنید.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۴</span>
+                        <div>
+                            <strong>
+                                ذخیره و تأیید کنید
+                            </strong>
+                            <p>
+                                ابتدا قیمت‌ها را ذخیره کنید.
+                                سپس در زمان مناسب پیش‌فاکتور
+                                را برای پرداخت تأیید کنید.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-warning">
+
+                    اگر قیمت قبلاً ثبت شده باشد و بخواهید
+                    آن را تغییر دهید، سیستم دلیل اصلاح می‌خواهد.
+                    دلیل را کوتاه، دقیق و قابل فهم بنویسید؛
+                    مانند «اصلاح قیمت طبق اعلام تأمین‌کننده».
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        💳
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            امور مالی
+                        </span>
+
+                        <h2>
+                            بخش پرداخت چگونه استفاده می‌شود؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        ابتدا خلاصه پرداخت را نگاه کنید.
+                    </strong>
+
+                    <p>
+                        بدون باز کردن هیچ فرمی می‌توانید
+                        مبلغ، مرجع پرداخت، ثبت‌کننده،
+                        زمان ثبت و وضعیت تأیید را ببینید.
+                    </p>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+                        <span>۱</span>
+                        <div>
+                            <strong>
+                                پرداخت هنوز ثبت نشده
+                            </strong>
+                            <p>
+                                فقط پس از مشاهده و اطمینان
+                                از واریز واقعی مشتری،
+                                «ثبت و تأیید پرداخت دستی»
+                                را باز کنید.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۲</span>
+                        <div>
+                            <strong>
+                                مبلغ و مرجع پرداخت
+                            </strong>
+                            <p>
+                                مبلغ دریافتی و شماره پیگیری
+                                یا مرجع بانکی را با دقت ثبت کنید.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۳</span>
+                        <div>
+                            <strong>
+                                پرداخت قبلاً ثبت شده
+                            </strong>
+                            <p>
+                                فرم اصلاح را فقط زمانی باز کنید
+                                که مرجع یا توضیحات پرداخت
+                                اشتباه ثبت شده باشد.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-warning">
+
+                    تأیید پرداخت یک اقدام مهم مالی است.
+                    قبل از ثبت، صرفاً به گفته مشتری اکتفا نکنید
+                    و واریز را از روش مورد تأیید شرکت بررسی کنید.
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🖨️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            دسترسی سریع
+                        </span>
+
+                        <h2>
+                            فاکتور، برگه انبار و برچسب ارسال
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-document-grid">
+
+                    <article>
+
+                        <span>🧾</span>
+
+                        <div>
+                            <strong>
+                                فاکتور
+                            </strong>
+
+                            <p>
+                                برای مشاهده یا چاپ سند مالی
+                                مشتری استفاده کنید.
+                            </p>
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>📦</span>
+
+                        <div>
+                            <strong>
+                                برگه انبار بدون قیمت
+                            </strong>
+
+                            <p>
+                                برای تحویل به انبار و آماده‌سازی
+                                کالا بدون نمایش اطلاعات مالی.
+                            </p>
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>🏷️</span>
+
+                        <div>
+                            <strong>
+                                برچسب ارسال
+                            </strong>
+
+                            <p>
+                                برای آماده‌سازی بسته و اطلاعات
+                                موردنیاز ارسال استفاده کنید.
+                            </p>
+                        </div>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    این سه گزینه در بالای پرونده قرار دارند؛
+                    لازم نیست برای چاپ اسناد در صفحه
+                    به دنبال بخش دیگری بگردید.
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🚚
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            عملیات ارسال
+                        </span>
+
+                        <h2>
+                            ارسال و تحویل سفارش
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p class="hom-help-lead">
+                    در حالت بسته، مهم‌ترین اطلاعات ارسال
+                    به‌صورت خلاصه نمایش داده می‌شود.
+                    برای انجام عملیات، بخش را باز کنید.
+                </p>
+
+
+                <div class="hom-help-field-guide">
+
+                    <div>
+                        <strong>روش ارسال</strong>
+                        <span>
+                            نوع ارسال انتخاب‌شده برای سفارش.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>شرکت / باربری / شعبه</strong>
+                        <span>
+                            نام شرکت حمل، پیک، باربری
+                            یا شعبه مقصد.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>کد رهگیری / بارنامه</strong>
+                        <span>
+                            شماره‌ای که برای پیگیری ارسال
+                            استفاده می‌شود.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>وضعیت کرایه</strong>
+                        <span>
+                            مشخص می‌کند هزینه حمل پرداخت شده
+                            یا پس‌کرایه است.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>توضیحات ارسال</strong>
+                        <span>
+                            فقط نکات ضروری و کاربردی ارسال
+                            را در این قسمت بنویسید.
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-warning">
+
+                    اگر فقط مرحله سفارش را جلو می‌برید
+                    و اطلاعات ارسال را تغییر نداده‌اید،
+                    لازم نیست دلیل اصلاح بنویسید.
+                    دلیل اصلاح فقط برای تغییر اطلاعات
+                    قبلاً ثبت‌شده است.
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🪜
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            مسیر پرونده
+                        </span>
+
+                        <h2>
+                            بخش «مراحل سفارش» چه کاربردی دارد؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <p>
+                        اگر می‌خواهید سریع بفهمید پرونده
+                        تا کجا پیش رفته است،
+                        ابتدا «مراحل سفارش» را باز کنید.
+                    </p>
+
+                    <p>
+                        این بخش خلاصه مسیر پرونده است
+                        و برای پیگیری روزانه بسیار مناسب‌تر
+                        از بخش سوابق و رخدادهاست.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+
+            <section
+                id="hom-help-customer-audit"
+                class="hom-help-topic hom-help-audit-guide"
+            >
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🕘
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            بررسی سابقه پرونده
+                        </span>
+
+                        <h2>
+                            «سوابق و رخدادها» دقیقاً برای چه کاری است؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-audit-important">
+
+                    <strong>
+                        این بخش محل پیگیری روزانه سفارش نیست.
+                    </strong>
+
+                    <p>
+                        اگر می‌خواهید بدانید سفارش در چه مرحله‌ای است،
+                        ابتدا وضعیت بالای پرونده و سپس
+                        «مراحل سفارش» را بررسی کنید.
+                    </p>
+
+                    <p>
+                        «سوابق و رخدادها» زمانی استفاده می‌شود
+                        که بخواهید اتفاقات گذشته پرونده را
+                        مانند یک گزارش دقیق بررسی کنید.
+                    </p>
+
+                </div>
+
+
+                <div class="hom-help-question-grid">
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            چه کسی قیمت را تغییر داده است؟
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            پرداخت در چه زمانی تأیید شده است؟
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            چه کسی شماره پیگیری را اصلاح کرده است؟
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            اطلاعات مشتری قبلاً چه مقداری داشته است؟
+                        </p>
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-audit-grid">
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۱
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                سوابق و رخدادها را باز کنید
+                            </h3>
+
+                            <p>
+                                این قسمت عمداً در حالت عادی بسته است
+                                تا صفحه کار شما شلوغ نشود.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۲
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                ردیف موردنظر را پیدا کنید
+                            </h3>
+
+                            <p>
+                                در هر ردیف، عنوان رخداد،
+                                نام انجام‌دهنده و زمان اقدام
+                                نمایش داده می‌شود.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۳
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                همان رخداد را باز کنید
+                            </h3>
+
+                            <p>
+                                فقط جزئیات همان اتفاق باز می‌شود
+                                و سایر رخدادها همچنان جمع می‌مانند.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۴
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                قبل و بعد را مقایسه کنید
+                            </h3>
+
+                            <p>
+                                اگر تغییری انجام شده باشد،
+                                مقدار قبل و بعد را کنار هم
+                                مشاهده خواهید کرد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۵
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                دلیل اصلاح را بخوانید
+                            </h3>
+
+                            <p>
+                                برای تغییرات اصلاحی،
+                                علت ثبت‌شده توسط اپراتور
+                                نیز در همان رخداد دیده می‌شود.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۶
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                انجام‌دهنده را شناسایی کنید
+                            </h3>
+
+                            <p>
+                                نام کاربر، نقش او،
+                                حساب کاربری و منبع ثبت عملیات
+                                در جزئیات رخداد قابل مشاهده است.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-audit-example">
+
+                    <strong>
+                        مثال عملی:
+                    </strong>
+
+                    فرض کنید شماره پیگیری پرداخت با چیزی
+                    که اکنون در پرونده دیده می‌شود متفاوت است.
+                    برای فهمیدن علت، وارد «سوابق و رخدادها» شوید،
+                    رخداد مربوط به پرداخت را پیدا کنید و باز کنید.
+                    سپس مقدار قبلی، مقدار جدید، زمان تغییر،
+                    نام انجام‌دهنده و دلیل اصلاح را بررسی کنید.
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ✏️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            اصلاح اطلاعات
+                        </span>
+
+                        <h2>
+                            دلیل اصلاح را چگونه بنویسیم؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-do-dont">
+
+                    <div class="is-good">
+
+                        <strong>
+                            مناسب
+                        </strong>
+
+                        <ul>
+                            <li>
+                                اصلاح قیمت طبق اعلام تأمین‌کننده
+                            </li>
+
+                            <li>
+                                اصلاح شماره پیگیری ثبت‌شده اشتباه
+                            </li>
+
+                            <li>
+                                تغییر باربری طبق درخواست مشتری
+                            </li>
+
+                            <li>
+                                اصلاح شناسه ملی طبق مدرک مشتری
+                            </li>
+                        </ul>
+
+                    </div>
+
+
+                    <div class="is-bad">
+
+                        <strong>
+                            نامناسب
+                        </strong>
+
+                        <ul>
+                            <li>اصلاح شد</li>
+                            <li>اشتباه بود</li>
+                            <li>تغییر</li>
+                            <li>اوکی شد</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <p class="hom-help-lead">
+                    هدف از دلیل اصلاح این است که اگر چند روز
+                    یا چند ماه بعد شخص دیگری پرونده را بررسی کرد،
+                    بدون سؤال از اپراتور قبلی متوجه علت تغییر شود.
+                </p>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🔍
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            پیدا کردن سریع پاسخ
+                        </span>
+
+                        <h2>
+                            دنبال چه چیزی هستید؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-find-answer">
+
+                    <div>
+                        <strong>
+                            سفارش الان در چه مرحله‌ای است؟
+                        </strong>
+                        <span>
+                            وضعیت بالای پرونده + مراحل سفارش
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            مشتری چه کسی است؟
+                        </strong>
+                        <span>
+                            اطلاعات مشتری
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            اطلاعات فاکتور رسمی چیست؟
+                        </strong>
+                        <span>
+                            اطلاعات حقوقی خریدار
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            قیمت‌ها چقدر هستند؟
+                        </strong>
+                        <span>
+                            اقلام و قیمت‌گذاری
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            پرداخت تأیید شده است؟
+                        </strong>
+                        <span>
+                            خلاصه پرداخت
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            سفارش چگونه ارسال شده؟
+                        </strong>
+                        <span>
+                            ارسال و تحویل
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            چه کسی این اطلاعات را تغییر داده؟
+                        </strong>
+                        <span>
+                            سوابق و رخدادها
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            فاکتور یا برگه انبار می‌خواهم
+                        </strong>
+                        <span>
+                            دسترسی سریع بالای پرونده
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ✅
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            روال پیشنهادی
+                        </span>
+
+                        <h2>
+                            روش ساده کار با هر پرونده
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <ol class="hom-help-daily-checklist">
+
+                    <li>
+                        ابتدا وضعیت بالای پرونده را ببینید.
+                    </li>
+
+                    <li>
+                        نام مشتری و اطلاعات ضروری را کنترل کنید.
+                    </li>
+
+                    <li>
+                        فقط بخش مربوط به اقدام فعلی را باز کنید.
+                    </li>
+
+                    <li>
+                        عملیات موردنیاز را انجام و ذخیره کنید.
+                    </li>
+
+                    <li>
+                        وضعیت جدید پرونده را بررسی کنید.
+                    </li>
+
+                    <li>
+                        اگر نیاز به سند دارید از دسترسی سریع
+                        بالای صفحه استفاده کنید.
+                    </li>
+
+                    <li>
+                        فقط در صورت وجود سؤال درباره اتفاقات گذشته،
+                        به «سوابق و رخدادها» مراجعه کنید.
+                    </li>
+
+                </ol>
+
+            </section>
+
+
+
+            <?php
+            self::render_help_security_content();
+            ?>
+
+
             <div class="hom-help-page-back">
 
                 <a
-                    href="<?php
-                    echo esc_url(
-                        $help_index_url
-                    );
-                    ?>"
+                    href="<?php echo esc_url($help_index_url); ?>"
                     class="hom-help-action hom-help-action-secondary"
                 >
                     <span aria-hidden="true">←</span>
@@ -1741,389 +3502,6 @@ class HOM_View {
 
             </div>
 
-
-            <section
-                id="hom-help-customers"
-                class="hom-help-topic"
-            >
-
-                <div class="hom-help-topic__head">
-
-                    <div class="hom-help-topic__icon">
-                        👥
-                    </div>
-
-                    <div>
-
-                        <span class="hom-help-kicker">
-                            راهنمای مدیریت و پیگیری مشتریان
-                        </span>
-
-                        <h2>
-                            مسیر کامل رسیدگی به مشتری
-                        </h2>
-
-                        <p>
-                            از ورود درخواست پیش‌فاکتور تا قیمت‌گذاری،
-                            پرداخت، آماده‌سازی، ارسال و تحویل نهایی.
-                        </p>
-
-                    </div>
-
-                    <a
-                        href="<?php
-                        echo esc_url(
-                            $orders_url
-                        );
-                        ?>"
-                        class="hom-help-action hom-help-action-primary"
-                    >
-                        رفتن به مدیریت و پیگیری مشتریان
-                    </a>
-
-                </div>
-
-
-                <div class="hom-help-section-heading">
-
-                    <span>
-                        مسیر استاندارد کار
-                    </span>
-
-                    <h2>
-                        مراحل رسیدگی به پیش‌فاکتور و سفارش
-                    </h2>
-
-                    <p>
-                        برای جلوگیری از خطا، مراحل را به ترتیب انجام دهید.
-                    </p>
-
-                </div>
-
-
-                <section class="hom-help-steps">
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۱</div>
-                        <div class="hom-help-step__icon">🔎</div>
-                        <h3>مشتری یا سفارش را پیدا کنید</h3>
-                        <p>
-                            با شماره سفارش، نام، موبایل یا کد رهگیری
-                            جستجو کنید و در صورت نیاز از فیلتر وضعیت
-                            برای محدود کردن نتایج استفاده کنید.
-                        </p>
-                    </article>
-
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۲</div>
-                        <div class="hom-help-step__icon">👤</div>
-                        <h3>اطلاعات مشتری را بررسی کنید</h3>
-                        <p>
-                            مشخصات مشتری و اطلاعات حقوقی خریدار شامل
-                            نام حقوقی، شناسه ملی، کد اقتصادی، شماره ثبت،
-                            کدپستی و نشانی را کنترل و در صورت نیاز تکمیل کنید.
-                        </p>
-                    </article>
-
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۳</div>
-                        <div class="hom-help-step__icon">💰</div>
-                        <h3>قیمت‌گذاری را انجام دهید</h3>
-                        <p>
-                            قیمت واحد اقلام و هزینه ارسال را بررسی
-                            و ثبت کنید و سپس «ذخیره قیمت‌ها» را بزنید.
-                            اصلاح قیمت ثبت‌شده نیازمند دلیل اصلاح است.
-                        </p>
-                    </article>
-
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۴</div>
-                        <div class="hom-help-step__icon">✓</div>
-                        <h3>پیش‌فاکتور را تأیید کنید</h3>
-                        <p>
-                            پس از کنترل نهایی قیمت‌ها، دکمه
-                            «تأیید و آماده‌سازی برای پرداخت»
-                            را بزنید تا مشتری بتواند مرحله پرداخت
-                            را ادامه دهد.
-                        </p>
-                    </article>
-
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۵</div>
-                        <div class="hom-help-step__icon">💳</div>
-                        <h3>پرداخت را تأیید کنید</h3>
-                        <p>
-                            فقط پس از مشاهده قطعی واریز، مبلغ،
-                            شماره پیگیری یا مرجع پرداخت و توضیحات
-                            را ثبت کرده و «تأیید دریافت کامل وجه»
-                            را بزنید.
-                        </p>
-                    </article>
-
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۶</div>
-                        <div class="hom-help-step__icon">📦</div>
-                        <h3>سفارش را آماده ارسال کنید</h3>
-                        <p>
-                            روش ارسال، شرکت یا باربری، کد رهگیری،
-                            وضعیت کرایه و توضیحات را تکمیل کنید و
-                            پس از آماده شدن کالا وضعیت «آماده ارسال»
-                            را ثبت نمایید.
-                        </p>
-                    </article>
-
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۷</div>
-                        <div class="hom-help-step__icon">🚚</div>
-                        <h3>ارسال را ثبت کنید</h3>
-                        <p>
-                            پس از تحویل واقعی کالا به باربری یا
-                            شرکت حمل، سفارش را به وضعیت
-                            «ارسال شده» منتقل کنید.
-                        </p>
-                    </article>
-
-
-                    <article class="hom-help-step">
-                        <div class="hom-help-step__number">۸</div>
-                        <div class="hom-help-step__icon">✅</div>
-                        <h3>تحویل را نهایی کنید</h3>
-                        <p>
-                            پس از اطمینان از رسیدن کالا به مشتری،
-                            وضعیت «تحویل شده» را ثبت کنید.
-                        </p>
-                    </article>
-
-                </section>
-
-
-                <div class="hom-help-section-heading">
-                    <span>وضعیت پرونده</span>
-                    <h2>وضعیت‌ها چه معنایی دارند؟</h2>
-                </div>
-
-
-                <section class="hom-help-tools">
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">🆕</span>
-                        <div>
-                            <h3>پیش‌فاکتور جدید</h3>
-                            <p>درخواست تازه‌ای که باید بررسی و قیمت‌گذاری شود.</p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">✓</span>
-                        <div>
-                            <h3>تأیید شده</h3>
-                            <p>پیش‌فاکتور تأیید و برای پرداخت آماده شده است.</p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">⌛</span>
-                        <div>
-                            <h3>انتظار پرداخت</h3>
-                            <p>پرونده در انتظار انجام یا تأیید پرداخت است.</p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">🔍</span>
-                        <div>
-                            <h3>در انتظار بررسی</h3>
-                            <p>سفارش پیش از ادامه کار به بررسی نیاز دارد.</p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">⚙️</span>
-                        <div>
-                            <h3>در حال آماده‌سازی</h3>
-                            <p>سفارش وارد مرحله آماده‌سازی کالا شده است.</p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">📦</span>
-                        <div>
-                            <h3>آماده ارسال</h3>
-                            <p>کالا آماده تحویل به باربری یا شرکت حمل است.</p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">🚚</span>
-                        <div>
-                            <h3>ارسال شده</h3>
-                            <p>کالا ارسال و اطلاعات حمل ثبت شده است.</p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">✅</span>
-                        <div>
-                            <h3>تحویل شده</h3>
-                            <p>سفارش تحویل مشتری شده و عملیات پایان یافته است.</p>
-                        </div>
-                    </article>
-
-                </section>
-
-
-                <section class="hom-help-important">
-
-                    <div class="hom-help-important__icon">
-                        ✎
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            دلیل اصلاح چه زمانی لازم است؟
-                        </strong>
-
-                        <p>
-                            زمانی که اطلاعاتی قبلاً ثبت شده و اکنون
-                            قصد تغییر آن را دارید، سیستم ممکن است
-                            «دلیل اصلاح» درخواست کند. دلیل واضح و
-                            واقعی بنویسید تا سابقه تغییر قابل پیگیری باشد.
-                        </p>
-
-                        <p>
-                            در اطلاعات پرداخت پس از تأیید دریافت وجه،
-                            مبلغ و وضعیت پرداخت قابل تغییر نیستند.
-                            فقط مرجع و توضیحات پرداخت را می‌توان با
-                            ثبت دلیل اصلاح کرد.
-                        </p>
-
-                        <p>
-                            اصلاح اطلاعات ثبت‌شده مشتری، قیمت‌ها
-                            و اطلاعات ارسال نیز در سوابق عملیات
-                            ثبت می‌شود.
-                        </p>
-
-                    </div>
-
-                </section>
-
-
-                <div class="hom-help-section-heading">
-                    <span>اسناد و سوابق</span>
-                    <h2>ابزارهای تکمیلی پرونده مشتری</h2>
-                </div>
-
-
-                <section class="hom-help-tools">
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">🧾</span>
-                        <div>
-                            <h3>چاپ فاکتور</h3>
-                            <p>
-                                نسخه چاپی فاکتور شامل اطلاعات طرفین،
-                                اقلام و مبالغ سفارش.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">📦</span>
-                        <div>
-                            <h3>برگه انبار بدون قیمت</h3>
-                            <p>
-                                نسخه مناسب انبار و آماده‌سازی کالا
-                                بدون نمایش قیمت فروش.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">🏷️</span>
-                        <div>
-                            <h3>برچسب ارسال</h3>
-                            <p>
-                                اطلاعات موردنیاز برای شناسایی مرسوله
-                                و مقصد ارسال.
-                            </p>
-                        </div>
-                    </article>
-
-                    <article class="hom-help-tool">
-                        <span class="hom-help-tool__icon">🕘</span>
-                        <div>
-                            <h3>رخدادها و سوابق</h3>
-                            <p>
-                                سابقه قیمت‌گذاری، تأیید، اصلاح،
-                                پرداخت و مراحل ارسال را نشان می‌دهد.
-                            </p>
-                        </div>
-                    </article>
-
-                </section>
-
-
-                <section class="hom-help-warning">
-
-                    <div class="hom-help-warning__head">
-
-                        <span class="hom-help-warning__icon">⚠️</span>
-
-                        <div>
-                            <span>قبل از ثبت نهایی</span>
-                            <h2>نکات مهم رسیدگی به مشتری</h2>
-                        </div>
-
-                    </div>
-
-                    <ul>
-                        <li>
-                            قیمت اقلام و هزینه ارسال را پیش از
-                            تأیید پیش‌فاکتور دوباره کنترل کنید.
-                        </li>
-
-                        <li>
-                            پرداخت را فقط پس از مشاهده قطعی واریز
-                            تأیید کنید.
-                        </li>
-
-                        <li>
-                            برای اصلاح اطلاعات قبلی، دلیل واقعی
-                            و قابل فهم ثبت کنید.
-                        </li>
-
-                        <li>
-                            پیش از ارسال، مقصد، روش حمل، باربری
-                            و کد رهگیری را کنترل کنید.
-                        </li>
-
-                        <li>
-                            وضعیت ارسال یا تحویل را پیش از انجام
-                            واقعی آن مرحله ثبت نکنید.
-                        </li>
-
-                        <li>
-                            اطلاعات آزمایشی یا غیرواقعی در پرونده
-                            مشتری ثبت نکنید؛ رخدادها سابقه رسمی
-                            عملیات پنل هستند.
-                        </li>
-                    </ul>
-
-                </section>
-
-            </section>
-
-
-            <?php
-            self::render_help_security_content();
-            ?>
 
         </div>
 

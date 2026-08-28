@@ -4065,6 +4065,479 @@ final class HOM_Orders {
 
 
 
+    public static function customer_contact_data(
+        $order
+    ) {
+
+        $empty = [
+            'customer_id' => 0,
+
+            'first_name' => '',
+            'last_name' => '',
+            'display_name' => '',
+
+            'phone' => '',
+            'email' => '',
+
+            'billing' => [
+                'company' => '',
+                'address_1' => '',
+                'address_2' => '',
+                'city' => '',
+                'state' => '',
+                'postcode' => '',
+                'country' => '',
+            ],
+
+            'shipping' => [
+                'first_name' => '',
+                'last_name' => '',
+                'company' => '',
+                'address_1' => '',
+                'address_2' => '',
+                'city' => '',
+                'state' => '',
+                'postcode' => '',
+                'country' => '',
+            ],
+        ];
+
+
+        if (!($order instanceof WC_Order)) {
+            return $empty;
+        }
+
+
+        $customer_id =
+            absint(
+                $order->get_customer_id()
+            );
+
+
+        $data =
+            $empty;
+
+
+        $data['customer_id'] =
+            $customer_id;
+
+
+        $user =
+            $customer_id
+                ? get_userdata(
+                    $customer_id
+                )
+                : false;
+
+
+        $customer =
+            $customer_id
+                ? new WC_Customer(
+                    $customer_id
+                )
+                : null;
+
+
+        $b2b =
+            self::b2b_customer_data(
+                $order
+            );
+
+
+        /*
+         * Personal identity.
+         *
+         * Order snapshot has priority.
+         * Then WooCommerce customer profile.
+         * Then WordPress user profile.
+         */
+        $data['first_name'] =
+            trim(
+                (string)
+                $order->get_billing_first_name()
+            );
+
+
+        if (
+            '' === $data['first_name'] &&
+            $customer
+        ) {
+
+            $data['first_name'] =
+                trim(
+                    (string)
+                    $customer
+                        ->get_billing_first_name()
+                );
+        }
+
+
+        if (
+            '' === $data['first_name'] &&
+            $user instanceof WP_User
+        ) {
+
+            $data['first_name'] =
+                trim(
+                    (string)
+                    get_user_meta(
+                        $customer_id,
+                        'first_name',
+                        true
+                    )
+                );
+        }
+
+
+        $data['last_name'] =
+            trim(
+                (string)
+                $order->get_billing_last_name()
+            );
+
+
+        if (
+            '' === $data['last_name'] &&
+            $customer
+        ) {
+
+            $data['last_name'] =
+                trim(
+                    (string)
+                    $customer
+                        ->get_billing_last_name()
+                );
+        }
+
+
+        if (
+            '' === $data['last_name'] &&
+            $user instanceof WP_User
+        ) {
+
+            $data['last_name'] =
+                trim(
+                    (string)
+                    get_user_meta(
+                        $customer_id,
+                        'last_name',
+                        true
+                    )
+                );
+        }
+
+
+        $data['display_name'] =
+            trim(
+                $data['first_name']
+                . ' '
+                . $data['last_name']
+            );
+
+
+        if (
+            '' === $data['display_name'] &&
+            $user instanceof WP_User
+        ) {
+
+            $data['display_name'] =
+                trim(
+                    (string)
+                    (
+                        $user->display_name
+                        ?: $user->user_login
+                    )
+                );
+        }
+
+
+        /*
+         * A legal entity name is a useful final display
+         * fallback when no personal name exists.
+         */
+        if (
+            '' === $data['display_name']
+        ) {
+
+            $data['display_name'] =
+                trim(
+                    (string)
+                    ($b2b['legal_name'] ?? '')
+                );
+        }
+
+
+        /*
+         * Phone.
+         *
+         * WooCommerce order -> WooCommerce profile ->
+         * HSB verified/login mobile -> HSB customer meta.
+         */
+        $data['phone'] =
+            trim(
+                (string)
+                $order->get_billing_phone()
+            );
+
+
+        if (
+            '' === $data['phone'] &&
+            $customer
+        ) {
+
+            $data['phone'] =
+                trim(
+                    (string)
+                    $customer
+                        ->get_billing_phone()
+                );
+        }
+
+
+        if (
+            '' === $data['phone'] &&
+            $customer_id &&
+            class_exists('HSB_Auth_API') &&
+            method_exists(
+                'HSB_Auth_API',
+                'get_mobile'
+            )
+        ) {
+
+            $data['phone'] =
+                trim(
+                    (string)
+                    HSB_Auth_API::get_mobile(
+                        $customer_id
+                    )
+                );
+        }
+
+
+        if (
+            '' === $data['phone'] &&
+            $customer_id
+        ) {
+
+            $data['phone'] =
+                trim(
+                    (string)
+                    get_user_meta(
+                        $customer_id,
+                        'hsb_receiver_phone',
+                        true
+                    )
+                );
+        }
+
+
+        /*
+         * Email.
+         */
+        $data['email'] =
+            trim(
+                (string)
+                $order->get_billing_email()
+            );
+
+
+        if (
+            '' === $data['email'] &&
+            $customer
+        ) {
+
+            $data['email'] =
+                trim(
+                    (string)
+                    $customer
+                        ->get_billing_email()
+                );
+        }
+
+
+        if (
+            '' === $data['email'] &&
+            $user instanceof WP_User
+        ) {
+
+            $data['email'] =
+                trim(
+                    (string)
+                    $user->user_email
+                );
+        }
+
+
+        /*
+         * Billing / invoice address.
+         *
+         * Order snapshot first, then profile.
+         * HOM legal data is only a display fallback here;
+         * nothing is written back automatically.
+         */
+        $billing_map = [
+            'company' =>
+                'get_billing_company',
+
+            'address_1' =>
+                'get_billing_address_1',
+
+            'address_2' =>
+                'get_billing_address_2',
+
+            'city' =>
+                'get_billing_city',
+
+            'state' =>
+                'get_billing_state',
+
+            'postcode' =>
+                'get_billing_postcode',
+
+            'country' =>
+                'get_billing_country',
+        ];
+
+
+        foreach (
+            $billing_map
+            as $field => $getter
+        ) {
+
+            $value =
+                trim(
+                    (string)
+                    $order->$getter()
+                );
+
+
+            if (
+                '' === $value &&
+                $customer
+            ) {
+
+                $value =
+                    trim(
+                        (string)
+                        $customer->$getter()
+                    );
+            }
+
+
+            $data['billing'][$field] =
+                $value;
+        }
+
+
+        if (
+            '' ===
+            $data['billing']['company']
+        ) {
+
+            $data['billing']['company'] =
+                trim(
+                    (string)
+                    ($b2b['legal_name'] ?? '')
+                );
+        }
+
+
+        if (
+            '' ===
+            $data['billing']['postcode']
+        ) {
+
+            $data['billing']['postcode'] =
+                trim(
+                    (string)
+                    ($b2b['postcode'] ?? '')
+                );
+        }
+
+
+        if (
+            '' ===
+            $data['billing']['address_1']
+        ) {
+
+            $data['billing']['address_1'] =
+                trim(
+                    (string)
+                    ($b2b['address'] ?? '')
+                );
+        }
+
+
+        /*
+         * Shipping is intentionally kept separate.
+         * Legal/invoice address must never silently become
+         * the delivery destination.
+         */
+        $shipping_map = [
+            'first_name' =>
+                'get_shipping_first_name',
+
+            'last_name' =>
+                'get_shipping_last_name',
+
+            'company' =>
+                'get_shipping_company',
+
+            'address_1' =>
+                'get_shipping_address_1',
+
+            'address_2' =>
+                'get_shipping_address_2',
+
+            'city' =>
+                'get_shipping_city',
+
+            'state' =>
+                'get_shipping_state',
+
+            'postcode' =>
+                'get_shipping_postcode',
+
+            'country' =>
+                'get_shipping_country',
+        ];
+
+
+        foreach (
+            $shipping_map
+            as $field => $getter
+        ) {
+
+            $value =
+                trim(
+                    (string)
+                    $order->$getter()
+                );
+
+
+            if (
+                '' === $value &&
+                $customer
+            ) {
+
+                $value =
+                    trim(
+                        (string)
+                        $customer->$getter()
+                    );
+            }
+
+
+            $data['shipping'][$field] =
+                $value;
+        }
+
+
+        return $data;
+    }
+
+
+
     private static function b2b_profile_meta_map() {
 
         return [

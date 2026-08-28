@@ -452,126 +452,254 @@ final class HOM_Order_Audit {
                 $order
             );
 
+
+        $count =
+            is_array($log)
+                ? count($log)
+                : 0;
+
+
+        if ($log) {
+
+            /*
+             * Most recent activity is more useful
+             * for daily operational work.
+             */
+            $log =
+                array_reverse(
+                    $log
+                );
+        }
+
         ?>
 
-        <section
-            class="hom-card hom-order-audit"
-            style="margin-top:20px"
+        <details
+            class="
+                hom-order-accordion
+                hom-order-audit
+            "
         >
 
-            <h2>
-                رخدادها و فعالیت‌های انجام‌شده
-            </h2>
+            <summary>
 
-            <?php if (!$log) : ?>
+                <span class="hom-order-accordion__identity">
 
-                <p class="hom-muted">
-                    هنوز فعالیتی برای این پرونده ثبت نشده است.
-                </p>
+                    <span class="hom-order-accordion__icon">
+                        ☷
+                    </span>
 
-            <?php else : ?>
+                    <span>
+                        <strong>
+                            سوابق و رخدادها
+                        </strong>
 
-                <div class="hom-order-audit__list">
+                        <small>
+                            برای بررسی اینکه چه کاری، چه زمانی و توسط چه کسی انجام شده است
+                        </small>
+                    </span>
 
-                    <?php foreach ($log as $row) : ?>
+                </span>
 
-                        <article class="hom-order-audit__item">
 
-                            <div>
+                <span class="hom-order-accordion__count">
+                    <?php
+                    echo esc_html(
+                        $count
+                    );
+                    ?>
+                    رخداد
+                </span>
 
-                                <strong>
-                                    <?php
-                                    echo esc_html(
-                                        self::event_label(
-                                            $row['event']
-                                            ?? ''
+            </summary>
+
+
+            <div class="hom-order-accordion__body">
+
+                <?php if (!$log) : ?>
+
+                    <p class="hom-muted">
+                        هنوز فعالیتی ثبت نشده است.
+                    </p>
+
+                <?php else : ?>
+
+                    <div class="hom-order-audit__list">
+
+                        <?php foreach ($log as $row) : ?>
+
+                            <?php
+                            $event_time =
+                                !empty(
+                                    $row['timestamp']
+                                )
+                                    ? wp_date(
+                                        'Y/m/d H:i',
+                                        absint(
+                                            $row[
+                                                'timestamp'
+                                            ]
                                         )
+                                    )
+                                    : (
+                                        $row['date']
+                                        ?? '—'
                                     );
-                                    ?>
-                                </strong>
+                            ?>
 
+                            <details
+                                class="hom-order-audit__event"
+                            >
 
-                                <?php if (!empty($row['description'])) : ?>
+                                <summary>
+
+                                    <strong>
+                                        <?php
+                                        echo esc_html(
+                                            self::event_label(
+                                                $row['event']
+                                                ?? ''
+                                            )
+                                        );
+                                        ?>
+                                    </strong>
+
 
                                     <span>
                                         <?php
                                         echo esc_html(
-                                            $row['description']
+                                            $row['user_name']
+                                            ?? 'سیستم'
                                         );
                                         ?>
                                     </span>
 
-                                <?php endif; ?>
+
+                                    <time>
+                                        <?php
+                                        echo esc_html(
+                                            $event_time
+                                        );
+                                        ?>
+                                    </time>
+
+                                </summary>
 
 
-                                <?php
-                                if (
-                                    !empty($row['changes']) &&
-                                    is_array($row['changes'])
-                                ) :
-                                    ?>
+                                <div
+                                    class="
+                                        hom-order-audit__event-body
+                                    "
+                                >
 
-                                    <div
-                                        style="
-                                            display:grid;
-                                            gap:8px;
-                                            margin-top:10px
-                                        "
-                                    >
+                                    <?php
+                                    if (
+                                        !empty(
+                                            $row[
+                                                'description'
+                                            ]
+                                        )
+                                    ) :
+                                        ?>
 
-                                        <?php foreach ($row['changes'] as $change) : ?>
+                                        <p
+                                            class="
+                                                hom-order-audit__description
+                                            "
+                                        >
+                                            <?php
+                                            echo esc_html(
+                                                $row[
+                                                    'description'
+                                                ]
+                                            );
+                                            ?>
+                                        </p>
 
-                                            <div
-                                                style="
-                                                    padding:9px 11px;
-                                                    border:1px solid #e5e7eb;
-                                                    border-radius:8px;
-                                                    background:#fafafa
-                                                "
-                                            >
+                                    <?php endif; ?>
 
-                                                <strong>
-                                                    <?php
-                                                    echo esc_html(
-                                                        $change['field']
-                                                        ?? 'تغییر'
-                                                    );
-                                                    ?>
-                                                </strong>
+
+                                    <?php
+                                    if (
+                                        !empty(
+                                            $row['changes']
+                                        ) &&
+                                        is_array(
+                                            $row['changes']
+                                        )
+                                    ) :
+                                        ?>
+
+                                        <div
+                                            class="
+                                                hom-order-audit__changes
+                                            "
+                                        >
+
+                                            <?php
+                                            foreach (
+                                                $row[
+                                                    'changes'
+                                                ]
+                                                as $change
+                                            ) :
+                                                ?>
 
                                                 <div
-                                                    style="
-                                                        display:flex;
-                                                        flex-wrap:wrap;
-                                                        gap:14px;
-                                                        margin-top:5px;
-                                                        font-size:13px
+                                                    class="
+                                                        hom-order-audit__change
                                                     "
                                                 >
 
+                                                    <strong>
+                                                        <?php
+                                                        echo esc_html(
+                                                            $change[
+                                                                'field'
+                                                            ]
+                                                            ?? 'تغییر'
+                                                        );
+                                                        ?>
+                                                    </strong>
+
+
                                                     <span>
-                                                        قبل:
+                                                        <small>
+                                                            قبل
+                                                        </small>
+
                                                         <?php
                                                         echo esc_html(
                                                             (
-                                                                $change['before']
+                                                                $change[
+                                                                    'before'
+                                                                ]
                                                                 ?? ''
                                                             ) !== ''
-                                                                ? $change['before']
+                                                                ? $change[
+                                                                    'before'
+                                                                ]
                                                                 : '—'
                                                         );
                                                         ?>
                                                     </span>
 
+
                                                     <span>
-                                                        بعد:
+                                                        <small>
+                                                            بعد
+                                                        </small>
+
                                                         <?php
                                                         echo esc_html(
                                                             (
-                                                                $change['after']
+                                                                $change[
+                                                                    'after'
+                                                                ]
                                                                 ?? ''
                                                             ) !== ''
-                                                                ? $change['after']
+                                                                ? $change[
+                                                                    'after'
+                                                                ]
                                                                 : '—'
                                                         );
                                                         ?>
@@ -579,138 +707,161 @@ final class HOM_Order_Audit {
 
                                                 </div>
 
-                                            </div>
+                                            <?php endforeach; ?>
 
-                                        <?php endforeach; ?>
+                                        </div>
+
+                                    <?php endif; ?>
+
+
+                                    <?php
+                                    if (
+                                        !empty(
+                                            $row['reason']
+                                        )
+                                    ) :
+                                        ?>
+
+                                        <div
+                                            class="
+                                                hom-order-audit__reason
+                                            "
+                                        >
+
+                                            <strong>
+                                                دلیل اصلاح:
+                                            </strong>
+
+                                            <?php
+                                            echo esc_html(
+                                                $row['reason']
+                                            );
+                                            ?>
+
+                                        </div>
+
+                                    <?php endif; ?>
+
+
+                                    <div
+                                        class="
+                                            hom-order-audit__meta
+                                        "
+                                    >
+
+                                        <span>
+                                            <?php
+                                            echo esc_html(
+                                                $row[
+                                                    'user_name'
+                                                ]
+                                                ?? 'سیستم'
+                                            );
+                                            ?>
+                                        </span>
+
+
+                                        <?php
+                                        if (
+                                            !empty(
+                                                $row[
+                                                    'role_name'
+                                                ]
+                                            )
+                                        ) :
+                                            ?>
+
+                                            <span>
+                                                <?php
+                                                echo esc_html(
+                                                    $row[
+                                                        'role_name'
+                                                    ]
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+
+                                        <?php
+                                        if (
+                                            !empty(
+                                                $row[
+                                                    'user_login'
+                                                ]
+                                            )
+                                        ) :
+                                            ?>
+
+                                            <span dir="ltr">
+                                                @<?php
+                                                echo esc_html(
+                                                    $row[
+                                                        'user_login'
+                                                    ]
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+
+                                        <span>
+                                            منبع:
+                                            <?php
+                                            echo esc_html(
+                                                self::source_label(
+                                                    $row[
+                                                        'source'
+                                                    ]
+                                                    ?? ''
+                                                )
+                                            );
+                                            ?>
+                                        </span>
+
+
+                                        <?php
+                                        if (
+                                            !empty(
+                                                $row[
+                                                    'user_id'
+                                                ]
+                                            )
+                                        ) :
+                                            ?>
+
+                                            <span dir="ltr">
+                                                ID:
+                                                <?php
+                                                echo esc_html(
+                                                    absint(
+                                                        $row[
+                                                            'user_id'
+                                                        ]
+                                                    )
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
 
                                     </div>
 
-                                <?php endif; ?>
+                                </div>
 
+                            </details>
 
-                                <?php if (!empty($row['reason'])) : ?>
+                        <?php endforeach; ?>
 
-                                    <p
-                                        style="
-                                            margin:10px 0 0;
-                                            padding:9px 11px;
-                                            border-right:3px solid #d4a72c;
-                                            background:#fffaf0;
-                                            border-radius:6px
-                                        "
-                                    >
-                                        <strong>
-                                            دلیل اصلاح:
-                                        </strong>
+                    </div>
 
-                                        <?php
-                                        echo esc_html(
-                                            $row['reason']
-                                        );
-                                        ?>
-                                    </p>
+                <?php endif; ?>
 
-                                <?php endif; ?>
+            </div>
 
-                            </div>
-
-
-                            <div class="hom-order-audit__actor">
-
-                                <strong>
-                                    <?php
-                                    echo esc_html(
-                                        $row['user_name']
-                                        ?? 'سیستم'
-                                    );
-                                    ?>
-                                </strong>
-
-
-                                <?php if (!empty($row['role_name'])) : ?>
-
-                                    <span>
-                                        <?php
-                                        echo esc_html(
-                                            $row['role_name']
-                                        );
-                                        ?>
-                                    </span>
-
-                                <?php endif; ?>
-
-
-                                <?php if (!empty($row['user_login'])) : ?>
-
-                                    <span dir="ltr">
-                                        @<?php
-                                        echo esc_html(
-                                            $row['user_login']
-                                        );
-                                        ?>
-                                    </span>
-
-                                <?php endif; ?>
-
-
-                                <small>
-                                    منبع:
-                                    <?php
-                                    echo esc_html(
-                                        self::source_label(
-                                            $row['source']
-                                            ?? ''
-                                        )
-                                    );
-                                    ?>
-                                </small>
-
-
-                                <?php if (!empty($row['user_id'])) : ?>
-
-                                    <small>
-                                        User ID:
-                                        <?php
-                                        echo esc_html(
-                                            absint(
-                                                $row['user_id']
-                                            )
-                                        );
-                                        ?>
-                                    </small>
-
-                                <?php endif; ?>
-
-                            </div>
-
-
-                            <time>
-                                <?php
-                                echo esc_html(
-                                    !empty($row['timestamp'])
-                                        ? wp_date(
-                                            'Y/m/d H:i',
-                                            absint(
-                                                $row['timestamp']
-                                            )
-                                        )
-                                        : (
-                                            $row['date']
-                                            ?? '—'
-                                        )
-                                );
-                                ?>
-                            </time>
-
-                        </article>
-
-                    <?php endforeach; ?>
-
-                </div>
-
-            <?php endif; ?>
-
-        </section>
+        </details>
 
         <?php
     }

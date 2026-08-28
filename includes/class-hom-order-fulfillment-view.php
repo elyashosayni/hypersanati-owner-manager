@@ -13,7 +13,8 @@ final class HOM_Order_Fulfillment_View {
         if (
             !($order instanceof WC_Order) ||
             !current_user_can(
-                HOM_Capabilities::CAP_MANAGE_FULFILLMENT
+                HOM_Capabilities::
+                CAP_MANAGE_FULFILLMENT
             )
         ) {
             return;
@@ -50,6 +51,35 @@ final class HOM_Order_Fulfillment_View {
             HOM_Orders::shipping_methods();
 
 
+        $method_label =
+            (
+                !empty(
+                    $data['method']
+                ) &&
+                isset(
+                    $methods[
+                        $data['method']
+                    ]
+                )
+            )
+                ? $methods[
+                    $data['method']
+                ]
+                : 'تعیین نشده';
+
+
+        $freight_label =
+            'prepaid' ===
+            $data['freight_payment']
+                ? 'پرداخت شده'
+                : (
+                    'collect' ===
+                    $data['freight_payment']
+                        ? 'پس‌کرایه'
+                        : 'تعیین نشده'
+                );
+
+
         $shipping_already_saved =
             '' !==
             trim(
@@ -84,17 +114,37 @@ final class HOM_Order_Fulfillment_View {
         ?>
 
         <section
-            class="hom-card"
-            style="margin-top:20px"
+            class="
+                hom-order-operation-card
+                hom-order-fulfillment-card
+            "
         >
 
-            <h2>
-                ارسال و تحویل سفارش
-            </h2>
+            <div class="hom-order-operation-card__head">
 
-            <p>
-                وضعیت فعلی:
-                <strong>
+                <div>
+
+                    <span class="hom-order-operation-card__eyebrow">
+                        عملیات سفارش
+                    </span>
+
+                    <h2>
+                        ارسال و تحویل
+                    </h2>
+
+                </div>
+
+
+                <span
+                    class="
+                        hom-order-operation-status
+                        <?php
+                        echo 'completed' === $status
+                            ? 'is-complete'
+                            : 'is-pending';
+                        ?>
+                    "
+                >
                     <?php
                     echo esc_html(
                         HOM_Orders::status_label(
@@ -102,278 +152,394 @@ final class HOM_Order_Fulfillment_View {
                         )
                     );
                     ?>
-                </strong>
-            </p>
+                </span>
+
+            </div>
 
 
-            <form
-                method="post"
-                action="<?php
-                echo esc_url(
-                    HOM_Router::panel_url()
-                );
-                ?>"
-            >
+            <div class="hom-order-operation-summary">
 
-                <input
-                    type="hidden"
-                    name="hom_action"
-                    value="hom_save_order_fulfillment"
-                >
+                <div>
+                    <span>روش ارسال</span>
 
-                <input
-                    type="hidden"
-                    name="order_id"
-                    value="<?php
-                    echo esc_attr(
-                        $order->get_id()
-                    );
-                    ?>"
-                >
-
-                <?php
-                wp_nonce_field(
-                    'hom_save_order_fulfillment_' .
-                    $order->get_id()
-                );
-                ?>
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $method_label
+                        );
+                        ?>
+                    </strong>
+                </div>
 
 
-                <label class="hom-field">
+                <div>
+                    <span>شرکت / باربری</span>
+
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $data['company']
+                                ?: '—'
+                        );
+                        ?>
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>کد رهگیری</span>
+
+                    <strong dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $data[
+                                'tracking_code'
+                            ]
+                            ?: '—'
+                        );
+                        ?>
+                    </strong>
+                </div>
+
+
+                <div>
+                    <span>کرایه</span>
+
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $freight_label
+                        );
+                        ?>
+                    </strong>
+                </div>
+
+            </div>
+
+
+            <details class="hom-order-action-disclosure">
+
+                <summary>
 
                     <span>
-                        روش ارسال
+                        <?php
+                        echo esc_html(
+                            $shipping_already_saved
+                                ? 'مشاهده / اصلاح اطلاعات ارسال'
+                                : 'ثبت اطلاعات ارسال'
+                        );
+                        ?>
                     </span>
 
-                    <select
-                        name="shipping_method"
+                    <small>
+                        فقط هنگام انجام عملیات باز کنید
+                    </small>
+
+                </summary>
+
+
+                <div class="hom-order-action-disclosure__body">
+
+                    <form
+                        method="post"
+                        action="<?php
+                        echo esc_url(
+                            HOM_Router::panel_url()
+                        );
+                        ?>"
                     >
 
-                        <option value="">
-                            انتخاب کنید
-                        </option>
+                        <input
+                            type="hidden"
+                            name="hom_action"
+                            value="hom_save_order_fulfillment"
+                        >
+
+                        <input
+                            type="hidden"
+                            name="order_id"
+                            value="<?php
+                            echo esc_attr(
+                                $order->get_id()
+                            );
+                            ?>"
+                        >
 
                         <?php
-                        foreach (
-                            $methods
-                            as $key => $label
+                        wp_nonce_field(
+                            'hom_save_order_fulfillment_' .
+                            $order->get_id()
+                        );
+                        ?>
+
+
+                        <div class="hom-order-form-grid">
+
+                            <label class="hom-field">
+
+                                <span>
+                                    روش ارسال
+                                </span>
+
+                                <select
+                                    name="shipping_method"
+                                >
+
+                                    <option value="">
+                                        انتخاب کنید
+                                    </option>
+
+                                    <?php
+                                    foreach (
+                                        $methods
+                                        as $key => $label
+                                    ) :
+                                        ?>
+
+                                        <option
+                                            value="<?php
+                                            echo esc_attr(
+                                                $key
+                                            );
+                                            ?>"
+                                            <?php
+                                            selected(
+                                                $data[
+                                                    'method'
+                                                ],
+                                                $key
+                                            );
+                                            ?>
+                                        >
+                                            <?php
+                                            echo esc_html(
+                                                $label
+                                            );
+                                            ?>
+                                        </option>
+
+                                    <?php endforeach; ?>
+
+                                </select>
+
+                            </label>
+
+
+                            <label class="hom-field">
+
+                                <span>
+                                    شرکت / باربری / شعبه
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="shipping_company"
+                                    value="<?php
+                                    echo esc_attr(
+                                        $data[
+                                            'company'
+                                        ]
+                                    );
+                                    ?>"
+                                >
+
+                            </label>
+
+
+                            <label class="hom-field">
+
+                                <span>
+                                    کد رهگیری / بارنامه
+                                </span>
+
+                                <input
+                                    type="text"
+                                    name="tracking_code"
+                                    dir="ltr"
+                                    value="<?php
+                                    echo esc_attr(
+                                        $data[
+                                            'tracking_code'
+                                        ]
+                                    );
+                                    ?>"
+                                >
+
+                            </label>
+
+
+                            <label class="hom-field">
+
+                                <span>
+                                    وضعیت کرایه
+                                </span>
+
+                                <select
+                                    name="freight_payment"
+                                >
+
+                                    <option value="">
+                                        تعیین نشده
+                                    </option>
+
+                                    <option
+                                        value="prepaid"
+                                        <?php
+                                        selected(
+                                            $data[
+                                                'freight_payment'
+                                            ],
+                                            'prepaid'
+                                        );
+                                        ?>
+                                    >
+                                        پرداخت شده
+                                    </option>
+
+                                    <option
+                                        value="collect"
+                                        <?php
+                                        selected(
+                                            $data[
+                                                'freight_payment'
+                                            ],
+                                            'collect'
+                                        );
+                                        ?>
+                                    >
+                                        پس‌کرایه
+                                    </option>
+
+                                </select>
+
+                            </label>
+
+                        </div>
+
+
+                        <label
+                            class="
+                                hom-field
+                                hom-order-field-wide
+                            "
+                        >
+
+                            <span>
+                                توضیحات ارسال
+                            </span>
+
+                            <textarea
+                                name="shipping_notes"
+                                rows="2"
+                            ><?php
+                            echo esc_textarea(
+                                $data['notes']
+                            );
+                            ?></textarea>
+
+                        </label>
+
+
+                        <?php
+                        if (
+                            $shipping_already_saved
                         ) :
                             ?>
 
-                            <option
-                                value="<?php
-                                echo esc_attr($key);
-                                ?>"
-                                <?php
-                                selected(
-                                    $data['method'],
-                                    $key
-                                );
-                                ?>
+                            <label
+                                class="
+                                    hom-field
+                                    hom-order-field-wide
+                                "
                             >
-                                <?php
-                                echo esc_html($label);
-                                ?>
-                            </option>
 
-                        <?php endforeach; ?>
+                                <span>
+                                    دلیل اصلاح
+                                </span>
 
-                    </select>
+                                <input
+                                    type="text"
+                                    name="correction_reason"
+                                    placeholder="فقط اگر اطلاعات بالا تغییر کرده است"
+                                >
 
-                </label>
+                            </label>
 
-
-                <label class="hom-field">
-
-                    <span>
-                        شرکت / باربری / شعبه
-                    </span>
-
-                    <input
-                        type="text"
-                        name="shipping_company"
-                        value="<?php
-                        echo esc_attr(
-                            $data['company']
-                        );
-                        ?>"
-                    >
-
-                </label>
+                        <?php endif; ?>
 
 
-                <label class="hom-field">
+                        <div class="hom-order-action-buttons">
 
-                    <span>
-                        کد رهگیری / شماره بارنامه
-                    </span>
-
-                    <input
-                        type="text"
-                        name="tracking_code"
-                        value="<?php
-                        echo esc_attr(
-                            $data['tracking_code']
-                        );
-                        ?>"
-                        dir="ltr"
-                    >
-
-                </label>
+                            <button
+                                type="submit"
+                                name="fulfillment_action"
+                                value="save"
+                                class="
+                                    hom-button
+                                    hom-button-secondary
+                                "
+                            >
+                                ذخیره اطلاعات
+                            </button>
 
 
-                <label class="hom-field">
+                            <?php if ('processing' === $status) : ?>
 
-                    <span>
-                        وضعیت کرایه
-                    </span>
+                                <button
+                                    type="submit"
+                                    name="fulfillment_action"
+                                    value="ready"
+                                    class="
+                                        hom-button
+                                        hom-button-primary
+                                    "
+                                >
+                                    آماده ارسال
+                                </button>
 
-                    <select
-                        name="freight_payment"
-                    >
-
-                        <option value="">
-                            تعیین نشده
-                        </option>
-
-                        <option
-                            value="prepaid"
-                            <?php
-                            selected(
-                                $data['freight_payment'],
-                                'prepaid'
-                            );
-                            ?>
-                        >
-                            پرداخت شده
-                        </option>
-
-                        <option
-                            value="collect"
-                            <?php
-                            selected(
-                                $data['freight_payment'],
-                                'collect'
-                            );
-                            ?>
-                        >
-                            پس‌کرایه
-                        </option>
-
-                    </select>
-
-                </label>
+                            <?php endif; ?>
 
 
-                <label class="hom-field">
+                            <?php if ('hom-ready' === $status) : ?>
 
-                    <span>
-                        توضیحات ارسال
-                    </span>
+                                <button
+                                    type="submit"
+                                    name="fulfillment_action"
+                                    value="shipped"
+                                    class="
+                                        hom-button
+                                        hom-button-primary
+                                    "
+                                >
+                                    ثبت ارسال
+                                </button>
 
-                    <textarea
-                        name="shipping_notes"
-                        rows="3"
-                    ><?php
-                    echo esc_textarea(
-                        $data['notes']
-                    );
-                    ?></textarea>
-
-                </label>
-
-
-                <?php if ($shipping_already_saved) : ?>
-
-                    <label
-                        class="hom-field"
-                        style="margin-top:14px"
-                    >
-
-                        <span>
-                            دلیل اصلاح اطلاعات ارسال
-                        </span>
-
-                        <textarea
-                            name="correction_reason"
-                            rows="3"
-                            placeholder="اگر اطلاعات ارسال بالا را تغییر داده‌اید، دلیل اصلاح را بنویسید..."
-                        ></textarea>
-
-                    </label>
-
-                    <small>
-                        در صورت تغییر هرکدام از اطلاعات ارسال ثبت‌شده،
-                        وارد کردن دلیل اصلاح الزامی است.
-                        برای تغییر صرفاً مرحله سفارش، این فیلد لازم نیست.
-                    </small>
-
-                <?php endif; ?>
+                            <?php endif; ?>
 
 
-                <div
-                    style="
-                        display:flex;
-                        flex-wrap:wrap;
-                        gap:10px;
-                        margin-top:16px
-                    "
-                >
+                            <?php if ('hom-shipped' === $status) : ?>
 
-                    <button
-                        type="submit"
-                        name="fulfillment_action"
-                        value="save"
-                        class="hom-button hom-button-secondary"
-                    >
-                        ذخیره اطلاعات ارسال
-                    </button>
+                                <button
+                                    type="submit"
+                                    name="fulfillment_action"
+                                    value="delivered"
+                                    class="
+                                        hom-button
+                                        hom-button-primary
+                                    "
+                                >
+                                    ثبت تحویل
+                                </button>
 
+                            <?php endif; ?>
 
-                    <?php if ('processing' === $status) : ?>
+                        </div>
 
-                        <button
-                            type="submit"
-                            name="fulfillment_action"
-                            value="ready"
-                            class="hom-button hom-button-primary"
-                        >
-                            سفارش آماده ارسال است
-                        </button>
-
-                    <?php endif; ?>
-
-
-                    <?php if ('hom-ready' === $status) : ?>
-
-                        <button
-                            type="submit"
-                            name="fulfillment_action"
-                            value="shipped"
-                            class="hom-button hom-button-primary"
-                        >
-                            ثبت ارسال سفارش
-                        </button>
-
-                    <?php endif; ?>
-
-
-                    <?php if ('hom-shipped' === $status) : ?>
-
-                        <button
-                            type="submit"
-                            name="fulfillment_action"
-                            value="delivered"
-                            class="hom-button hom-button-primary"
-                        >
-                            ثبت تحویل به مشتری
-                        </button>
-
-                    <?php endif; ?>
+                    </form>
 
                 </div>
 
-            </form>
+            </details>
 
         </section>
 

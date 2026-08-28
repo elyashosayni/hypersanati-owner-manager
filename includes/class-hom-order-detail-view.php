@@ -27,85 +27,92 @@ final class HOM_Order_Detail_View {
             HOM_Router::panel_url()
         );
 
-        ?>
-        <div class="hom-page-heading">
-            <div>
-                <a href="<?php echo esc_url($back_url); ?>">
-                    ← بازگشت به سفارش‌ها
-                </a>
-
-                <h1>
-                    <?php
-                    echo 'yes' === $order->get_meta(
-                        '_hsb_is_preinvoice',
-                        true
-                    )
-                        ? 'پیش‌فاکتور'
-                        : 'سفارش';
-                    ?>
-
-                    #<?php
-                    echo esc_html(
-                        $order->get_order_number()
-                    );
-                    ?>
-                </h1>
-
-                <p>
-                    وضعیت:
-                    <?php
-                    echo esc_html(
-                        HOM_Orders::status_label(
-                            $order->get_status()
-                        )
-                    );
-                    ?>
-                </p>
-            </div>
-        </div>
-
-        <section class="hom-card" style="margin-bottom:20px">
-
-            <strong>
-                مشتری:
-                <?php
-                echo esc_html(
-                    $order->get_formatted_billing_full_name()
-                    ?: 'ثبت نشده'
-                );
-                ?>
-            </strong>
-
-            <p>
-                تلفن:
-                <span dir="ltr">
-                    <?php
-                    echo esc_html(
-                        $order->get_billing_phone()
-                        ?: '—'
-                    );
-                    ?>
-                </span>
-            </p>
-
-            <p>
-                شهر:
-                <?php
-                echo esc_html(
-                    $order->get_billing_city()
-                    ?: '—'
-                );
-                ?>
-            </p>
-
-        </section>
+        $contact =
+            HOM_Orders::customer_contact_data(
+                $order
+            );
 
 
-        <?php
         $b2b =
             HOM_Orders::b2b_customer_data(
                 $order
             );
+
+
+        $assignee =
+            HOM_Orders::assignee_data(
+                $order
+            );
+
+
+        $can_manage_customer =
+            current_user_can(
+                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+            );
+
+
+        $is_preinvoice =
+            'yes' ===
+            $order->get_meta(
+                '_hsb_is_preinvoice',
+                true
+            );
+
+
+        $status_label =
+            HOM_Orders::status_label(
+                $order->get_status()
+            );
+
+
+        $customer_name =
+            trim(
+                (string)
+                $contact['display_name']
+            );
+
+
+        if ('' === $customer_name) {
+
+            $customer_name =
+                trim(
+                    (string)
+                    $b2b['legal_name']
+                );
+        }
+
+
+        $b2b_already_saved =
+            '' !==
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_b2b_updated_at',
+                    true
+                )
+            );
+
+
+        $created =
+            $order->get_date_created();
+
+
+        $created_label =
+            $created
+                ? wp_date(
+                    'Y/m/d H:i',
+                    $created->getTimestamp()
+                )
+                : '—';
+
+
+        $help_url =
+            add_query_arg(
+                'view',
+                'help-customers',
+                HOM_Router::panel_url()
+            );
+
 
         $b2b_notice =
             isset($_GET['notice'])
@@ -115,673 +122,1100 @@ final class HOM_Order_Detail_View {
                     )
                 )
                 : '';
+
         ?>
+
+
+        <div class="hom-order-detail-header">
+
+            <div class="hom-order-detail-header__nav">
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $back_url
+                    );
+                    ?>"
+                    class="hom-order-back-link"
+                >
+                    <span aria-hidden="true">←</span>
+                    بازگشت به مدیریت و پیگیری مشتریان
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $help_url
+                    );
+                    ?>"
+                    class="hom-order-help-link"
+                >
+                    <span aria-hidden="true">👁</span>
+                    راهنمای این بخش
+                </a>
+
+            </div>
+
+
+            <div class="hom-order-detail-header__main">
+
+                <div>
+
+                    <div class="hom-order-detail-kicker">
+                        <?php
+                        echo esc_html(
+                            $is_preinvoice
+                                ? 'پرونده پیش‌فاکتور'
+                                : 'پرونده سفارش'
+                        );
+                        ?>
+                    </div>
+
+                    <div class="hom-order-detail-title-row">
+
+                        <h1>
+                            <?php
+                            echo esc_html(
+                                $is_preinvoice
+                                    ? 'پیش‌فاکتور'
+                                    : 'سفارش'
+                            );
+                            ?>
+
+                            <span dir="ltr">
+                                #<?php
+                                echo esc_html(
+                                    $order
+                                        ->get_order_number()
+                                );
+                                ?>
+                            </span>
+                        </h1>
+
+
+                        <span class="hom-order-detail-status">
+                            <?php
+                            echo esc_html(
+                                $status_label
+                            );
+                            ?>
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-order-detail-total">
+
+                    <span>
+                        مبلغ نهایی
+                    </span>
+
+                    <strong>
+                        <?php
+                        echo wp_kses_post(
+                            $order
+                                ->get_formatted_order_total()
+                        );
+                        ?>
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="hom-order-summary-grid">
+
+                <div class="hom-order-summary-item">
+
+                    <span class="hom-order-summary-item__label">
+                        مشتری
+                    </span>
+
+                    <strong>
+                        <?php if ($customer_name) : ?>
+
+                            <?php
+                            echo esc_html(
+                                $customer_name
+                            );
+                            ?>
+
+                        <?php else : ?>
+
+                            <span class="hom-order-missing">
+                                تکمیل نشده
+                            </span>
+
+                        <?php endif; ?>
+                    </strong>
+
+                </div>
+
+
+                <div class="hom-order-summary-item">
+
+                    <span class="hom-order-summary-item__label">
+                        شماره تماس
+                    </span>
+
+                    <strong dir="ltr">
+
+                        <?php if (!empty($contact['phone'])) : ?>
+
+                            <?php
+                            echo esc_html(
+                                $contact['phone']
+                            );
+                            ?>
+
+                        <?php else : ?>
+
+                            <span class="hom-order-missing">
+                                تکمیل نشده
+                            </span>
+
+                        <?php endif; ?>
+
+                    </strong>
+
+                </div>
+
+
+                <div class="hom-order-summary-item">
+
+                    <span class="hom-order-summary-item__label">
+                        مسئول پرونده
+                    </span>
+
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            $assignee['name']
+                                ?: 'تعیین نشده'
+                        );
+                        ?>
+                    </strong>
+
+                </div>
+
+
+                <div class="hom-order-summary-item">
+
+                    <span class="hom-order-summary-item__label">
+                        تاریخ ثبت
+                    </span>
+
+                    <strong dir="ltr">
+                        <?php
+                        echo esc_html(
+                            $created_label
+                        );
+                        ?>
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+            <div class="hom-order-quick-actions">
+
+                <span class="hom-order-quick-actions__label">
+                    دسترسی سریع:
+                </span>
+
+
+                <a
+                    target="_blank"
+                    rel="noopener"
+                    href="<?php
+                    echo esc_url(
+                        HOM_Order_Documents::url(
+                            $order->get_id(),
+                            'invoice'
+                        )
+                    );
+                    ?>"
+                >
+                    🧾 فاکتور
+                </a>
+
+
+                <a
+                    target="_blank"
+                    rel="noopener"
+                    href="<?php
+                    echo esc_url(
+                        HOM_Order_Documents::url(
+                            $order->get_id(),
+                            'warehouse'
+                        )
+                    );
+                    ?>"
+                >
+                    📦 برگه انبار
+                </a>
+
+
+                <a
+                    target="_blank"
+                    rel="noopener"
+                    href="<?php
+                    echo esc_url(
+                        HOM_Order_Documents::url(
+                            $order->get_id(),
+                            'shipping'
+                        )
+                    );
+                    ?>"
+                >
+                    🏷️ برچسب ارسال
+                </a>
+
+            </div>
+
+        </div>
+
 
 
         <?php if ('b2b-saved' === $b2b_notice) : ?>
 
             <div class="hom-alert hom-alert-success">
-                اطلاعات حقوقی خریدار ذخیره شد.
+                اطلاعات خریدار با موفقیت ذخیره شد.
             </div>
 
         <?php elseif ('b2b-error' === $b2b_notice) : ?>
 
             <div class="hom-alert hom-alert-error">
-                ذخیره اطلاعات حقوقی خریدار انجام نشد.
+                ذخیره اطلاعات خریدار انجام نشد.
             </div>
 
         <?php endif; ?>
 
 
-        <section
-            class="hom-card hom-b2b-customer-card"
-            style="margin-bottom:20px"
-        >
 
-            <h2>
-                اطلاعات حقوقی خریدار
-            </h2>
+        <section class="hom-order-customer-grid">
 
+            <article class="hom-order-info-card">
 
-            <?php
-            if (
-                current_user_can(
-                    HOM_Capabilities::CAP_MANAGE_PREINVOICES
-                )
-            ) :
-                ?>
+                <div class="hom-order-info-card__head">
 
-                <form
-                    method="post"
-                    action="<?php
-                    echo esc_url(
-                        HOM_Router::panel_url()
-                    );
-                    ?>"
-                >
+                    <span class="hom-order-info-card__icon">
+                        👤
+                    </span>
 
-                    <input
-                        type="hidden"
-                        name="hom_action"
-                        value="hom_save_b2b_customer"
-                    >
+                    <div>
+                        <span>
+                            مشخصات پایه
+                        </span>
 
-                    <input
-                        type="hidden"
-                        name="order_id"
-                        value="<?php
-                        echo esc_attr(
-                            $order->get_id()
-                        );
-                        ?>"
-                    >
+                        <h2>
+                            اطلاعات مشتری
+                        </h2>
+                    </div>
 
-                    <?php
-                    wp_nonce_field(
-                        'hom_save_b2b_customer_' .
-                        $order->get_id()
-                    );
-                    ?>
+                </div>
 
 
-                    <div
-                        style="
-                            display:grid;
-                            grid-template-columns:
-                                repeat(2,minmax(0,1fr));
-                            gap:14px
-                        "
-                    >
+                <dl class="hom-order-data-list">
 
-                        <label class="hom-field">
+                    <div>
+                        <dt>نام مشتری</dt>
 
-                            <span>
-                                نام حقوقی / نام شرکت
-                            </span>
+                        <dd>
+                            <?php if ($customer_name) : ?>
 
-                            <input
-                                type="text"
-                                name="legal_name"
-                                value="<?php
-                                echo esc_attr(
-                                    $b2b['legal_name']
+                                <?php
+                                echo esc_html(
+                                    $customer_name
                                 );
-                                ?>"
-                            >
+                                ?>
 
-                        </label>
+                            <?php else : ?>
 
+                                <span class="hom-order-missing">
+                                    تکمیل نشده
+                                </span>
 
-                        <label class="hom-field">
-
-                            <span>
-                                شناسه ملی
-                            </span>
-
-                            <input
-                                type="text"
-                                name="national_id"
-                                inputmode="numeric"
-                                dir="ltr"
-                                value="<?php
-                                echo esc_attr(
-                                    $b2b['national_id']
-                                );
-                                ?>"
-                            >
-
-                        </label>
-
-
-                        <label class="hom-field">
-
-                            <span>
-                                کد اقتصادی
-                            </span>
-
-                            <input
-                                type="text"
-                                name="economic_code"
-                                inputmode="numeric"
-                                dir="ltr"
-                                value="<?php
-                                echo esc_attr(
-                                    $b2b['economic_code']
-                                );
-                                ?>"
-                            >
-
-                        </label>
-
-
-                        <label class="hom-field">
-
-                            <span>
-                                شماره ثبت
-                            </span>
-
-                            <input
-                                type="text"
-                                name="registration_no"
-                                dir="ltr"
-                                value="<?php
-                                echo esc_attr(
-                                    $b2b['registration_no']
-                                );
-                                ?>"
-                            >
-
-                        </label>
-
-
-                        <label class="hom-field">
-
-                            <span>
-                                کدپستی
-                            </span>
-
-                            <input
-                                type="text"
-                                name="postcode"
-                                inputmode="numeric"
-                                dir="ltr"
-                                value="<?php
-                                echo esc_attr(
-                                    $b2b['postcode']
-                                );
-                                ?>"
-                            >
-
-                        </label>
-
+                            <?php endif; ?>
+                        </dd>
                     </div>
 
 
-                    <label
-                        class="hom-field"
-                        style="margin-top:14px"
-                    >
+                    <div>
+                        <dt>شماره تماس</dt>
 
+                        <dd dir="ltr">
+
+                            <?php if (!empty($contact['phone'])) : ?>
+
+                                <?php
+                                echo esc_html(
+                                    $contact['phone']
+                                );
+                                ?>
+
+                            <?php else : ?>
+
+                                <span class="hom-order-missing">
+                                    تکمیل نشده
+                                </span>
+
+                            <?php endif; ?>
+
+                        </dd>
+                    </div>
+
+
+                    <div>
+                        <dt>ایمیل</dt>
+
+                        <dd dir="ltr">
+
+                            <?php if (!empty($contact['email'])) : ?>
+
+                                <?php
+                                echo esc_html(
+                                    $contact['email']
+                                );
+                                ?>
+
+                            <?php else : ?>
+
+                                <span class="hom-order-missing">
+                                    تکمیل نشده
+                                </span>
+
+                            <?php endif; ?>
+
+                        </dd>
+                    </div>
+
+
+                    <div>
+                        <dt>شناسه مشتری</dt>
+
+                        <dd dir="ltr">
+                            <?php
+                            echo $contact['customer_id']
+                                ? esc_html(
+                                    '#' .
+                                    $contact['customer_id']
+                                )
+                                : '—';
+                            ?>
+                        </dd>
+                    </div>
+
+                </dl>
+
+            </article>
+
+
+
+            <article class="hom-order-info-card">
+
+                <div class="hom-order-info-card__head">
+
+                    <span class="hom-order-info-card__icon">
+                        🏢
+                    </span>
+
+                    <div>
                         <span>
-                            آدرس فاکتور
+                            اطلاعات فاکتور
                         </span>
 
-                        <textarea
-                            name="b2b_address"
-                            rows="3"
-                        ><?php
-                        echo esc_textarea(
-                            $b2b['address']
-                        );
-                        ?></textarea>
+                        <h2>
+                            اطلاعات حقوقی خریدار
+                        </h2>
+                    </div>
 
-                    </label>
+                </div>
 
 
-                    <?php
-                    $b2b_already_saved =
-                        '' !==
-                        trim(
-                            (string)
-                            $order->get_meta(
-                                '_hom_b2b_updated_at',
-                                true
-                            )
-                        );
-                    ?>
+                <dl class="hom-order-data-list hom-order-data-list--legal">
+
+                    <div>
+                        <dt>نام حقوقی / شرکت</dt>
+                        <dd>
+                            <?php
+                            echo $b2b['legal_name']
+                                ? esc_html(
+                                    $b2b['legal_name']
+                                )
+                                : '<span class="hom-order-missing">تکمیل نشده</span>';
+                            ?>
+                        </dd>
+                    </div>
 
 
-                    <?php if ($b2b_already_saved) : ?>
+                    <div>
+                        <dt>شناسه ملی</dt>
+                        <dd dir="ltr">
+                            <?php
+                            echo $b2b['national_id']
+                                ? esc_html(
+                                    $b2b['national_id']
+                                )
+                                : '<span class="hom-order-missing">تکمیل نشده</span>';
+                            ?>
+                        </dd>
+                    </div>
 
-                        <label
-                            class="hom-field"
-                            style="margin-top:14px"
-                        >
 
-                            <span>
-                                دلیل اصلاح اطلاعات حقوقی
+                    <div>
+                        <dt>کد اقتصادی</dt>
+                        <dd dir="ltr">
+                            <?php
+                            echo $b2b['economic_code']
+                                ? esc_html(
+                                    $b2b['economic_code']
+                                )
+                                : '<span class="hom-order-missing">تکمیل نشده</span>';
+                            ?>
+                        </dd>
+                    </div>
+
+
+                    <div>
+                        <dt>شماره ثبت</dt>
+                        <dd dir="ltr">
+                            <?php
+                            echo $b2b['registration_no']
+                                ? esc_html(
+                                    $b2b['registration_no']
+                                )
+                                : '<span class="hom-order-missing">تکمیل نشده</span>';
+                            ?>
+                        </dd>
+                    </div>
+
+
+                    <div>
+                        <dt>کدپستی</dt>
+                        <dd dir="ltr">
+                            <?php
+                            echo $b2b['postcode']
+                                ? esc_html(
+                                    $b2b['postcode']
+                                )
+                                : '<span class="hom-order-missing">تکمیل نشده</span>';
+                            ?>
+                        </dd>
+                    </div>
+
+
+                    <div class="is-wide">
+                        <dt>آدرس فاکتور</dt>
+                        <dd>
+                            <?php
+                            echo $b2b['address']
+                                ? esc_html(
+                                    $b2b['address']
+                                )
+                                : '<span class="hom-order-missing">تکمیل نشده</span>';
+                            ?>
+                        </dd>
+                    </div>
+
+                </dl>
+
+
+                <?php if ($can_manage_customer) : ?>
+
+                    <details
+                        class="hom-order-edit-disclosure"
+                        <?php
+                        echo $b2b_already_saved
+                            ? ''
+                            : 'open';
+                        ?>
+                    >
+
+                        <summary>
+
+                            <span aria-hidden="true">
+                                ✎
                             </span>
 
-                            <textarea
-                                name="correction_reason"
-                                rows="3"
-                                required
-                                placeholder="علت اصلاح اطلاعات خریدار را بنویسید..."
-                            ></textarea>
+                            <?php
+                            echo esc_html(
+                                $b2b_already_saved
+                                    ? 'ویرایش اطلاعات حقوقی'
+                                    : 'تکمیل اطلاعات حقوقی'
+                            );
+                            ?>
 
-                        </label>
-
-                        <small>
-                            اطلاعات حقوقی این سفارش قبلاً ثبت شده است؛
-                            برای هر تغییر بعدی، ثبت دلیل الزامی است.
-                        </small>
-
-                    <?php endif; ?>
+                        </summary>
 
 
-                    <button
-                        type="submit"
-                        class="hom-button hom-button-secondary"
-                        style="margin-top:14px"
-                    >
-                        ذخیره اطلاعات حقوقی
-                    </button>
+                        <div class="hom-order-edit-disclosure__body">
 
-                </form>
+                            <form
+                                method="post"
+                                action="<?php
+                                echo esc_url(
+                                    HOM_Router::panel_url()
+                                );
+                                ?>"
+                            >
 
+                                <input
+                                    type="hidden"
+                                    name="hom_action"
+                                    value="hom_save_b2b_customer"
+                                >
 
-            <?php else : ?>
+                                <input
+                                    type="hidden"
+                                    name="order_id"
+                                    value="<?php
+                                    echo esc_attr(
+                                        $order->get_id()
+                                    );
+                                    ?>"
+                                >
 
-
-                <p>
-                    نام حقوقی:
-                    <strong>
-                        <?php
-                        echo esc_html(
-                            $b2b['legal_name']
-                                ?: '—'
-                        );
-                        ?>
-                    </strong>
-                </p>
-
-                <p>
-                    شناسه ملی:
-                    <span dir="ltr">
-                        <?php
-                        echo esc_html(
-                            $b2b['national_id']
-                                ?: '—'
-                        );
-                        ?>
-                    </span>
-                </p>
-
-                <p>
-                    کد اقتصادی:
-                    <span dir="ltr">
-                        <?php
-                        echo esc_html(
-                            $b2b['economic_code']
-                                ?: '—'
-                        );
-                        ?>
-                    </span>
-                </p>
-
-                <p>
-                    شماره ثبت:
-                    <span dir="ltr">
-                        <?php
-                        echo esc_html(
-                            $b2b['registration_no']
-                                ?: '—'
-                        );
-                        ?>
-                    </span>
-                </p>
-
-                <p>
-                    کدپستی:
-                    <span dir="ltr">
-                        <?php
-                        echo esc_html(
-                            $b2b['postcode']
-                                ?: '—'
-                        );
-                        ?>
-                    </span>
-                </p>
-
-                <p>
-                    آدرس:
-                    <?php
-                    echo esc_html(
-                        $b2b['address']
-                            ?: '—'
-                    );
-                    ?>
-                </p>
+                                <?php
+                                wp_nonce_field(
+                                    'hom_save_b2b_customer_' .
+                                    $order->get_id()
+                                );
+                                ?>
 
 
-            <?php endif; ?>
+                                <div class="hom-order-form-grid">
+
+                                    <label class="hom-field">
+                                        <span>
+                                            نام حقوقی / نام شرکت
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            name="legal_name"
+                                            value="<?php
+                                            echo esc_attr(
+                                                $b2b['legal_name']
+                                            );
+                                            ?>"
+                                        >
+                                    </label>
+
+
+                                    <label class="hom-field">
+                                        <span>
+                                            شناسه ملی
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            name="national_id"
+                                            inputmode="numeric"
+                                            dir="ltr"
+                                            value="<?php
+                                            echo esc_attr(
+                                                $b2b['national_id']
+                                            );
+                                            ?>"
+                                        >
+                                    </label>
+
+
+                                    <label class="hom-field">
+                                        <span>
+                                            کد اقتصادی
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            name="economic_code"
+                                            inputmode="numeric"
+                                            dir="ltr"
+                                            value="<?php
+                                            echo esc_attr(
+                                                $b2b['economic_code']
+                                            );
+                                            ?>"
+                                        >
+                                    </label>
+
+
+                                    <label class="hom-field">
+                                        <span>
+                                            شماره ثبت
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            name="registration_no"
+                                            dir="ltr"
+                                            value="<?php
+                                            echo esc_attr(
+                                                $b2b['registration_no']
+                                            );
+                                            ?>"
+                                        >
+                                    </label>
+
+
+                                    <label class="hom-field">
+                                        <span>
+                                            کدپستی
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            name="postcode"
+                                            inputmode="numeric"
+                                            dir="ltr"
+                                            value="<?php
+                                            echo esc_attr(
+                                                $b2b['postcode']
+                                            );
+                                            ?>"
+                                        >
+                                    </label>
+
+                                </div>
+
+
+                                <label class="hom-field hom-order-field-wide">
+
+                                    <span>
+                                        آدرس فاکتور
+                                    </span>
+
+                                    <textarea
+                                        name="b2b_address"
+                                        rows="3"
+                                    ><?php
+                                    echo esc_textarea(
+                                        $b2b['address']
+                                    );
+                                    ?></textarea>
+
+                                </label>
+
+
+                                <?php if ($b2b_already_saved) : ?>
+
+                                    <div class="hom-order-correction-box">
+
+                                        <label class="hom-field">
+
+                                            <span>
+                                                دلیل اصلاح
+                                            </span>
+
+                                            <textarea
+                                                name="correction_reason"
+                                                rows="2"
+                                                placeholder="اگر اطلاعاتی را تغییر داده‌اید، دلیل اصلاح را کوتاه و واضح بنویسید."
+                                            ></textarea>
+
+                                        </label>
+
+                                        <small>
+                                            فقط در صورت تغییر اطلاعات
+                                            ثبت‌شده، دلیل اصلاح لازم است.
+                                        </small>
+
+                                    </div>
+
+                                <?php endif; ?>
+
+
+                                <div class="hom-order-form-actions">
+
+                                    <button
+                                        type="submit"
+                                        class="hom-button hom-button-primary"
+                                    >
+                                        ذخیره اطلاعات خریدار
+                                    </button>
+
+                                </div>
+
+                            </form>
+
+                        </div>
+
+                    </details>
+
+                <?php endif; ?>
+
+            </article>
 
         </section>
 
 
         <?php
-        $assignee =
-            HOM_Orders::assignee_data(
-                $order
+        $order_item_count =
+            count(
+                $order->get_items(
+                    'line_item'
+                )
+            );
+
+
+        $already_priced =
+            '' !==
+            trim(
+                (string)
+                $order->get_meta(
+                    '_hom_preinvoice_priced_at',
+                    true
+                )
             );
         ?>
 
-        <section
-            class="hom-card hom-order-assignee"
-            style="margin-bottom:20px"
-        >
 
-            <strong>
-                مسئول جاری پرونده:
-                <?php
-                echo esc_html(
-                    $assignee['name']
-                        ?: 'هنوز تعیین نشده'
-                );
-                ?>
-            </strong>
+        <details class="hom-order-accordion hom-order-items-accordion">
 
-            <?php if (!empty($assignee['login'])) : ?>
+            <summary>
 
-                <span dir="ltr">
-                    (@<?php
-                    echo esc_html(
-                        $assignee['login']
-                    );
-                    ?>)
-                </span>
+                <span class="hom-order-accordion__identity">
 
-            <?php endif; ?>
-
-            <p
-                class="hom-muted"
-                style="margin:8px 0 0"
-            >
-                مسئول پرونده به‌صورت خودکار بر اساس آخرین
-                قیمت‌گذاری یا تأیید پیش‌فاکتور ثبت می‌شود.
-            </p>
-
-        </section>
-
-
-        <?php if ($can_price) : ?>
-
-            <form
-                method="post"
-                action="<?php echo esc_url(HOM_Router::panel_url()); ?>"
-            >
-
-                <input
-                    type="hidden"
-                    name="hom_action"
-                    value="hom_save_preinvoice_prices"
-                >
-
-                <input
-                    type="hidden"
-                    name="order_id"
-                    value="<?php echo esc_attr($order->get_id()); ?>"
-                >
-
-                <?php
-                wp_nonce_field(
-                    'hom_save_preinvoice_prices_' .
-                    $order->get_id()
-                );
-                ?>
-
-        <?php endif; ?>
-
-
-        <div class="hom-table-wrap">
-
-            <table class="hom-products-table">
-
-                <thead>
-                    <tr>
-                        <th>محصول</th>
-                        <th>SKU</th>
-                        <th>تعداد</th>
-                        <th>قیمت واحد</th>
-                        <th>جمع</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                <?php
-                foreach (
-                    $order->get_items('line_item')
-                    as $item_id => $item
-                ) :
-
-                    $product = $item->get_product();
-
-                    $quantity = max(
-                        1,
-                        (float) $item->get_quantity()
-                    );
-
-                    $unit_price =
-                        (float) $item->get_total()
-                        / $quantity;
-                    ?>
-
-                    <tr>
-
-                        <td>
-                            <?php echo esc_html($item->get_name()); ?>
-                        </td>
-
-                        <td>
-                            <?php
-                            echo esc_html(
-                                $product
-                                    ? ($product->get_sku() ?: '—')
-                                    : '—'
-                            );
-                            ?>
-                        </td>
-
-                        <td>
-                            <?php echo esc_html($quantity); ?>
-                        </td>
-
-                        <td>
-
-                            <?php if ($can_price) : ?>
-
-                                <input
-                                    type="text"
-                                    inputmode="decimal"
-                                    name="item_price[<?php echo esc_attr($item_id); ?>]"
-                                    value="<?php echo esc_attr($unit_price); ?>"
-                                    style="max-width:160px"
-                                >
-
-                            <?php else : ?>
-
-                                <?php
-                                echo wp_kses_post(
-                                    wc_price(
-                                        $unit_price,
-                                        [
-                                            'currency' =>
-                                                $order->get_currency(),
-                                        ]
-                                    )
-                                );
-                                ?>
-
-                            <?php endif; ?>
-
-                        </td>
-
-                        <td>
-                            <?php
-                            echo wp_kses_post(
-                                $order->get_formatted_line_subtotal(
-                                    $item
-                                )
-                            );
-                            ?>
-                        </td>
-
-                    </tr>
-
-                <?php endforeach; ?>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-        <?php if ($can_price) : ?>
-
-            <div style="margin-top:16px;max-width:320px">
-
-                <label class="hom-field">
-
-                    <span>
-                        هزینه ارسال
+                    <span class="hom-order-accordion__icon">
+                        🧾
                     </span>
 
-                    <input
-                        type="text"
-                        inputmode="decimal"
-                        name="shipping_cost"
-                        value="<?php
-                        echo esc_attr(
-                            HOM_Orders::preinvoice_shipping_cost(
-                                $order
-                            )
+                    <span>
+                        <strong>
+                            اقلام و قیمت‌گذاری
+                        </strong>
+
+                        <small>
+                            <?php
+                            echo esc_html(
+                                $order_item_count
+                            );
+                            ?>
+                            قلم
+                        </small>
+                    </span>
+
+                </span>
+
+
+                <span class="hom-order-accordion__summary-value">
+
+                    <?php
+                    echo wp_kses_post(
+                        $order
+                            ->get_formatted_order_total()
+                    );
+                    ?>
+
+                </span>
+
+            </summary>
+
+
+            <div class="hom-order-accordion__body">
+
+
+                <?php if ($can_price) : ?>
+
+                    <form
+                        method="post"
+                        action="<?php
+                        echo esc_url(
+                            HOM_Router::panel_url()
                         );
                         ?>"
                     >
 
-                </label>
+                        <input
+                            type="hidden"
+                            name="hom_action"
+                            value="hom_save_preinvoice_prices"
+                        >
 
-                <small>
-                    برای پس‌کرایه، مبلغ را صفر بگذارید.
-                </small>
+                        <input
+                            type="hidden"
+                            name="order_id"
+                            value="<?php
+                            echo esc_attr(
+                                $order->get_id()
+                            );
+                            ?>"
+                        >
 
-            </div>
+                        <?php
+                        wp_nonce_field(
+                            'hom_save_preinvoice_prices_' .
+                            $order->get_id()
+                        );
+                        ?>
 
-            <?php
-            $already_priced =
-                '' !==
-                trim(
-                    (string)
-                    $order->get_meta(
-                        '_hom_preinvoice_priced_at',
-                        true
-                    )
-                );
-            ?>
+                <?php endif; ?>
 
 
-            <?php if ($already_priced) : ?>
+                <div class="hom-order-items-table-wrap">
 
-                <div style="margin-top:16px">
+                    <table class="hom-products-table">
 
-                    <label class="hom-field">
+                        <thead>
+                            <tr>
+                                <th>محصول</th>
+                                <th>SKU</th>
+                                <th>تعداد</th>
+                                <th>قیمت واحد</th>
+                                <th>جمع</th>
+                            </tr>
+                        </thead>
 
-                        <span>
-                            دلیل اصلاح قیمت
-                        </span>
+                        <tbody>
 
-                        <textarea
-                            name="correction_reason"
-                            rows="3"
-                            required
-                            placeholder="علت تغییر قیمت یا هزینه ارسال را بنویسید..."
-                        ></textarea>
+                        <?php
+                        foreach (
+                            $order->get_items(
+                                'line_item'
+                            )
+                            as $item_id => $item
+                        ) :
 
-                    </label>
+                            $product =
+                                $item->get_product();
 
-                    <small>
-                        این پیش‌فاکتور قبلاً قیمت‌گذاری شده است؛
-                        برای هر اصلاح، ثبت دلیل الزامی است.
-                    </small>
+                            $quantity =
+                                max(
+                                    1,
+                                    (float)
+                                    $item->get_quantity()
+                                );
+
+                            $unit_price =
+                                (float)
+                                $item->get_total()
+                                /
+                                $quantity;
+                            ?>
+
+                            <tr>
+
+                                <td>
+                                    <?php
+                                    echo esc_html(
+                                        $item->get_name()
+                                    );
+                                    ?>
+                                </td>
+
+                                <td dir="ltr">
+                                    <?php
+                                    echo esc_html(
+                                        $product
+                                            ? (
+                                                $product->get_sku()
+                                                ?: '—'
+                                            )
+                                            : '—'
+                                    );
+                                    ?>
+                                </td>
+
+                                <td>
+                                    <?php
+                                    echo esc_html(
+                                        $quantity
+                                    );
+                                    ?>
+                                </td>
+
+                                <td>
+
+                                    <?php if ($can_price) : ?>
+
+                                        <input
+                                            class="hom-order-price-input"
+                                            type="text"
+                                            inputmode="decimal"
+                                            name="item_price[<?php
+                                            echo esc_attr(
+                                                $item_id
+                                            );
+                                            ?>]"
+                                            value="<?php
+                                            echo esc_attr(
+                                                $unit_price
+                                            );
+                                            ?>"
+                                        >
+
+                                    <?php else : ?>
+
+                                        <?php
+                                        echo wp_kses_post(
+                                            wc_price(
+                                                $unit_price,
+                                                [
+                                                    'currency' =>
+                                                        $order
+                                                            ->get_currency(),
+                                                ]
+                                            )
+                                        );
+                                        ?>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+                                <td>
+                                    <?php
+                                    echo wp_kses_post(
+                                        $order
+                                            ->get_formatted_line_subtotal(
+                                                $item
+                                            )
+                                    );
+                                    ?>
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
+
+                        </tbody>
+
+                    </table>
 
                 </div>
 
-            <?php endif; ?>
+
+                <?php if ($can_price) : ?>
+
+                    <div class="hom-order-pricing-footer">
+
+                        <label class="hom-field">
+
+                            <span>
+                                هزینه ارسال
+                            </span>
+
+                            <input
+                                type="text"
+                                inputmode="decimal"
+                                name="shipping_cost"
+                                value="<?php
+                                echo esc_attr(
+                                    HOM_Orders::
+                                    preinvoice_shipping_cost(
+                                        $order
+                                    )
+                                );
+                                ?>"
+                            >
+
+                            <small>
+                                برای پس‌کرایه مبلغ را صفر بگذارید.
+                            </small>
+
+                        </label>
 
 
-            <p style="margin-top:16px">
+                        <?php if ($already_priced) : ?>
 
-                <button
-                    type="submit"
-                    class="hom-button hom-button-primary"
-                >
-                    ذخیره قیمت‌ها
-                </button>
+                            <label class="hom-field">
 
-            </p>
+                                <span>
+                                    دلیل اصلاح قیمت
+                                </span>
 
-            </form>
+                                <textarea
+                                    name="correction_reason"
+                                    rows="2"
+                                    required
+                                    placeholder="دلیل اصلاح را کوتاه بنویسید..."
+                                ></textarea>
 
-        <?php endif; ?>
+                            </label>
 
-
-        <section class="hom-card" style="margin-top:20px">
-
-            <strong>
-                مبلغ نهایی:
-                <?php
-                echo wp_kses_post(
-                    $order->get_formatted_order_total()
-                );
-                ?>
-            </strong>
+                        <?php endif; ?>
 
 
-            <?php if ($can_price) : ?>
+                        <button
+                            type="submit"
+                            class="hom-button hom-button-primary"
+                        >
+                            ذخیره قیمت‌ها
+                        </button>
 
-                <form
-                    method="post"
-                    action="<?php echo esc_url(HOM_Router::panel_url()); ?>"
-                    style="margin-top:16px"
-                >
+                    </div>
 
-                    <input
-                        type="hidden"
-                        name="hom_action"
-                        value="hom_approve_preinvoice"
+                    </form>
+
+
+                    <form
+                        method="post"
+                        action="<?php
+                        echo esc_url(
+                            HOM_Router::panel_url()
+                        );
+                        ?>"
+                        class="hom-order-approve-form"
                     >
 
-                    <input
-                        type="hidden"
-                        name="order_id"
-                        value="<?php echo esc_attr($order->get_id()); ?>"
-                    >
+                        <input
+                            type="hidden"
+                            name="hom_action"
+                            value="hom_approve_preinvoice"
+                        >
 
-                    <?php
-                    wp_nonce_field(
-                        'hom_approve_preinvoice_' .
-                        $order->get_id()
-                    );
-                    ?>
+                        <input
+                            type="hidden"
+                            name="order_id"
+                            value="<?php
+                            echo esc_attr(
+                                $order->get_id()
+                            );
+                            ?>"
+                        >
 
-                    <button
-                        type="submit"
-                        class="hom-button hom-button-primary"
-                        <?php disabled((float) $order->get_total() <= 0); ?>
-                    >
-                        تأیید و آماده‌سازی برای پرداخت
-                    </button>
+                        <?php
+                        wp_nonce_field(
+                            'hom_approve_preinvoice_' .
+                            $order->get_id()
+                        );
+                        ?>
 
-                </form>
+                        <button
+                            type="submit"
+                            class="hom-button hom-button-primary"
+                            <?php
+                            disabled(
+                                (float)
+                                $order->get_total()
+                                <= 0
+                            );
+                            ?>
+                        >
+                            تأیید و آماده‌سازی برای پرداخت
+                        </button>
 
-            <?php elseif (
-                'preinv-approved' === $order->get_status()
-            ) : ?>
+                    </form>
 
-                <p>
-                    پیش‌فاکتور تأیید شده و آماده پرداخت مشتری است.
-                </p>
+                <?php endif; ?>
 
-            <?php endif; ?>
 
-        </section>
+            </div>
+
+        </details>
+
 
         <?php
         $can_confirm_manual_payment =
             current_user_can(
-                HOM_Capabilities::CAP_MANAGE_PREINVOICES
+                HOM_Capabilities::
+                CAP_MANAGE_PREINVOICES
             ) &&
             HOM_Orders::can_confirm_manual_payment(
                 $order
@@ -802,497 +1236,481 @@ final class HOM_Order_Detail_View {
                     )
                 )
                 : '';
+
+
+        $payment_confirmed =
+            !empty(
+                $manual_payment['confirmed_at']
+            );
+
+
+        $payment_actor =
+            (
+                $payment_confirmed &&
+                !empty(
+                    $manual_payment['confirmed_by']
+                )
+            )
+                ? get_userdata(
+                    $manual_payment['confirmed_by']
+                )
+                : false;
+
+
+        $can_correct_payment =
+            $payment_confirmed &&
+            current_user_can(
+                HOM_Capabilities::
+                CAP_MANAGE_PREINVOICES
+            ) &&
+            HOM_Orders::can_correct_manual_payment(
+                $order
+            );
         ?>
 
 
         <?php if ('payment-confirmed' === $payment_notice) : ?>
 
-            <div
-                class="hom-alert hom-alert-success"
-                style="margin-top:20px"
-            >
-                دریافت کامل وجه با موفقیت تأیید شد و سفارش
-                وارد مرحله آماده‌سازی گردید.
+            <div class="hom-alert hom-alert-success">
+                دریافت کامل وجه با موفقیت تأیید شد.
             </div>
 
         <?php elseif ('payment-error' === $payment_notice) : ?>
 
-            <div
-                class="hom-alert hom-alert-error"
-                style="margin-top:20px"
-            >
-                تأیید پرداخت انجام نشد. اطلاعات مبلغ و مرجع
-                پرداخت را بررسی کنید.
+            <div class="hom-alert hom-alert-error">
+                ثبت پرداخت انجام نشد؛
+                مبلغ و مرجع پرداخت را بررسی کنید.
             </div>
 
         <?php elseif ('payment-corrected' === $payment_notice) : ?>
 
-            <div
-                class="hom-alert hom-alert-success"
-                style="margin-top:20px"
-            >
-                اطلاعات پرداخت با موفقیت اصلاح و در سوابق
-                تغییرات ثبت شد.
+            <div class="hom-alert hom-alert-success">
+                اطلاعات پرداخت اصلاح شد.
             </div>
 
-        <?php elseif ('payment-correction-error' === $payment_notice) : ?>
+        <?php elseif (
+            'payment-correction-error'
+            ===
+            $payment_notice
+        ) : ?>
 
-            <div
-                class="hom-alert hom-alert-error"
-                style="margin-top:20px"
-            >
+            <div class="hom-alert hom-alert-error">
                 اصلاح اطلاعات پرداخت انجام نشد.
             </div>
 
         <?php endif; ?>
 
 
-        <?php if ($can_confirm_manual_payment) : ?>
+        <section
+            class="
+                hom-order-operation-card
+                hom-order-payment-card
+            "
+        >
 
-            <section
-                class="hom-card hom-manual-payment-card"
-                style="margin-top:20px"
-            >
+            <div class="hom-order-operation-card__head">
 
-                <h2>
-                    تأیید پرداخت دستی
-                </h2>
+                <div>
 
-                <p class="hom-muted">
-                    فقط پس از مشاهده و تأیید قطعی واریز بانکی،
-                    دریافت کامل وجه را ثبت کنید.
-                </p>
+                    <span class="hom-order-operation-card__eyebrow">
+                        امور مالی
+                    </span>
+
+                    <h2>
+                        پرداخت
+                    </h2>
+
+                </div>
 
 
-                <form
-                    method="post"
-                    action="<?php
-                    echo esc_url(
-                        HOM_Router::panel_url()
-                    );
-                    ?>"
+                <span
+                    class="
+                        hom-order-operation-status
+                        <?php
+                        echo $payment_confirmed
+                            ? 'is-complete'
+                            : 'is-pending';
+                        ?>
+                    "
                 >
-
-                    <input
-                        type="hidden"
-                        name="hom_action"
-                        value="hom_confirm_manual_payment"
-                    >
-
-                    <input
-                        type="hidden"
-                        name="order_id"
-                        value="<?php
-                        echo esc_attr(
-                            $order->get_id()
-                        );
-                        ?>"
-                    >
-
                     <?php
-                    wp_nonce_field(
-                        'hom_confirm_manual_payment_' .
-                        $order->get_id()
+                    echo esc_html(
+                        $payment_confirmed
+                            ? 'تأیید شده'
+                            : 'در انتظار ثبت'
                     );
                     ?>
+                </span>
+
+            </div>
 
 
-                    <label class="hom-field">
+            <div class="hom-order-operation-summary">
 
-                        <span>
-                            مبلغ واریزشده
-                        </span>
+                <div>
+                    <span>مبلغ</span>
 
-                        <input
-                            type="text"
-                            inputmode="decimal"
-                            name="payment_amount"
-                            required
-                            value="<?php
-                            echo esc_attr(
-                                wc_format_decimal(
-                                    $order->get_total()
-                                )
-                            );
-                            ?>"
-                        >
-
-                    </label>
-
-                    <small>
-                        باید دقیقاً برابر مبلغ نهایی سفارش باشد.
-                    </small>
-
-
-                    <label
-                        class="hom-field"
-                        style="margin-top:14px"
-                    >
-
-                        <span>
-                            شماره پیگیری / مرجع پرداخت
-                        </span>
-
-                        <input
-                            type="text"
-                            name="payment_reference"
-                            dir="ltr"
-                            required
-                        >
-
-                    </label>
-
-
-                    <label
-                        class="hom-field"
-                        style="margin-top:14px"
-                    >
-
-                        <span>
-                            توضیحات پرداخت
-                        </span>
-
-                        <textarea
-                            name="payment_notes"
-                            rows="3"
-                            placeholder="در صورت نیاز توضیح تکمیلی بنویسید..."
-                        ></textarea>
-
-                    </label>
-
-
-                    <button
-                        type="submit"
-                        class="hom-button hom-button-primary"
-                        style="margin-top:16px"
-                    >
-                        تأیید دریافت کامل وجه
-                    </button>
-
-                </form>
-
-            </section>
-
-
-        <?php elseif (
-            !empty(
-                $manual_payment['confirmed_at']
-            )
-        ) : ?>
-
-            <?php
-            $payment_actor =
-                !empty(
-                    $manual_payment['confirmed_by']
-                )
-                    ? get_userdata(
-                        $manual_payment['confirmed_by']
-                    )
-                    : false;
-            ?>
-
-            <section
-                class="hom-card hom-manual-payment-card"
-                style="margin-top:20px"
-            >
-
-                <h2>
-                    اطلاعات پرداخت
-                </h2>
-
-                <p>
-                    روش:
-                    <strong>
-                        کارت‌به‌کارت / واریز دستی
-                    </strong>
-                </p>
-
-                <p>
-                    مبلغ:
                     <strong>
                         <?php
                         echo wp_kses_post(
                             wc_price(
-                                (float)
-                                $manual_payment['amount'],
+                                $payment_confirmed
+                                    ? (float)
+                                        $manual_payment[
+                                            'amount'
+                                        ]
+                                    : (float)
+                                        $order
+                                            ->get_total(),
                                 [
                                     'currency' =>
-                                        $order->get_currency(),
+                                        $order
+                                            ->get_currency(),
                                 ]
                             )
                         );
                         ?>
                     </strong>
-                </p>
+                </div>
 
-                <p>
-                    مرجع پرداخت:
+
+                <div>
+                    <span>مرجع پرداخت</span>
+
                     <strong dir="ltr">
                         <?php
                         echo esc_html(
-                            $manual_payment['reference']
-                            ?: '—'
-                        );
-                        ?>
-                    </strong>
-                </p>
-
-                <p>
-                    تأییدکننده:
-                    <strong>
-                        <?php
-                        echo esc_html(
-                            $payment_actor
+                            $payment_confirmed
                                 ? (
-                                    $payment_actor->display_name
-                                    ?: $payment_actor->user_login
+                                    $manual_payment[
+                                        'reference'
+                                    ]
+                                    ?: '—'
                                 )
                                 : '—'
                         );
                         ?>
                     </strong>
-                </p>
+                </div>
 
-                <p>
-                    زمان تأیید:
+
+                <div>
+                    <span>ثبت‌کننده</span>
+
                     <strong>
                         <?php
                         echo esc_html(
-                            $manual_payment['confirmed_at']
-                            ?: '—'
+                            $payment_actor
+                                ? (
+                                    $payment_actor
+                                        ->display_name
+                                    ?: $payment_actor
+                                        ->user_login
+                                )
+                                : '—'
                         );
                         ?>
                     </strong>
-                </p>
+                </div>
 
 
-                <?php if (!empty($manual_payment['notes'])) : ?>
+                <div>
+                    <span>زمان ثبت</span>
 
-                    <p>
-                        توضیحات:
+                    <strong dir="ltr">
                         <?php
                         echo esc_html(
-                            $manual_payment['notes']
+                            $payment_confirmed
+                                ? (
+                                    $manual_payment[
+                                        'confirmed_at'
+                                    ]
+                                    ?: '—'
+                                )
+                                : '—'
                         );
                         ?>
-                    </p>
+                    </strong>
+                </div>
 
-                <?php endif; ?>
-
-
-                <?php
-                if (
-                    current_user_can(
-                        HOM_Capabilities::CAP_MANAGE_PREINVOICES
-                    ) &&
-                    HOM_Orders::can_correct_manual_payment(
-                        $order
-                    )
-                ) :
-                    ?>
-
-                    <hr
-                        style="
-                            margin:20px 0;
-                            border:0;
-                            border-top:1px solid #e5e7eb
-                        "
-                    >
-
-                    <h3>
-                        اصلاح اطلاعات پرداخت
-                    </h3>
-
-                    <p class="hom-muted">
-                        مبلغ و وضعیت پرداخت قابل تغییر نیستند.
-                        فقط مرجع و توضیحات پرداخت را در صورت
-                        ثبت اشتباه اصلاح کنید.
-                    </p>
+            </div>
 
 
-                    <form
-                        method="post"
-                        action="<?php
-                        echo esc_url(
-                            HOM_Router::panel_url()
-                        );
-                        ?>"
-                    >
+            <?php if ($can_confirm_manual_payment) : ?>
 
-                        <input
-                            type="hidden"
-                            name="hom_action"
-                            value="hom_correct_manual_payment"
-                        >
+                <details class="hom-order-action-disclosure">
 
-                        <input
-                            type="hidden"
-                            name="order_id"
-                            value="<?php
-                            echo esc_attr(
-                                $order->get_id()
+                    <summary>
+                        <span>
+                            ثبت و تأیید پرداخت دستی
+                        </span>
+
+                        <small>
+                            فقط هنگام ثبت واریز باز کنید
+                        </small>
+                    </summary>
+
+
+                    <div class="hom-order-action-disclosure__body">
+
+                        <form
+                            method="post"
+                            action="<?php
+                            echo esc_url(
+                                HOM_Router::panel_url()
                             );
                             ?>"
                         >
 
-                        <?php
-                        wp_nonce_field(
-                            'hom_correct_manual_payment_' .
-                            $order->get_id()
-                        );
-                        ?>
-
-
-                        <label class="hom-field">
-
-                            <span>
-                                شماره پیگیری / مرجع پرداخت
-                            </span>
+                            <input
+                                type="hidden"
+                                name="hom_action"
+                                value="hom_confirm_manual_payment"
+                            >
 
                             <input
-                                type="text"
-                                name="payment_reference"
-                                dir="ltr"
-                                required
+                                type="hidden"
+                                name="order_id"
                                 value="<?php
                                 echo esc_attr(
-                                    $manual_payment[
-                                        'reference'
-                                    ]
+                                    $order->get_id()
                                 );
                                 ?>"
                             >
 
-                        </label>
-
-
-                        <label
-                            class="hom-field"
-                            style="margin-top:14px"
-                        >
-
-                            <span>
-                                توضیحات پرداخت
-                            </span>
-
-                            <textarea
-                                name="payment_notes"
-                                rows="3"
-                            ><?php
-                            echo esc_textarea(
-                                $manual_payment[
-                                    'notes'
-                                ]
+                            <?php
+                            wp_nonce_field(
+                                'hom_confirm_manual_payment_' .
+                                $order->get_id()
                             );
-                            ?></textarea>
-
-                        </label>
+                            ?>
 
 
-                        <label
-                            class="hom-field"
-                            style="margin-top:14px"
+                            <div class="hom-order-form-grid">
+
+                                <label class="hom-field">
+
+                                    <span>
+                                        مبلغ واریزشده
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        inputmode="decimal"
+                                        name="payment_amount"
+                                        required
+                                        value="<?php
+                                        echo esc_attr(
+                                            wc_format_decimal(
+                                                $order
+                                                    ->get_total()
+                                            )
+                                        );
+                                        ?>"
+                                    >
+
+                                </label>
+
+
+                                <label class="hom-field">
+
+                                    <span>
+                                        شماره پیگیری / مرجع
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="payment_reference"
+                                        dir="ltr"
+                                        required
+                                    >
+
+                                </label>
+
+                            </div>
+
+
+                            <label
+                                class="
+                                    hom-field
+                                    hom-order-field-wide
+                                "
+                            >
+
+                                <span>
+                                    توضیحات پرداخت
+                                </span>
+
+                                <textarea
+                                    name="payment_notes"
+                                    rows="2"
+                                    placeholder="اختیاری"
+                                ></textarea>
+
+                            </label>
+
+
+                            <div class="hom-order-form-actions">
+
+                                <button
+                                    type="submit"
+                                    class="
+                                        hom-button
+                                        hom-button-primary
+                                    "
+                                >
+                                    تأیید دریافت کامل وجه
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </details>
+
+
+            <?php elseif ($can_correct_payment) : ?>
+
+
+                <details class="hom-order-action-disclosure">
+
+                    <summary>
+                        <span>
+                            اصلاح اطلاعات پرداخت
+                        </span>
+
+                        <small>
+                            فقط در صورت ثبت اشتباه
+                        </small>
+                    </summary>
+
+
+                    <div class="hom-order-action-disclosure__body">
+
+                        <form
+                            method="post"
+                            action="<?php
+                            echo esc_url(
+                                HOM_Router::panel_url()
+                            );
+                            ?>"
                         >
 
-                            <span>
-                                دلیل اصلاح
-                            </span>
+                            <input
+                                type="hidden"
+                                name="hom_action"
+                                value="hom_correct_manual_payment"
+                            >
 
-                            <textarea
-                                name="correction_reason"
-                                rows="3"
-                                required
-                                placeholder="دلیل اصلاح اطلاعات پرداخت را بنویسید..."
-                            ></textarea>
+                            <input
+                                type="hidden"
+                                name="order_id"
+                                value="<?php
+                                echo esc_attr(
+                                    $order->get_id()
+                                );
+                                ?>"
+                            >
 
-                        </label>
-
-
-                        <button
-                            type="submit"
-                            class="hom-button hom-button-secondary"
-                            style="margin-top:16px"
-                        >
-                            ثبت اصلاح اطلاعات پرداخت
-                        </button>
-
-                    </form>
-
-                <?php endif; ?>
-
-            </section>
-
-        <?php endif; ?>
+                            <?php
+                            wp_nonce_field(
+                                'hom_correct_manual_payment_' .
+                                $order->get_id()
+                            );
+                            ?>
 
 
-        <section
-            class="hom-card hom-order-document-actions"
-            style="margin-top:20px"
-        >
+                            <div class="hom-order-form-grid">
 
-            <h2>
-                اسناد و چاپ
-            </h2>
+                                <label class="hom-field">
 
-            <div
-                style="
-                    display:flex;
-                    flex-wrap:wrap;
-                    gap:10px
-                "
-            >
+                                    <span>
+                                        شماره پیگیری / مرجع
+                                    </span>
 
-                <a
-                    class="hom-button hom-button-secondary"
-                    target="_blank"
-                    rel="noopener"
-                    href="<?php
-                    echo esc_url(
-                        HOM_Order_Documents::url(
-                            $order->get_id(),
-                            'invoice'
-                        )
-                    );
-                    ?>"
-                >
-                    چاپ فاکتور
-                </a>
+                                    <input
+                                        type="text"
+                                        name="payment_reference"
+                                        dir="ltr"
+                                        required
+                                        value="<?php
+                                        echo esc_attr(
+                                            $manual_payment[
+                                                'reference'
+                                            ]
+                                        );
+                                        ?>"
+                                    >
+
+                                </label>
 
 
-                <a
-                    class="hom-button hom-button-secondary"
-                    target="_blank"
-                    rel="noopener"
-                    href="<?php
-                    echo esc_url(
-                        HOM_Order_Documents::url(
-                            $order->get_id(),
-                            'warehouse'
-                        )
-                    );
-                    ?>"
-                >
-                    برگه انبار بدون قیمت
-                </a>
+                                <label class="hom-field">
+
+                                    <span>
+                                        دلیل اصلاح
+                                    </span>
+
+                                    <input
+                                        type="text"
+                                        name="correction_reason"
+                                        required
+                                        placeholder="مثلاً اصلاح شماره پیگیری"
+                                    >
+
+                                </label>
+
+                            </div>
 
 
-                <a
-                    class="hom-button hom-button-secondary"
-                    target="_blank"
-                    rel="noopener"
-                    href="<?php
-                    echo esc_url(
-                        HOM_Order_Documents::url(
-                            $order->get_id(),
-                            'shipping'
-                        )
-                    );
-                    ?>"
-                >
-                    برچسب ارسال
-                </a>
+                            <label
+                                class="
+                                    hom-field
+                                    hom-order-field-wide
+                                "
+                            >
 
-            </div>
+                                <span>
+                                    توضیحات پرداخت
+                                </span>
+
+                                <textarea
+                                    name="payment_notes"
+                                    rows="2"
+                                ><?php
+                                echo esc_textarea(
+                                    $manual_payment[
+                                        'notes'
+                                    ]
+                                );
+                                ?></textarea>
+
+                            </label>
+
+
+                            <div class="hom-order-form-actions">
+
+                                <button
+                                    type="submit"
+                                    class="
+                                        hom-button
+                                        hom-button-secondary
+                                    "
+                                >
+                                    ثبت اصلاح
+                                </button>
+
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </details>
+
+            <?php endif; ?>
 
         </section>
 
@@ -1304,99 +1722,130 @@ final class HOM_Order_Detail_View {
         ?>
 
 
-        <hr
-            style="
-                margin:34px 0 22px;
-                border:0;
-                border-top:1px solid #dfe3e8
-            "
-        >
-
-        <section
-            class="hom-card hom-order-tracking-header"
-            style="margin-top:0"
-        >
-
-            <h2 style="margin-bottom:6px">
-                پیگیری و سوابق تغییرات
-            </h2>
-
-            <p
-                class="hom-muted"
-                style="margin:0"
-            >
-                تمام مراحل، تأییدها، اصلاحات و اقدامات انجام‌شده
-                روی این پرونده در این بخش نگهداری می‌شوند.
-            </p>
-
-        </section>
-
-
         <?php
         $timeline =
             HOM_Orders::timeline(
                 $order
             );
 
+
         if ($timeline) :
             ?>
 
-            <section
-                class="hom-card hom-order-timeline"
-                style="margin-top:20px"
+            <details
+                class="
+                    hom-order-accordion
+                    hom-order-timeline-disclosure
+                "
             >
 
-                <h2>
-                    مراحل سفارش
-                </h2>
+                <summary>
 
-                <div class="hom-order-timeline__items">
+                    <span class="hom-order-accordion__identity">
 
-                    <?php foreach ($timeline as $event) : ?>
+                        <span class="hom-order-accordion__icon">
+                            ◷
+                        </span>
 
-                        <div class="hom-order-timeline__item">
+                        <span>
+                            <strong>
+                                مراحل سفارش
+                            </strong>
 
-                            <span class="hom-order-timeline__dot"></span>
+                            <small>
+                                مسیر انجام این پرونده
+                            </small>
+                        </span>
 
-                            <div>
+                    </span>
 
-                                <strong>
-                                    <?php
-                                    echo esc_html(
-                                        $event['label']
-                                    );
-                                    ?>
-                                </strong>
 
-                                <span>
-                                    <?php
-                                    echo esc_html(
-                                        $event['date']
-                                    );
-                                    ?>
-                                </span>
+                    <span class="hom-order-accordion__count">
+                        <?php
+                        echo esc_html(
+                            count(
+                                $timeline
+                            )
+                        );
+                        ?>
+                        مرحله
+                    </span>
 
-                                <?php if (!empty($event['description'])) : ?>
+                </summary>
 
-                                    <small>
+
+                <div class="hom-order-accordion__body">
+
+                    <div class="hom-order-timeline__items">
+
+                        <?php
+                        foreach (
+                            $timeline
+                            as $event
+                        ) :
+                            ?>
+
+                            <div class="hom-order-timeline__item">
+
+                                <span
+                                    class="hom-order-timeline__dot"
+                                ></span>
+
+                                <div>
+
+                                    <strong>
                                         <?php
                                         echo esc_html(
-                                            $event['description']
+                                            $event[
+                                                'label'
+                                            ]
                                         );
                                         ?>
-                                    </small>
+                                    </strong>
 
-                                <?php endif; ?>
+                                    <span>
+                                        <?php
+                                        echo esc_html(
+                                            $event[
+                                                'date'
+                                            ]
+                                        );
+                                        ?>
+                                    </span>
+
+                                    <?php
+                                    if (
+                                        !empty(
+                                            $event[
+                                                'description'
+                                            ]
+                                        )
+                                    ) :
+                                        ?>
+
+                                        <small>
+                                            <?php
+                                            echo esc_html(
+                                                $event[
+                                                    'description'
+                                                ]
+                                            );
+                                            ?>
+                                        </small>
+
+                                    <?php endif; ?>
+
+                                </div>
 
                             </div>
 
-                        </div>
+                        <?php endforeach; ?>
 
-                    <?php endforeach; ?>
+                    </div>
 
                 </div>
 
-            </section>
+            </details>
 
         <?php endif; ?>
 
