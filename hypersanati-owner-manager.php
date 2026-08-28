@@ -29,6 +29,7 @@ require_once HOM_PATH . 'includes/class-hom-orders.php';
 require_once HOM_PATH . 'includes/class-hom-order-audit.php';
 require_once HOM_PATH . 'includes/class-hom-order-detail-view.php';
 require_once HOM_PATH . 'includes/class-hom-order-fulfillment-view.php';
+require_once HOM_PATH . 'includes/class-hom-warehouse-verification.php';
 require_once HOM_PATH . 'includes/class-hom-order-documents.php';
 require_once HOM_PATH . 'includes/class-hom-seller-settings.php';
 require_once HOM_PATH . 'includes/class-hom-seller-settings-view.php';

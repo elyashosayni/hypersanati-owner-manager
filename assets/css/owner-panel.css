@@ -11513,3 +11513,277 @@ input[type="range"] {
         height: 44px;
     }
 }
+
+
+/* ==========================================================
+   HOM WAREHOUSE QR VERIFICATION
+   ========================================================== */
+
+.hom-warehouse-check {
+    width: min(900px, 100%);
+    margin: 0 auto;
+}
+
+.hom-warehouse-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.hom-warehouse-summary > div {
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.hom-warehouse-summary span {
+    display: block;
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-summary strong {
+    display: block;
+    color: #0f172a;
+}
+
+.hom-warehouse-form {
+    margin-top: 20px;
+}
+
+.hom-warehouse-items {
+    display: grid;
+    gap: 10px;
+}
+
+.hom-warehouse-item {
+    position: relative;
+
+    display: grid;
+    grid-template-columns:
+        30px
+        34px
+        minmax(0, 1fr)
+        auto;
+    align-items: center;
+    gap: 10px;
+
+    padding: 14px;
+
+    border: 1px solid #dbe3ec;
+    border-radius: 14px;
+
+    background: #fff;
+
+    cursor: pointer;
+}
+
+.hom-warehouse-item:has(input:checked) {
+    border-color: #16a34a;
+    background: #f0fdf4;
+}
+
+.hom-warehouse-item input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hom-warehouse-item__check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+
+    color: transparent;
+    font-weight: 800;
+}
+
+.hom-warehouse-item input:checked +
+.hom-warehouse-item__check {
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #fff;
+}
+
+.hom-warehouse-item input:focus-visible +
+.hom-warehouse-item__check {
+    outline: 3px solid rgba(37, 99, 235, .22);
+    outline-offset: 2px;
+}
+
+.hom-warehouse-item__number {
+    color: #64748b;
+    font-weight: 700;
+    text-align: center;
+}
+
+.hom-warehouse-item__body {
+    min-width: 0;
+}
+
+.hom-warehouse-item__body > strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #0f172a;
+}
+
+.hom-warehouse-item__body > span {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-item__body i {
+    font-style: normal;
+    color: #cbd5e1;
+}
+
+.hom-warehouse-item__qty {
+    min-width: 70px;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-item__qty strong {
+    display: block;
+    margin-top: 2px;
+    color: #0f172a;
+    font-size: 18px;
+}
+
+.hom-warehouse-progress {
+    margin-top: 20px;
+    padding: 14px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    background: #fff;
+}
+
+.hom-warehouse-progress__bar {
+    height: 8px;
+    margin-top: 10px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.hom-warehouse-progress__bar span {
+    display: block;
+
+    width: 0;
+    height: 100%;
+
+    border-radius: inherit;
+    background: #16a34a;
+
+    transition: width .18s ease;
+}
+
+.hom-warehouse-confirm {
+    width: 100%;
+    margin-top: 14px;
+}
+
+.hom-warehouse-confirm:disabled {
+    cursor: not-allowed;
+    opacity: .45;
+}
+
+.hom-warehouse-confirm-note {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    text-align: center;
+}
+
+.hom-warehouse-verified {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin: 18px 0;
+    padding: 16px;
+
+    border: 1px solid #86efac;
+    border-radius: 14px;
+
+    background: #f0fdf4;
+}
+
+.hom-warehouse-verified__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+    color: #fff;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.hom-warehouse-verified p {
+    margin: 3px 0 0;
+    color: #166534;
+    font-size: 12px;
+}
+
+
+@media (max-width: 760px) {
+
+    .hom-warehouse-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .hom-warehouse-item {
+        grid-template-columns:
+            30px
+            28px
+            minmax(0, 1fr);
+    }
+
+    .hom-warehouse-item__qty {
+        grid-column: 3;
+        min-width: 0;
+        text-align: right;
+    }
+
+    .hom-warehouse-item__qty strong {
+        display: inline;
+        margin-right: 5px;
+    }
+}
+
+
+@media (max-width: 460px) {
+
+    .hom-warehouse-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-warehouse-item {
+        padding: 12px 10px;
+    }
+}

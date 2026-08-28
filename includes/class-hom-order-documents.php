@@ -394,6 +394,49 @@ final class HOM_Order_Documents {
             min-width: 140px;
         }
 
+        .hom-warehouse-qr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+
+            margin-top: 24px;
+            padding: 18px;
+
+            border: 2px solid #111827;
+            border-radius: 10px;
+        }
+
+        .hom-warehouse-qr__text {
+            flex: 1;
+        }
+
+        .hom-warehouse-qr__text strong {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 15px;
+        }
+
+        .hom-warehouse-qr__text p {
+            margin: 0;
+            color: #4b5563;
+        }
+
+        .hom-warehouse-qr__code {
+            width: 150px;
+            min-width: 150px;
+            height: 150px;
+
+            padding: 5px;
+            background: #fff;
+        }
+
+        .hom-warehouse-qr__code img,
+        .hom-warehouse-qr__code canvas {
+            width: 140px !important;
+            height: 140px !important;
+        }
+
         .hom-print-footer {
             margin-top: 28px;
             padding-top: 14px;
@@ -1047,6 +1090,12 @@ final class HOM_Order_Documents {
         $methods =
             HOM_Orders::shipping_methods();
 
+
+        $warehouse_url =
+            HOM_Warehouse_Verification::url(
+                $order
+            );
+
         ?>
         <section class="hom-print-grid">
 
@@ -1195,6 +1244,86 @@ final class HOM_Order_Documents {
             </tbody>
 
         </table>
+
+
+        <?php if ($warehouse_url) : ?>
+
+            <section class="hom-warehouse-qr">
+
+                <div class="hom-warehouse-qr__text">
+
+                    <strong>
+                        کنترل آنلاین انبار
+                    </strong>
+
+                    <p>
+                        مسئول انبار این QR را با موبایل اسکن کند،
+                        همه اقلام سفارش را کنترل و سپس تأیید نهایی را ثبت کند.
+                    </p>
+
+                </div>
+
+
+                <div
+                    id="hom-warehouse-qr-code"
+                    class="hom-warehouse-qr__code"
+                    data-url="<?php
+                    echo esc_attr(
+                        $warehouse_url
+                    );
+                    ?>"
+                ></div>
+
+            </section>
+
+
+            <script
+                src="<?php
+                echo esc_url(
+                    HOM_URL .
+                    'assets/vendor/qrcodejs/qrcode.min.js?ver=' .
+                    HOM_VERSION
+                );
+                ?>"
+            ></script>
+
+            <script>
+            (function () {
+
+                var target =
+                    document.getElementById(
+                        'hom-warehouse-qr-code'
+                    );
+
+                if (
+                    !target ||
+                    typeof QRCode === 'undefined'
+                ) {
+                    return;
+                }
+
+
+                new QRCode(
+                    target,
+                    {
+                        text:
+                            target.getAttribute(
+                                'data-url'
+                            ),
+
+                        width: 140,
+                        height: 140,
+
+                        correctLevel:
+                            QRCode.CorrectLevel.M
+                    }
+                );
+            }());
+            </script>
+
+        <?php endif; ?>
+
+
         <?php
 
         self::footer();

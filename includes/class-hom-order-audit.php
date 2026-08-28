@@ -210,6 +210,9 @@ final class HOM_Order_Audit {
             'owner-panel' =>
                 'پنل فروش',
 
+            'warehouse-qr' =>
+                'کنترل انبار / QR',
+
             'customer' =>
                 'مشتری',
 

@@ -118,6 +118,12 @@ class HOM_Router {
                     'handle_save_order_fulfillment',
                 ],
 
+            'hom_confirm_warehouse' =>
+                [
+                    HOM_Warehouse_Verification::class,
+                    'handle_confirm',
+                ],
+
             'hom_confirm_manual_payment' =>
                 [
                     HOM_Orders::class,

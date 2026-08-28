@@ -625,6 +625,7 @@ class HOM_View {
             'products',
             'product-images',
             'orders',
+            'warehouse-check',
             'seller-settings',
             'help',
             'help-customers',
@@ -799,7 +800,14 @@ class HOM_View {
                 );
                 ?>"
                 class="hom-nav-item <?php
-                echo 'orders' === $current_view
+                echo in_array(
+                    $current_view,
+                    [
+                        'orders',
+                        'warehouse-check',
+                    ],
+                    true
+                )
                     ? 'is-active'
                     : '';
                 ?>"
@@ -1104,6 +1112,13 @@ class HOM_View {
             } elseif ('products' === $current_view) {
 
                 self::render_products_content();
+
+            } elseif (
+                'warehouse-check' ===
+                $current_view
+            ) {
+
+                HOM_Warehouse_Verification::render();
 
             } elseif ('orders' === $current_view) {
 
