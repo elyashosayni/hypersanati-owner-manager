@@ -60,6 +60,145 @@ class HOM_Router {
     }
 
 
+    private static function handle_owner_action_request() {
+
+        $method =
+            strtoupper(
+                $_SERVER['REQUEST_METHOD']
+                ?? 'GET'
+            );
+
+
+        if ('POST' === $method) {
+
+            $action =
+                isset($_POST['hom_action'])
+                    ? sanitize_key(
+                        wp_unslash(
+                            $_POST['hom_action']
+                        )
+                    )
+                    : '';
+
+        } else {
+
+            $action =
+                isset($_GET['hom_action'])
+                    ? sanitize_key(
+                        wp_unslash(
+                            $_GET['hom_action']
+                        )
+                    )
+                    : '';
+        }
+
+
+        if ('' === $action) {
+            return;
+        }
+
+
+        $post_actions = [
+
+            'hom_save_preinvoice_prices' =>
+                [
+                    HOM_Orders::class,
+                    'handle_save_preinvoice_prices',
+                ],
+
+            'hom_approve_preinvoice' =>
+                [
+                    HOM_Orders::class,
+                    'handle_approve_preinvoice',
+                ],
+
+            'hom_save_order_fulfillment' =>
+                [
+                    HOM_Orders::class,
+                    'handle_save_order_fulfillment',
+                ],
+
+            'hom_confirm_warehouse' =>
+                [
+                    HOM_Warehouse_Verification::class,
+                    'handle_confirm',
+                ],
+
+            'hom_create_warehouse_staff' =>
+                [
+                    HOM_Warehouse_Staff::class,
+                    'handle_create',
+                ],
+
+            'hom_toggle_warehouse_staff' =>
+                [
+                    HOM_Warehouse_Staff::class,
+                    'handle_toggle',
+                ],
+
+            'hom_confirm_manual_payment' =>
+                [
+                    HOM_Orders::class,
+                    'handle_confirm_manual_payment',
+                ],
+
+            'hom_correct_manual_payment' =>
+                [
+                    HOM_Orders::class,
+                    'handle_correct_manual_payment',
+                ],
+
+            'hom_save_b2b_customer' =>
+                [
+                    HOM_Orders::class,
+                    'handle_save_b2b_customer',
+                ],
+
+            'hom_save_seller_settings' =>
+                [
+                    HOM_Seller_Settings::class,
+                    'handle_save',
+                ],
+        ];
+
+
+        $get_actions = [
+
+            'hom_print_order_document' =>
+                [
+                    HOM_Order_Documents::class,
+                    'handle_print',
+                ],
+        ];
+
+
+        if (
+            'POST' === $method &&
+            isset($post_actions[$action])
+        ) {
+
+            call_user_func(
+                $post_actions[$action]
+            );
+
+            return;
+        }
+
+
+        if (
+            'GET' === $method &&
+            isset($get_actions[$action])
+        ) {
+
+            call_user_func(
+                $get_actions[$action]
+            );
+
+            return;
+        }
+    }
+
+
     public static function maybe_render() {
 
         if (!self::is_owner_panel()) {
@@ -87,6 +226,26 @@ class HOM_Router {
         HOM_Auth::guard_owner_panel();
 
         HOM_Auth::handle_request();
+
+        self::handle_owner_action_request();
+
+
+        if (
+            HOM_Auth::is_warehouse_check_page() &&
+            !current_user_can(
+                HOM_Capabilities::CAP_ACCESS_PANEL
+            ) &&
+            current_user_can(
+                HOM_Capabilities::
+                    CAP_VERIFY_WAREHOUSE
+            )
+        ) {
+
+            HOM_Warehouse_Verification::
+                render_standalone();
+
+            exit;
+        }
 
 
         HOM_View::render();

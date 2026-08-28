@@ -7,6 +7,107 @@ if (!defined('ABSPATH')) {
 class HOM_View {
 
 
+    private static function store_name() {
+
+        $name =
+            trim(
+                wp_strip_all_tags(
+                    (string)
+                    get_bloginfo('name')
+                )
+            );
+
+        return '' !== $name
+            ? $name
+            : 'صنعت گستران الفت';
+    }
+
+
+    private static function store_label() {
+
+        return
+            'فروشگاه ' .
+            self::store_name();
+    }
+
+
+    private static function brand_logo_url() {
+
+        $logo_id =
+            absint(
+                get_theme_mod(
+                    'custom_logo'
+                )
+            );
+
+
+        if (!$logo_id) {
+
+            $logo_id =
+                absint(
+                    get_option(
+                        'site_icon'
+                    )
+                );
+        }
+
+
+        if (!$logo_id) {
+            return '';
+        }
+
+
+        $url =
+            wp_get_attachment_image_url(
+                $logo_id,
+                'full'
+            );
+
+
+        return $url
+            ? (string) $url
+            : '';
+    }
+
+
+
+    private static function sidebar_logo_url() {
+
+        /*
+         * The compact white/orange Site Icon is better suited
+         * to the dark and narrow management sidebar than the
+         * horizontal website logo.
+         */
+
+        $site_icon_id =
+            absint(
+                get_option(
+                    'site_icon'
+                )
+            );
+
+
+        if ($site_icon_id) {
+
+            $url =
+                wp_get_attachment_image_url(
+                    $site_icon_id,
+                    'full'
+                );
+
+
+            if ($url) {
+                return (string) $url;
+            }
+        }
+
+
+        return self::brand_logo_url();
+    }
+
+
+
+
     public static function render() {
 
         if (HOM_Auth::is_owner_logged_in()) {
@@ -105,6 +206,216 @@ class HOM_View {
 
     private static function document_end() {
         ?>
+
+<script>
+/* HOM GLOBAL FIELD STATE UI */
+(function () {
+
+    'use strict';
+
+
+    function shouldHandle(field) {
+
+        if (!field) {
+            return false;
+        }
+
+
+        var tag =
+            String(
+                field.tagName || ''
+            ).toLowerCase();
+
+
+        if (
+            tag !== 'input' &&
+            tag !== 'select' &&
+            tag !== 'textarea'
+        ) {
+            return false;
+        }
+
+
+        var type =
+            String(
+                field.type || ''
+            ).toLowerCase();
+
+
+        return ![
+            'hidden',
+            'submit',
+            'button',
+            'reset',
+            'checkbox',
+            'radio',
+            'file',
+            'image'
+        ].includes(type);
+    }
+
+
+    function hasValue(field) {
+
+        if (
+            field.tagName &&
+            field.tagName.toLowerCase() === 'select'
+        ) {
+
+            return String(
+                field.value || ''
+            ).trim() !== '';
+        }
+
+
+        return String(
+            field.value || ''
+        ).trim() !== '';
+    }
+
+
+    function updateField(field) {
+
+        if (!shouldHandle(field)) {
+            return;
+        }
+
+
+        var filled =
+            hasValue(field);
+
+        var requiredEmpty =
+            field.required &&
+            !filled;
+
+
+        field.classList.toggle(
+            'hom-field-is-filled',
+            filled
+        );
+
+
+        field.classList.toggle(
+            'hom-field-is-required-empty',
+            requiredEmpty
+        );
+    }
+
+
+    function scan(root) {
+
+        var context =
+            root &&
+            root.querySelectorAll
+                ? root
+                : document;
+
+
+        context
+            .querySelectorAll(
+                'input, select, textarea'
+            )
+            .forEach(
+                updateField
+            );
+    }
+
+
+    document.addEventListener(
+        'DOMContentLoaded',
+        function () {
+
+            scan(document);
+
+
+            document.addEventListener(
+                'input',
+                function (event) {
+
+                    updateField(
+                        event.target
+                    );
+                }
+            );
+
+
+            document.addEventListener(
+                'change',
+                function (event) {
+
+                    updateField(
+                        event.target
+                    );
+                }
+            );
+
+
+            document.addEventListener(
+                'blur',
+                function (event) {
+
+                    updateField(
+                        event.target
+                    );
+                },
+                true
+            );
+
+
+            var observer =
+                new MutationObserver(
+                    function (mutations) {
+
+                        mutations.forEach(
+                            function (mutation) {
+
+                                mutation
+                                    .addedNodes
+                                    .forEach(
+                                        function (node) {
+
+                                            if (
+                                                node.nodeType !== 1
+                                            ) {
+                                                return;
+                                            }
+
+
+                                            if (
+                                                node.matches &&
+                                                node.matches(
+                                                    'input, select, textarea'
+                                                )
+                                            ) {
+
+                                                updateField(
+                                                    node
+                                                );
+                                            }
+
+
+                                            scan(node);
+                                        }
+                                    );
+                            }
+                        );
+                    }
+                );
+
+
+            observer.observe(
+                document.body,
+                {
+                    childList: true,
+                    subtree: true
+                }
+            );
+        }
+    );
+
+})();
+</script>
+
 </body>
 </html>
         <?php
@@ -114,8 +425,12 @@ class HOM_View {
     private static function render_login() {
 
         self::document_start(
-            'ورود به پنل مدیریت فروشگاه'
+            'ورود به پنل مدیریت ' .
+            self::store_label()
         );
+
+        $brand_logo_url =
+            self::brand_logo_url();
 
         $error = HOM_Auth::get_error();
 
@@ -124,18 +439,44 @@ class HOM_View {
 
     <section class="hom-login-brand">
 
-        <div class="hom-brand-mark">
-            H
-        </div>
+        <div class="hom-login-store-brand">
 
-        <div>
-            <div class="hom-brand-name">
-                هایپر صنعتی
-            </div>
+            <?php if ($brand_logo_url) : ?>
 
-            <div class="hom-brand-subtitle">
-                پنل مدیریت فروشگاه
-            </div>
+                <img
+                    src="<?php
+                    echo esc_url(
+                        $brand_logo_url
+                    );
+                    ?>"
+                    alt="<?php
+                    echo esc_attr(
+                        self::store_name()
+                    );
+                    ?>"
+                    class="hom-store-logo hom-store-logo--login"
+                >
+
+            <?php else : ?>
+
+                <strong class="hom-store-logo-fallback">
+                    <?php
+                    echo esc_html(
+                        self::store_name()
+                    );
+                    ?>
+                </strong>
+
+            <?php endif; ?>
+
+            <span>
+                <?php
+                echo esc_html(
+                    self::store_label()
+                );
+                ?>
+            </span>
+
         </div>
 
     </section>
@@ -152,7 +493,12 @@ class HOM_View {
                 </span>
 
                 <h1>
-                    ورود به پنل مدیریت فروشگاه
+                    ورود به پنل مدیریت
+                    <?php
+                    echo esc_html(
+                        self::store_label()
+                    );
+                    ?>
                 </h1>
 
                 <p>
@@ -278,7 +624,14 @@ class HOM_View {
             'dashboard',
             'products',
             'product-images',
+            'orders',
+            'warehouse-check',
+            'warehouse-staff',
+            'seller-settings',
             'help',
+            'help-customers',
+            'help-product-images',
+            'help-warehouse-staff',
         ];
 
         return in_array(
@@ -301,8 +654,12 @@ class HOM_View {
 
 
         self::document_start(
-            'پنل مدیریت فروشگاه'
+            'پنل مدیریت ' .
+            self::store_label()
         );
+
+        $brand_logo_url =
+            self::sidebar_logo_url();
 
         ?>
 <div class="hom-app">
@@ -311,18 +668,45 @@ class HOM_View {
 
         <div class="hom-sidebar-brand">
 
-            <div class="hom-brand-mark">
-                H
-            </div>
+            <div class="hom-sidebar-store-brand">
 
-            <div>
-                <strong>
-                    هایپر صنعتی
-                </strong>
+                <?php if ($brand_logo_url) : ?>
 
-                <span>
-                    مدیریت فروشگاه
+                    <img
+                        src="<?php
+                        echo esc_url(
+                            $brand_logo_url
+                        );
+                        ?>"
+                        alt="<?php
+                        echo esc_attr(
+                            self::store_name()
+                        );
+                        ?>"
+                        class="hom-store-logo hom-store-logo--sidebar"
+                    >
+
+                <?php else : ?>
+
+                    <strong class="hom-store-logo-fallback">
+                        <?php
+                        echo esc_html(
+                            self::store_name()
+                        );
+                        ?>
+                    </strong>
+
+                <?php endif; ?>
+
+
+                <span class="hom-sidebar-store-label">
+                    <?php
+                    echo esc_html(
+                        self::store_label()
+                    );
+                    ?>
                 </span>
+
             </div>
 
         </div>
@@ -366,7 +750,7 @@ class HOM_View {
                 </span>
 
                 <span>
-                    صفحه اصلی
+                    داشبورد مدیریت فروشگاه
                 </span>
             </a>
 
@@ -402,9 +786,109 @@ class HOM_View {
                 </span>
 
                 <span>
-                    محصولات
+                    مدیریت تصاویر محصولات
                 </span>
             </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
+                        'orders',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo in_array(
+                    $current_view,
+                    [
+                        'orders',
+                        'warehouse-check',
+                    ],
+                    true
+                )
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ≡
+                </span>
+
+                <span>
+                    مدیریت و پیگیری مشتریان
+                </span>
+            </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
+                        'warehouse-staff',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo 'warehouse-staff' === $current_view
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ✓
+                </span>
+
+                <span>
+                    مسئولین تأیید انبار
+                </span>
+            </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
+                        'seller-settings',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo 'seller-settings' === $current_view
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    ⚙
+                </span>
+
+                <span>
+                    اطلاعات
+                    <?php
+                    echo esc_html(
+                        self::store_name()
+                    );
+                    ?>
+                </span>
+            </a>
+
 
 
             <a
@@ -418,7 +902,16 @@ class HOM_View {
                 );
                 ?>"
                 class="hom-nav-item <?php
-                echo 'help' === $current_view
+                echo in_array(
+                    $current_view,
+                    [
+                        'help',
+                        'help-customers',
+                        'help-product-images',
+                        'help-warehouse-staff',
+                    ],
+                    true
+                )
                     ? 'is-active'
                     : '';
                 ?>"
@@ -622,9 +1115,38 @@ class HOM_View {
 
             <?php
 
-            if ('help' === $current_view) {
+            if ('warehouse-staff' === $current_view) {
 
-                self::render_help_content();
+                HOM_Warehouse_Staff_View::render();
+
+            } elseif ('seller-settings' === $current_view) {
+
+                HOM_Seller_Settings_View::render();
+
+            } elseif ('help' === $current_view) {
+
+                self::render_help_index_content();
+
+            } elseif (
+                'help-customers' ===
+                $current_view
+            ) {
+
+                self::render_help_customers_content();
+
+            } elseif (
+                'help-product-images' ===
+                $current_view
+            ) {
+
+                self::render_help_product_images_content();
+
+            } elseif (
+                'help-warehouse-staff' ===
+                $current_view
+            ) {
+
+                self::render_help_warehouse_staff_content();
 
             } elseif ('product-images' === $current_view) {
 
@@ -633,6 +1155,17 @@ class HOM_View {
             } elseif ('products' === $current_view) {
 
                 self::render_products_content();
+
+            } elseif (
+                'warehouse-check' ===
+                $current_view
+            ) {
+
+                HOM_Warehouse_Verification::render();
+
+            } elseif ('orders' === $current_view) {
+
+                self::render_orders_content();
 
             } else {
 
@@ -654,81 +1187,2262 @@ class HOM_View {
 
     private static function render_dashboard_content() {
 
+        global $wpdb;
+
+
+        /*
+         * ---------------------------------------------------------
+         * SALES OVERVIEW
+         * ---------------------------------------------------------
+         */
+
+        $counts =
+            HOM_Orders::summary_counts();
+
+
+        $active_statuses = [
+            'preinvoice-review',
+            'preinv-approved',
+            'pending',
+            'on-hold',
+            'processing',
+            'hom-ready',
+            'hom-shipped',
+        ];
+
+
+        $active_orders = 0;
+
+
+        foreach (
+            $active_statuses
+            as $active_status
+        ) {
+
+            $active_orders +=
+                absint(
+                    $counts[
+                        $active_status
+                    ] ?? 0
+                );
+        }
+
+
+        /*
+         * ---------------------------------------------------------
+         * RECENT ORDERS
+         * ---------------------------------------------------------
+         */
+
+        $recent_result =
+            HOM_Orders::query(
+                'all',
+                1,
+                ''
+            );
+
+
+        $recent_orders =
+            array_slice(
+                $recent_result['items'] ?? [],
+                0,
+                5
+            );
+
+
+        /*
+         * ---------------------------------------------------------
+         * PRODUCT IMAGE HEALTH
+         * ---------------------------------------------------------
+         */
+
+        $product_post_counts =
+            wp_count_posts(
+                'product'
+            );
+
+
+        $total_products =
+            isset(
+                $product_post_counts->publish
+            )
+                ? absint(
+                    $product_post_counts->publish
+                )
+                : 0;
+
+
+        $missing_main_images =
+            absint(
+                $wpdb->get_var(
+                    "
+                    SELECT
+                        COUNT(DISTINCT p.ID)
+
+                    FROM
+                        {$wpdb->posts} p
+
+                    LEFT JOIN
+                        {$wpdb->postmeta} pm
+
+                        ON
+                            pm.post_id = p.ID
+                            AND
+                            pm.meta_key = '_thumbnail_id'
+
+                    WHERE
+                        p.post_type = 'product'
+                        AND
+                        p.post_status = 'publish'
+                        AND
+                        (
+                            pm.meta_id IS NULL
+                            OR
+                            pm.meta_value = ''
+                            OR
+                            pm.meta_value = '0'
+                        )
+                    "
+                )
+            );
+
+
+        $products_with_image =
+            max(
+                0,
+                $total_products
+                -
+                $missing_main_images
+            );
+
+
+        $image_coverage =
+            $total_products > 0
+                ? round(
+                    (
+                        $products_with_image
+                        /
+                        $total_products
+                    )
+                    *
+                    100
+                )
+                : 0;
+
+
+        /*
+         * ---------------------------------------------------------
+         * SELLER DATA HEALTH
+         * ---------------------------------------------------------
+         */
+
+        $seller =
+            HOM_Seller_Settings::data();
+
+
+        $seller_required_fields = [
+            'legal_name',
+            'national_id',
+            'economic_code',
+            'registration_no',
+            'postcode',
+            'phone',
+            'address',
+        ];
+
+
+        $seller_missing = [];
+
+
+        foreach (
+            $seller_required_fields
+            as $seller_field
+        ) {
+
+            if (
+                '' ===
+                trim(
+                    (string)
+                    (
+                        $seller[
+                            $seller_field
+                        ] ?? ''
+                    )
+                )
+            ) {
+
+                $seller_missing[] =
+                    $seller_field;
+            }
+        }
+
+
+        /*
+         * ---------------------------------------------------------
+         * URLS
+         * ---------------------------------------------------------
+         */
+
+        $orders_url =
+            add_query_arg(
+                'view',
+                'orders',
+                HOM_Router::panel_url()
+            );
+
+
+        $products_url =
+            add_query_arg(
+                'view',
+                'products',
+                HOM_Router::panel_url()
+            );
+
+
+        $seller_url =
+            add_query_arg(
+                'view',
+                'seller-settings',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+
+        $status_url =
+            static function (
+                $status
+            ) {
+
+                return add_query_arg(
+                    [
+                        'view' =>
+                            'orders',
+
+                        'status' =>
+                            $status,
+                    ],
+                    HOM_Router::panel_url()
+                );
+            };
+
+
+        $action_cards = [
+
+            [
+                'status' =>
+                    'preinvoice-review',
+
+                'label' =>
+                    'پیش‌فاکتور جدید',
+
+                'description' =>
+                    'نیازمند بررسی و قیمت‌گذاری',
+
+                'icon' =>
+                    '🧾',
+            ],
+
+            [
+                'status' =>
+                    'preinv-approved',
+
+                'label' =>
+                    'تأیید شده',
+
+                'description' =>
+                    'منتظر ادامه فرایند پرداخت',
+
+                'icon' =>
+                    '✓',
+            ],
+
+            [
+                'status' =>
+                    'pending',
+
+                'label' =>
+                    'انتظار پرداخت',
+
+                'description' =>
+                    'پرونده‌های در انتظار پرداخت',
+
+                'icon' =>
+                    '💳',
+            ],
+
+            [
+                'status' =>
+                    'on-hold',
+
+                'label' =>
+                    'در انتظار بررسی',
+
+                'description' =>
+                    'نیازمند بررسی واحد فروش',
+
+                'icon' =>
+                    '!',
+            ],
+
+            [
+                'status' =>
+                    'processing',
+
+                'label' =>
+                    'در حال آماده‌سازی',
+
+                'description' =>
+                    'سفارش‌های وارد عملیات',
+
+                'icon' =>
+                    '📦',
+            ],
+
+            [
+                'status' =>
+                    'hom-ready',
+
+                'label' =>
+                    'آماده ارسال',
+
+                'description' =>
+                    'آماده ثبت ارسال و رهگیری',
+
+                'icon' =>
+                    '🚚',
+            ],
+        ];
+
         ?>
 
-        <div class="hom-page-heading">
+
+        <div class="hom-dashboard">
+
+
+            <div class="hom-page-heading hom-dashboard-heading">
+
+                <div>
+
+                    <span class="hom-eyebrow">
+                        DASHBOARD
+                    </span>
+
+                    <h1>
+                        داشبورد مدیریت
+                        <?php
+                        echo esc_html(
+                            self::store_label()
+                        );
+                        ?>
+                    </h1>
+
+                    <p>
+                        وضعیت فروش، پرونده‌های مشتریان،
+                        عملیات ارسال و تصاویر محصولات را
+                        از یک نقطه کنترل کنید.
+                    </p>
+
+                </div>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $help_url
+                    );
+                    ?>"
+                    class="hom-dashboard-help"
+                >
+                    <span aria-hidden="true">
+                        ?
+                    </span>
+
+                    راهنمای پنل
+                </a>
+
+            </div>
+
+
+
+            <!-- ==================================================
+                 MAIN KPI
+                 ================================================== -->
+
+            <section class="hom-dashboard-kpis">
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $orders_url
+                    );
+                    ?>"
+                    class="hom-dashboard-kpi"
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        ◉
+                    </span>
+
+                    <div>
+
+                        <span>
+                            پرونده‌های فعال
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    $active_orders
+                                )
+                            );
+                            ?>
+                        </strong>
+
+                        <small>
+                            پرونده در جریان عملیات
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $status_url(
+                            'preinvoice-review'
+                        )
+                    );
+                    ?>"
+                    class="
+                        hom-dashboard-kpi
+                        is-attention
+                    "
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        🧾
+                    </span>
+
+                    <div>
+
+                        <span>
+                            پیش‌فاکتور جدید
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    absint(
+                                        $counts[
+                                            'preinvoice-review'
+                                        ] ?? 0
+                                    )
+                                )
+                            );
+                            ?>
+                        </strong>
+
+                        <small>
+                            نیازمند بررسی فروش
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $status_url(
+                            'hom-ready'
+                        )
+                    );
+                    ?>"
+                    class="hom-dashboard-kpi"
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        🚚
+                    </span>
+
+                    <div>
+
+                        <span>
+                            آماده ارسال
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    absint(
+                                        $counts[
+                                            'hom-ready'
+                                        ] ?? 0
+                                    )
+                                )
+                            );
+                            ?>
+                        </strong>
+
+                        <small>
+                            منتظر ثبت ارسال
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $products_url
+                    );
+                    ?>"
+                    class="hom-dashboard-kpi"
+                >
+
+                    <span class="hom-dashboard-kpi__icon">
+                        🖼️
+                    </span>
+
+                    <div>
+
+                        <span>
+                            پوشش تصویر محصولات
+                        </span>
+
+                        <strong>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    $image_coverage
+                                )
+                            );
+                            ?>%
+                        </strong>
+
+                        <small>
+                            <?php
+                            echo esc_html(
+                                number_format_i18n(
+                                    $missing_main_images
+                                )
+                            );
+                            ?>
+                            محصول بدون تصویر اصلی
+                        </small>
+
+                    </div>
+
+                </a>
+
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 NEEDS ATTENTION
+                 ================================================== -->
+
+            <section class="hom-dashboard-section">
+
+                <div class="hom-dashboard-section__head">
+
+                    <div>
+
+                        <span>
+                            عملیات فروش
+                        </span>
+
+                        <h2>
+                            نیازمند اقدام
+                        </h2>
+
+                        <p>
+                            برای ورود مستقیم به هر مرحله،
+                            کارت مربوط را انتخاب کنید.
+                        </p>
+
+                    </div>
+
+
+                    <a
+                        href="<?php
+                        echo esc_url(
+                            $orders_url
+                        );
+                        ?>"
+                    >
+                        مشاهده همه پرونده‌ها
+                        ←
+                    </a>
+
+                </div>
+
+
+                <div class="hom-dashboard-actions">
+
+                    <?php
+                    foreach (
+                        $action_cards
+                        as $action_card
+                    ) :
+
+                        $action_count =
+                            absint(
+                                $counts[
+                                    $action_card[
+                                        'status'
+                                    ]
+                                ] ?? 0
+                            );
+                        ?>
+
+                        <a
+                            href="<?php
+                            echo esc_url(
+                                $status_url(
+                                    $action_card[
+                                        'status'
+                                    ]
+                                )
+                            );
+                            ?>"
+                            class="
+                                hom-dashboard-action
+                                <?php
+                                echo $action_count > 0
+                                    ? 'has-items'
+                                    : '';
+                                ?>
+                            "
+                        >
+
+                            <span
+                                class="
+                                    hom-dashboard-action__icon
+                                "
+                                aria-hidden="true"
+                            >
+                                <?php
+                                echo esc_html(
+                                    $action_card[
+                                        'icon'
+                                    ]
+                                );
+                                ?>
+                            </span>
+
+
+                            <div>
+
+                                <strong>
+                                    <?php
+                                    echo esc_html(
+                                        number_format_i18n(
+                                            $action_count
+                                        )
+                                    );
+                                    ?>
+                                </strong>
+
+                                <span>
+                                    <?php
+                                    echo esc_html(
+                                        $action_card[
+                                            'label'
+                                        ]
+                                    );
+                                    ?>
+                                </span>
+
+                                <small>
+                                    <?php
+                                    echo esc_html(
+                                        $action_card[
+                                            'description'
+                                        ]
+                                    );
+                                    ?>
+                                </small>
+
+                            </div>
+
+                            <span
+                                class="
+                                    hom-dashboard-action__arrow
+                                "
+                                aria-hidden="true"
+                            >
+                                ←
+                            </span>
+
+                        </a>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 OPERATIONAL CONTENT
+                 ================================================== -->
+
+            <section class="hom-dashboard-main-grid">
+
+
+                <!-- RECENT CASES -->
+
+                <article
+                    class="
+                        hom-dashboard-panel
+                        hom-dashboard-recent
+                    "
+                >
+
+                    <div class="hom-dashboard-panel__head">
+
+                        <div>
+
+                            <span>
+                                آخرین فعالیت‌ها
+                            </span>
+
+                            <h2>
+                                پرونده‌های اخیر
+                            </h2>
+
+                        </div>
+
+
+                        <a
+                            href="<?php
+                            echo esc_url(
+                                $orders_url
+                            );
+                            ?>"
+                        >
+                            همه پرونده‌ها
+                        </a>
+
+                    </div>
+
+
+                    <?php
+                    if (!$recent_orders) :
+                        ?>
+
+                        <div class="hom-dashboard-empty">
+
+                            هنوز پرونده‌ای ثبت نشده است.
+
+                        </div>
+
+                    <?php else : ?>
+
+
+                        <div class="hom-dashboard-recent-list">
+
+                            <?php
+                            foreach (
+                                $recent_orders
+                                as $recent_item
+                            ) :
+
+                                $recent_order =
+                                    HOM_Orders::get_order(
+                                        $recent_item[
+                                            'id'
+                                        ]
+                                    );
+
+
+                                $recent_contact =
+                                    $recent_order
+                                        ? HOM_Orders::
+                                            customer_contact_data(
+                                                $recent_order
+                                            )
+                                        : [];
+
+
+                                $recent_name =
+                                    trim(
+                                        (string)
+                                        (
+                                            $recent_contact[
+                                                'display_name'
+                                            ]
+                                            ?? ''
+                                        )
+                                    );
+
+
+                                if (
+                                    '' === $recent_name ||
+                                    'مشتری بدون نام'
+                                        ===
+                                        $recent_name
+                                ) {
+
+                                    $recent_name =
+                                        trim(
+                                            (string)
+                                            (
+                                                $recent_item[
+                                                    'customer_name'
+                                                ]
+                                                ?? ''
+                                            )
+                                        );
+                                }
+
+
+                                if (
+                                    '' === $recent_name ||
+                                    'مشتری بدون نام'
+                                        ===
+                                        $recent_name
+                                ) {
+
+                                    $recent_name =
+                                        'نام ثبت نشده';
+                                }
+
+
+                                $recent_contact_value =
+                                    trim(
+                                        (string)
+                                        (
+                                            $recent_contact[
+                                                'phone'
+                                            ]
+                                            ?? ''
+                                        )
+                                    );
+
+
+                                if (
+                                    '' ===
+                                    $recent_contact_value
+                                ) {
+
+                                    $recent_contact_value =
+                                        trim(
+                                            (string)
+                                            (
+                                                $recent_contact[
+                                                    'email'
+                                                ]
+                                                ?? ''
+                                            )
+                                        );
+                                }
+                                ?>
+
+                                <a
+                                    href="<?php
+                                    echo esc_url(
+                                        HOM_Orders::detail_url(
+                                            $recent_item[
+                                                'id'
+                                            ]
+                                        )
+                                    );
+                                    ?>"
+                                    class="
+                                        hom-dashboard-recent-row
+                                    "
+                                >
+
+                                    <div
+                                        class="
+                                            hom-dashboard-recent-number
+                                        "
+                                    >
+                                        <strong>
+                                            #<?php
+                                            echo esc_html(
+                                                $recent_item[
+                                                    'number'
+                                                ]
+                                            );
+                                            ?>
+                                        </strong>
+
+                                        <span>
+                                            <?php
+                                            echo esc_html(
+                                                $recent_item[
+                                                    'is_preinvoice'
+                                                ]
+                                                    ? 'پیش‌فاکتور'
+                                                    : 'سفارش'
+                                            );
+                                            ?>
+                                        </span>
+                                    </div>
+
+
+                                    <div
+                                        class="
+                                            hom-dashboard-recent-customer
+                                        "
+                                    >
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                $recent_name
+                                            );
+                                            ?>
+                                        </strong>
+
+
+                                        <?php
+                                        if (
+                                            $recent_contact_value
+                                        ) :
+                                            ?>
+
+                                            <span dir="ltr">
+                                                <?php
+                                                echo esc_html(
+                                                    $recent_contact_value
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+
+                                    <span
+                                        class="
+                                            hom-dashboard-recent-status
+                                        "
+                                    >
+                                        <?php
+                                        echo esc_html(
+                                            $recent_item[
+                                                'status_label'
+                                            ]
+                                        );
+                                        ?>
+                                    </span>
+
+
+                                    <strong
+                                        class="
+                                            hom-dashboard-recent-total
+                                        "
+                                    >
+                                        <?php
+                                        echo wp_kses_post(
+                                            $recent_item[
+                                                'total_html'
+                                            ]
+                                        );
+                                        ?>
+                                    </strong>
+
+
+                                    <span
+                                        class="
+                                            hom-dashboard-recent-arrow
+                                        "
+                                        aria-hidden="true"
+                                    >
+                                        ←
+                                    </span>
+
+                                </a>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    <?php endif; ?>
+
+                </article>
+
+
+
+                <!-- SIDE HEALTH PANELS -->
+
+                <div class="hom-dashboard-side">
+
+
+                    <article class="hom-dashboard-panel">
+
+                        <div class="hom-dashboard-panel__head">
+
+                            <div>
+
+                                <span>
+                                    وضعیت کاتالوگ
+                                </span>
+
+                                <h2>
+                                    تصاویر محصولات
+                                </h2>
+
+                            </div>
+
+                            <span
+                                class="
+                                    hom-dashboard-health-icon
+                                "
+                            >
+                                🖼️
+                            </span>
+
+                        </div>
+
+
+                        <div class="hom-dashboard-image-health">
+
+                            <div
+                                class="
+                                    hom-dashboard-progress
+                                "
+                                role="progressbar"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                                aria-valuenow="<?php
+                                echo esc_attr(
+                                    $image_coverage
+                                );
+                                ?>"
+                            >
+
+                                <span
+                                    style="<?php
+                                    echo esc_attr(
+                                        'width:' .
+                                        $image_coverage .
+                                        '%'
+                                    );
+                                    ?>"
+                                ></span>
+
+                            </div>
+
+
+                            <strong>
+                                <?php
+                                echo esc_html(
+                                    number_format_i18n(
+                                        $products_with_image
+                                    )
+                                );
+                                ?>
+                                از
+                                <?php
+                                echo esc_html(
+                                    number_format_i18n(
+                                        $total_products
+                                    )
+                                );
+                                ?>
+                                محصول دارای تصویر اصلی
+                            </strong>
+
+
+                            <p>
+                                <?php if (
+                                    $missing_main_images > 0
+                                ) : ?>
+
+                                    هنوز
+                                    <strong>
+                                        <?php
+                                        echo esc_html(
+                                            number_format_i18n(
+                                                $missing_main_images
+                                            )
+                                        );
+                                        ?>
+                                    </strong>
+                                    محصول بدون تصویر اصلی است.
+
+                                <?php else : ?>
+
+                                    همه محصولات منتشرشده
+                                    تصویر اصلی دارند.
+
+                                <?php endif; ?>
+                            </p>
+
+
+                            <a
+                                href="<?php
+                                echo esc_url(
+                                    $products_url
+                                );
+                                ?>"
+                                class="
+                                    hom-dashboard-panel-action
+                                "
+                            >
+                                مدیریت تصاویر محصولات
+                                ←
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+
+                    <article class="hom-dashboard-panel">
+
+                        <div class="hom-dashboard-panel__head">
+
+                            <div>
+
+                                <span>
+                                    اطلاعات سازمانی
+                                </span>
+
+                                <h2>
+                                    اطلاعات
+                                    <?php
+                                    echo esc_html(
+                                        self::store_name()
+                                    );
+                                    ?>
+                                </h2>
+
+                            </div>
+
+                            <span
+                                class="
+                                    hom-dashboard-health-icon
+                                "
+                            >
+                                ⚙️
+                            </span>
+
+                        </div>
+
+
+                        <div class="hom-dashboard-seller-health">
+
+                            <?php if (
+                                empty(
+                                    $seller_missing
+                                )
+                            ) : ?>
+
+                                <div
+                                    class="
+                                        hom-dashboard-health-state
+                                        is-complete
+                                    "
+                                >
+                                    <span>✓</span>
+
+                                    <div>
+                                        <strong>
+                                            اطلاعات کامل است
+                                        </strong>
+
+                                        <small>
+                                            اطلاعات موردنیاز
+                                            اسناد فروش ثبت شده است.
+                                        </small>
+                                    </div>
+                                </div>
+
+                            <?php else : ?>
+
+                                <div
+                                    class="
+                                        hom-dashboard-health-state
+                                        is-warning
+                                    "
+                                >
+                                    <span>!</span>
+
+                                    <div>
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                number_format_i18n(
+                                                    count(
+                                                        $seller_missing
+                                                    )
+                                                )
+                                            );
+                                            ?>
+                                            مورد نیاز به تکمیل
+                                        </strong>
+
+                                        <small>
+                                            برای کامل بودن
+                                            اسناد فروش بررسی شود.
+                                        </small>
+                                    </div>
+                                </div>
+
+                            <?php endif; ?>
+
+
+                            <a
+                                href="<?php
+                                echo esc_url(
+                                    $seller_url
+                                );
+                                ?>"
+                                class="
+                                    hom-dashboard-panel-action
+                                "
+                            >
+                                بررسی اطلاعات
+                                <?php
+                                echo esc_html(
+                                    self::store_name()
+                                );
+                                ?>
+                                ←
+                            </a>
+
+                        </div>
+
+                    </article>
+
+
+                </div>
+
+            </section>
+
+
+
+            <!-- ==================================================
+                 QUICK ACCESS
+                 ================================================== -->
+
+            <section class="hom-dashboard-section">
+
+                <div class="hom-dashboard-section__head">
+
+                    <div>
+
+                        <span>
+                            میانبرها
+                        </span>
+
+                        <h2>
+                            دسترسی سریع
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-dashboard-shortcuts">
+
+
+                    <a href="<?php echo esc_url($orders_url); ?>">
+
+                        <span>☰</span>
+
+                        <div>
+                            <strong>
+                                مدیریت و پیگیری مشتریان
+                            </strong>
+
+                            <small>
+                                پیش‌فاکتورها، سفارش‌ها،
+                                پرداخت و ارسال
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                    <a href="<?php echo esc_url($products_url); ?>">
+
+                        <span>▦</span>
+
+                        <div>
+                            <strong>
+                                مدیریت تصاویر محصولات
+                            </strong>
+
+                            <small>
+                                تصویر اصلی و گالری محصولات
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                    <a href="<?php echo esc_url($seller_url); ?>">
+
+                        <span>⚙</span>
+
+                        <div>
+                            <strong>
+                                اطلاعات
+                                <?php
+                                echo esc_html(
+                                    self::store_name()
+                                );
+                                ?>
+                            </strong>
+
+                            <small>
+                                مشخصات مورد استفاده
+                                در اسناد فروش
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                    <a href="<?php echo esc_url($help_url); ?>">
+
+                        <span>?</span>
+
+                        <div>
+                            <strong>
+                                راهنمای پنل
+                            </strong>
+
+                            <small>
+                                آموزش استفاده از بخش‌های پنل
+                            </small>
+                        </div>
+
+                    </a>
+
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+        <?php
+    }
+
+
+    private static function render_orders_content() {
+
+        if (
+            !current_user_can(
+                HOM_Capabilities::CAP_VIEW_ORDERS
+            )
+        ) {
+            ?>
+            <div class="hom-alert hom-alert-error">
+                شما اجازه مشاهده سفارش‌ها را ندارید.
+            </div>
+            <?php
+
+            return;
+        }
+
+
+        $status =
+            isset($_GET['status'])
+                ? sanitize_key(
+                    wp_unslash(
+                        $_GET['status']
+                    )
+                )
+                : 'all';
+
+
+        $page =
+            isset($_GET['order_page'])
+                ? max(
+                    1,
+                    absint(
+                        $_GET['order_page']
+                    )
+                )
+                : 1;
+
+
+        $search =
+            isset($_GET['q'])
+                ? sanitize_text_field(
+                    wp_unslash(
+                        $_GET['q']
+                    )
+                )
+                : '';
+
+
+        $order_id =
+            isset($_GET['order_id'])
+                ? absint($_GET['order_id'])
+                : 0;
+
+        if ($order_id) {
+            HOM_Order_Detail_View::render($order_id);
+            return;
+        }
+
+        $result =
+            HOM_Orders::query(
+                $status,
+                $page,
+                $search
+            );
+
+
+        $counts =
+            HOM_Orders::summary_counts();
+
+
+        $customer_help_url =
+            add_query_arg(
+                'view',
+                'help-customers',
+                HOM_Router::panel_url()
+            );
+
+
+        $filters = [
+            'all' =>
+                'همه',
+
+            'preinvoice-review' =>
+                'پیش‌فاکتور جدید',
+
+            'preinv-approved' =>
+                'تأیید شده',
+
+            'pending' =>
+                'انتظار پرداخت',
+
+            'on-hold' =>
+                'در انتظار بررسی',
+
+            'processing' =>
+                'در حال آماده‌سازی',
+
+            'hom-ready' =>
+                'آماده ارسال',
+
+            'hom-shipped' =>
+                'ارسال شده',
+
+            'completed' =>
+                'تحویل شده',
+        ];
+
+        ?>
+
+        <div class="hom-page-heading hom-orders-heading">
 
             <div>
 
                 <span class="hom-eyebrow">
-                    DASHBOARD
+                    SALES & ORDERS
                 </span>
 
                 <h1>
-                    پنل مدیریت فروشگاه
+                    مدیریت و پیگیری مشتریان
                 </h1>
 
                 <p>
-                    از این بخش می‌توانید محصولات فروشگاه را مشاهده و جستجو کنید.
+                    مدیریت یکپارچه درخواست پیش‌فاکتور، اطلاعات مشتری،
+                    قیمت‌گذاری، پرداخت، آماده‌سازی، ارسال و تحویل سفارش‌ها
                 </p>
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $customer_help_url
+                    );
+                    ?>"
+                    class="hom-section-help-link"
+                >
+                    <span aria-hidden="true">👁</span>
+                    <span>
+                        راهنمای مدیریت و پیگیری مشتریان
+                    </span>
+                </a>
+
+            </div>
+
+            <div class="hom-products-count">
+
+                <strong>
+                    <?php
+                    echo esc_html(
+                        number_format_i18n(
+                            absint(
+                                $result['total']
+                            )
+                        )
+                    );
+                    ?>
+                </strong>
+
+                <span>
+                    مورد
+                </span>
 
             </div>
 
         </div>
 
 
-        <section class="hom-grid">
+        <form
+            method="get"
+            action="<?php
+            echo esc_url(
+                HOM_Router::panel_url()
+            );
+            ?>"
+            class="hom-orders-search"
+        >
 
-            <article class="hom-card hom-card-wide">
+            <input
+                type="hidden"
+                name="view"
+                value="orders"
+            >
 
-                <div class="hom-card-status">
-                    <span class="hom-status-dot"></span>
-                    سیستم فعال است
+            <input
+                type="hidden"
+                name="status"
+                value="<?php
+                echo esc_attr(
+                    $status
+                );
+                ?>"
+            >
+
+            <input
+                type="search"
+                name="q"
+                value="<?php
+                echo esc_attr(
+                    $search
+                );
+                ?>"
+                placeholder="شماره سفارش، نام، موبایل یا کد رهگیری..."
+            >
+
+            <button
+                type="submit"
+                class="hom-button hom-button-secondary"
+            >
+                جستجو
+            </button>
+
+        </form>
+
+
+        <section class="hom-order-status-grid">
+
+            <?php
+            foreach (
+                $filters
+                as $filter_status => $label
+            ) :
+
+                $url =
+                    add_query_arg(
+                        [
+                            'view' =>
+                                'orders',
+
+                            'status' =>
+                                $filter_status,
+
+                            'q' =>
+                                $search,
+                        ],
+                        HOM_Router::panel_url()
+                    );
+
+                $count =
+                    absint(
+                        $counts[
+                            $filter_status
+                        ] ?? 0
+                    );
+                ?>
+
+                <a
+                    href="<?php
+                    echo esc_url($url);
+                    ?>"
+                    class="hom-order-status-card <?php
+                    echo $status === $filter_status
+                        ? 'is-active'
+                        : '';
+                    ?>"
+                >
+
+                    <strong>
+                        <?php
+                        echo esc_html(
+                            number_format_i18n(
+                                $count
+                            )
+                        );
+                        ?>
+                    </strong>
+
+                    <span>
+                        <?php
+                        echo esc_html(
+                            $label
+                        );
+                        ?>
+                    </span>
+
+                </a>
+
+            <?php endforeach; ?>
+
+        </section>
+
+
+        <section class="hom-orders-panel">
+
+            <?php
+            if (
+                empty(
+                    $result['items']
+                )
+            ) :
+                ?>
+
+                <div class="hom-orders-empty">
+
+                    <strong>
+                        سفارشی در این بخش وجود ندارد
+                    </strong>
+
+                    <p>
+                        درخواست‌های پیش‌فاکتور و سفارش‌های مشتریان در این قسمت نمایش داده می‌شوند.
+                    </p>
+
                 </div>
 
-                <h2>
-                    پنل مدیریت فروشگاه آماده استفاده است
-                </h2>
+            <?php else : ?>
 
-                <p>
-                    دسترسی این حساب محدود به امکانات اختصاصی مدیر کسب‌وکار است.
-                </p>
+                <div class="hom-table-wrap">
 
-            </article>
+                    <table class="hom-products-table hom-orders-table">
+
+                        <thead>
+                            <tr>
+                                <th>پرونده</th>
+                                <th>نوع</th>
+                                <th>مشتری</th>
+                                <th>شهر</th>
+                                <th>وضعیت</th>
+                                <th>مسئول</th>
+                                <th>مبلغ</th>
+                                <th>ارسال</th>
+                                <th>تاریخ</th>
+                                <th>دسترسی سریع</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                        <?php
+                        foreach (
+                            $result['items']
+                            as $item
+                        ) :
+
+                            $row_order =
+                                HOM_Orders::get_order(
+                                    $item['id']
+                                );
 
 
-            <article class="hom-card">
-
-                <span class="hom-card-label">
-                    سطح دسترسی
-                </span>
-
-                <strong class="hom-card-value">
-                    Owner
-                </strong>
-
-                <span class="hom-card-meta">
-                    دسترسی محدود و اختصاصی
-                </span>
-
-            </article>
+                            $detail_url =
+                                HOM_Orders::detail_url(
+                                    $item['id']
+                                );
 
 
-            <article class="hom-card">
+                            $contact =
+                                $row_order
+                                    ? HOM_Orders::customer_contact_data(
+                                        $row_order
+                                    )
+                                    : [
+                                        'display_name' => '',
+                                        'phone' => '',
+                                        'email' => '',
+                                        'billing' => [
+                                            'city' => '',
+                                        ],
+                                    ];
 
-                <span class="hom-card-label">
-                    بخش فعال
-                </span>
 
-                <strong class="hom-card-value hom-card-value-text">
-                    محصولات
-                </strong>
+                            $customer_name =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['display_name']
+                                        ?? ''
+                                    )
+                                );
 
-                <span class="hom-card-meta">
-                    مشاهده و جستجوی محصولات
-                </span>
 
-            </article>
+                            if (
+                                '' === $customer_name ||
+                                'مشتری بدون نام'
+                                    ===
+                                    $customer_name
+                            ) {
+
+                                $customer_name =
+                                    trim(
+                                        (string)
+                                        (
+                                            $item['customer_name']
+                                            ?? ''
+                                        )
+                                    );
+                            }
+
+
+                            if (
+                                '' === $customer_name ||
+                                'مشتری بدون نام'
+                                    ===
+                                    $customer_name
+                            ) {
+
+                                $customer_name =
+                                    'نام ثبت نشده';
+                            }
+
+
+                            $customer_phone =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['phone']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            if (
+                                '' === $customer_phone
+                            ) {
+
+                                $customer_phone =
+                                    trim(
+                                        (string)
+                                        (
+                                            $item['phone']
+                                            ?? ''
+                                        )
+                                    );
+                            }
+
+
+                            $customer_email =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['email']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            $customer_city =
+                                trim(
+                                    (string)
+                                    (
+                                        $contact['billing']['city']
+                                        ?? ''
+                                    )
+                                );
+
+
+                            if (
+                                '' === $customer_city
+                            ) {
+
+                                $customer_city =
+                                    trim(
+                                        (string)
+                                        (
+                                            $item['city']
+                                            ?? ''
+                                        )
+                                    );
+                            }
+
+
+                            $tracking_code =
+                                $row_order
+                                    ? trim(
+                                        (string)
+                                        $row_order->get_meta(
+                                            '_hom_shipping_tracking_code',
+                                            true
+                                        )
+                                    )
+                                    : '';
+
+
+                            $invoice_url =
+                                $row_order
+                                    ? HOM_Order_Documents::url(
+                                        $item['id'],
+                                        'invoice'
+                                    )
+                                    : '';
+
+
+                            $warehouse_url =
+                                $row_order
+                                    ? HOM_Order_Documents::url(
+                                        $item['id'],
+                                        'warehouse'
+                                    )
+                                    : '';
+
+
+                            $shipping_url =
+                                $row_order
+                                    ? HOM_Order_Documents::url(
+                                        $item['id'],
+                                        'shipping'
+                                    )
+                                    : '';
+                            ?>
+
+                            <tr
+                                class="hom-order-row"
+                                data-href="<?php
+                                echo esc_url(
+                                    $detail_url
+                                );
+                                ?>"
+                                tabindex="0"
+                                aria-label="<?php
+                                echo esc_attr(
+                                    'باز کردن پرونده شماره ' .
+                                    $item['number']
+                                );
+                                ?>"
+                            >
+
+                                <td data-label="پرونده">
+
+                                    <div class="hom-order-number-cell">
+
+                                        <strong>
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $detail_url
+                                                );
+                                                ?>"
+                                                class="hom-order-number-link"
+                                            >
+                                                #<?php
+                                                echo esc_html(
+                                                    $item['number']
+                                                );
+                                                ?>
+                                            </a>
+
+                                        </strong>
+
+                                        <span>
+                                            مشاهده پرونده
+                                        </span>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td data-label="نوع">
+
+                                    <span class="hom-order-type-badge">
+                                        <?php
+                                        echo esc_html(
+                                            $item['is_preinvoice']
+                                                ? 'پیش‌فاکتور'
+                                                : 'سفارش'
+                                        );
+                                        ?>
+                                    </span>
+
+                                </td>
+
+
+                                <td data-label="مشتری">
+
+                                    <div class="hom-order-customer">
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                $customer_name
+                                            );
+                                            ?>
+                                        </strong>
+
+
+                                        <?php
+                                        if ($customer_phone) :
+                                            ?>
+
+                                            <span
+                                                dir="ltr"
+                                                class="hom-order-customer__phone"
+                                            >
+                                                <?php
+                                                echo esc_html(
+                                                    $customer_phone
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php
+                                        elseif ($customer_email) :
+                                            ?>
+
+                                            <span
+                                                dir="ltr"
+                                                class="hom-order-customer__email"
+                                            >
+                                                <?php
+                                                echo esc_html(
+                                                    $customer_email
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php else : ?>
+
+                                            <span class="hom-order-customer__missing">
+                                                اطلاعات تماس تکمیل نشده
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td data-label="شهر">
+
+                                    <?php if ($customer_city) : ?>
+
+                                        <?php
+                                        echo esc_html(
+                                            $customer_city
+                                        );
+                                        ?>
+
+                                    <?php else : ?>
+
+                                        <span class="hom-order-list-muted">
+                                            —
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+
+                                <td data-label="وضعیت">
+
+                                    <span class="hom-order-status-badge">
+                                        <?php
+                                        echo esc_html(
+                                            $item['status_label']
+                                        );
+                                        ?>
+                                    </span>
+
+                                </td>
+
+
+                                <td data-label="مسئول">
+
+                                    <div class="hom-order-assignee">
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                !empty(
+                                                    $item['assignee']['name']
+                                                )
+                                                    ? $item['assignee']['name']
+                                                    : 'تعیین نشده'
+                                            );
+                                            ?>
+                                        </strong>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td data-label="مبلغ">
+
+                                    <strong class="hom-order-list-total">
+                                        <?php
+                                        echo wp_kses_post(
+                                            $item['total_html']
+                                        );
+                                        ?>
+                                    </strong>
+
+                                </td>
+
+
+                                <td data-label="ارسال">
+
+                                    <div class="hom-order-shipping-summary">
+
+                                        <strong>
+                                            <?php
+                                            echo esc_html(
+                                                $item['shipping_method']
+                                                    ?: 'تعیین نشده'
+                                            );
+                                            ?>
+                                        </strong>
+
+
+                                        <?php if ($tracking_code) : ?>
+
+                                            <span dir="ltr">
+                                                رهگیری:
+                                                <?php
+                                                echo esc_html(
+                                                    $tracking_code
+                                                );
+                                                ?>
+                                            </span>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
+                                </td>
+
+
+                                <td data-label="تاریخ">
+
+                                    <span
+                                        class="hom-order-list-date"
+                                        dir="ltr"
+                                    >
+                                        <?php
+                                        echo esc_html(
+                                            $item['date']
+                                        );
+                                        ?>
+                                    </span>
+
+                                </td>
+
+
+                                <td data-label="دسترسی سریع">
+
+                                    <?php if ($row_order) : ?>
+
+                                        <div class="hom-order-row-actions">
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $invoice_url
+                                                );
+                                                ?>"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="hom-order-row-action"
+                                                title="مشاهده فاکتور"
+                                                aria-label="مشاهده فاکتور"
+                                            >
+                                                فاکتور
+                                            </a>
+
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $warehouse_url
+                                                );
+                                                ?>"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="hom-order-row-action"
+                                                title="برگه انبار بدون قیمت"
+                                                aria-label="برگه انبار بدون قیمت"
+                                            >
+                                                انبار
+                                            </a>
+
+
+                                            <a
+                                                href="<?php
+                                                echo esc_url(
+                                                    $shipping_url
+                                                );
+                                                ?>"
+                                                target="_blank"
+                                                rel="noopener"
+                                                class="hom-order-row-action"
+                                                title="برچسب ارسال"
+                                                aria-label="برچسب ارسال"
+                                            >
+                                                برچسب
+                                            </a>
+
+                                        </div>
+
+                                    <?php else : ?>
+
+                                        <span class="hom-order-list-muted">
+                                            —
+                                        </span>
+
+                                    <?php endif; ?>
+
+                                </td>
+
+                            </tr>
+
+                        <?php endforeach; ?>
+
+                        </tbody>
+
+                    </table>
+
+
+                    <script>
+                    (function () {
+
+                        if (
+                            window.homOrderRowsReady
+                        ) {
+                            return;
+                        }
+
+                        window.homOrderRowsReady = true;
+
+
+                        function interactiveTarget(
+                            target
+                        ) {
+
+                            return target.closest(
+                                'a, button, input, select, textarea, label, summary, details'
+                            );
+
+                        }
+
+
+                        document.addEventListener(
+                            'click',
+                            function (event) {
+
+                                var row =
+                                    event.target.closest(
+                                        '.hom-order-row[data-href]'
+                                    );
+
+
+                                if (
+                                    !row ||
+                                    interactiveTarget(
+                                        event.target
+                                    )
+                                ) {
+                                    return;
+                                }
+
+
+                                window.location.href =
+                                    row.dataset.href;
+
+                            }
+                        );
+
+
+                        document.addEventListener(
+                            'keydown',
+                            function (event) {
+
+                                if (
+                                    event.key !== 'Enter' &&
+                                    event.key !== ' '
+                                ) {
+                                    return;
+                                }
+
+
+                                var row =
+                                    event.target.closest(
+                                        '.hom-order-row[data-href]'
+                                    );
+
+
+                                if (!row) {
+                                    return;
+                                }
+
+
+                                event.preventDefault();
+
+                                window.location.href =
+                                    row.dataset.href;
+
+                            }
+                        );
+
+                    }());
+                    </script>
+
+                </div>
+
+            <?php endif; ?>
 
         </section>
 
@@ -736,19 +3450,29 @@ class HOM_View {
     }
 
 
-    private static function render_help_content() {
 
-        $user =
-            wp_get_current_user();
+    private static function render_help_index_content() {
 
-        $display_name =
-            $user->display_name
-                ?: $user->user_login;
-
-        $products_url =
+        $customer_help_url =
             add_query_arg(
                 'view',
-                'products',
+                'help-customers',
+                HOM_Router::panel_url()
+            );
+
+
+        $images_help_url =
+            add_query_arg(
+                'view',
+                'help-product-images',
+                HOM_Router::panel_url()
+            );
+
+
+        $warehouse_help_url =
+            add_query_arg(
+                'view',
+                'help-warehouse-staff',
                 HOM_Router::panel_url()
             );
 
@@ -759,55 +3483,2035 @@ class HOM_View {
             <section class="hom-help-hero">
 
                 <div class="hom-help-hero__icon">
-                    👋
+                    ?
                 </div>
 
                 <div class="hom-help-hero__content">
 
                     <span class="hom-help-kicker">
-                        راهنمای مدیر فروشگاه
+                        مرکز راهنمای پنل فروشگاه
                     </span>
 
                     <h1>
-                        <?php
-                        echo esc_html(
-                            $display_name
-                        );
-                        ?> عزیز، خوش آمدید
+                        راهنمای پنل مدیریت فروشگاه
                     </h1>
 
                     <p>
-                        از اینکه در مدیریت بهتر اطلاعات و تصاویر
-                        محصولات فروشگاه همکاری می‌کنید سپاسگزاریم.
-                        شناخت شما از محصولات، برندها و کدهای فنی
-                        باعث می‌شود تصاویر دقیق‌تر و مناسب‌تری
-                        برای هر محصول انتخاب شود.
+                        راهنمای بخش موردنظر را انتخاب کنید.
+                        هر راهنما در صفحه‌ای مستقل قرار دارد تا
+                        با اضافه شدن امکانات جدید، بتوان راهنماهای
+                        بیشتری بدون شلوغ شدن منوی اصلی به این بخش
+                        اضافه کرد.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-branch-grid">
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $customer_help_url
+                    );
+                    ?>"
+                    class="hom-help-branch-card is-primary"
+                >
+
+                    <span class="hom-help-branch-card__icon">
+                        👥
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            پیش‌فاکتور و سفارش
+                        </span>
+
+                        <h2>
+                            راهنمای مدیریت و پیگیری مشتریان
+                        </h2>
+
+                        <p>
+                            اطلاعات مشتری، قیمت‌گذاری،
+                            تأیید پیش‌فاکتور، پرداخت،
+                            آماده‌سازی، ارسال، تحویل،
+                            اصلاحات، اسناد و رخدادها.
+                        </p>
+
+                    </div>
+
+                    <span class="hom-help-branch-card__arrow">
+                        ←
+                    </span>
+
+                </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $images_help_url
+                    );
+                    ?>"
+                    class="hom-help-branch-card"
+                >
+
+                    <span class="hom-help-branch-card__icon">
+                        🖼️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            محصولات
+                        </span>
+
+                        <h2>
+                            راهنمای مدیریت تصاویر محصولات
+                        </h2>
+
+                        <p>
+                            جستجوی محصول، تصویر اصلی،
+                            گالری، ویرایش تصویر، واترمارک،
+                            آپلود و ذخیره نهایی.
+                        </p>
+
+                    </div>
+
+                    <span class="hom-help-branch-card__arrow">
+                        ←
+                    </span>
+
+                </a>
+
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $warehouse_help_url
+                    );
+                    ?>"
+                    class="hom-help-branch-card"
+                >
+
+                    <span class="hom-help-branch-card__icon">
+                        📦
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            انبار و کنترل نهایی
+                        </span>
+
+                        <h2>
+                            راهنمای مسئولین تأیید انبار
+                        </h2>
+
+                        <p>
+                            ساخت حساب مستقل، فعال و غیرفعال کردن
+                            دسترسی، ورود از QR، کنترل اقلام،
+                            تأیید نهایی و نکات امنیتی انبار.
+                        </p>
+
+                    </div>
+
+                    <span class="hom-help-branch-card__arrow">
+                        ←
+                    </span>
+
+                </a>
+
+            </section>
+
+        </div>
+
+        <?php
+    }
+
+
+
+
+    private static function render_help_customers_content() {
+
+        $orders_url =
+            add_query_arg(
+                'view',
+                'orders',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_index_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+        ?>
+
+        <div class="hom-help-page hom-customer-help-page">
+
+
+            <section class="hom-help-hero">
+
+                <div>
+
+                    <span class="hom-help-hero__eyebrow">
+                        راهنمای کار روزانه واحد فروش
+                    </span>
+
+                    <h1>
+                        راهنمای مدیریت و پیگیری مشتریان
+                    </h1>
+
+                    <p>
+                        این بخش برای مدیریت پرونده مشتری از زمان
+                        ثبت پیش‌فاکتور تا قیمت‌گذاری، پرداخت،
+                        آماده‌سازی، ارسال و تحویل طراحی شده است.
+                        لازم نیست همه قسمت‌های صفحه را همیشه باز کنید؛
+                        فقط بخشی را باز کنید که برای اقدام فعلی شما لازم است.
+                    </p>
+
+                </div>
+
+
+                <div class="hom-help-hero__actions">
+
+                    <a
+                        href="<?php echo esc_url($orders_url); ?>"
+                        class="hom-help-action hom-help-action-primary"
+                    >
+                        رفتن به مدیریت مشتریان
+                    </a>
+
+                    <a
+                        href="<?php echo esc_url($help_index_url); ?>"
+                        class="hom-help-action hom-help-action-secondary"
+                    >
+                        ← بازگشت به راهنمای پنل
+                    </a>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🧭
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            قبل از شروع
+                        </span>
+
+                        <h2>
+                            منطق صفحه را در یک نگاه بشناسید
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-customer-help-principles">
+
+                    <article>
+
+                        <strong>
+                            اطلاعات مهم همیشه دیده می‌شوند
+                        </strong>
+
+                        <p>
+                            وضعیت پرونده، مشتری، مسئول پرونده،
+                            مبلغ و خلاصه عملیات بدون باز کردن
+                            فرم‌ها قابل مشاهده هستند.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            فرم‌ها فقط هنگام نیاز باز می‌شوند
+                        </strong>
+
+                        <p>
+                            قیمت‌گذاری، پرداخت، ارسال، اصلاحات
+                            و جزئیات اضافی داخل بخش‌های جمع‌شونده
+                            قرار دارند تا صفحه شلوغ نشود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            سوابق برای بازرسی است، نه کار روزانه
+                        </strong>
+
+                        <p>
+                            برای پیگیری سفارش از وضعیت و مراحل سفارش
+                            استفاده کنید. «سوابق و رخدادها» فقط برای
+                            بررسی اتفاقات گذشته است.
+                        </p>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🗺️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            نقشه صفحه
+                        </span>
+
+                        <h2>
+                            هر قسمت صفحه چه کاری انجام می‌دهد؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-customer-help-map">
+
+                    <article>
+                        <span>۱</span>
+
+                        <div>
+                            <strong>
+                                سربرگ پرونده
+                            </strong>
+
+                            <p>
+                                شماره سفارش، وضعیت، مبلغ،
+                                مشتری، مسئول پرونده و دسترسی
+                                سریع به اسناد.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۲</span>
+
+                        <div>
+                            <strong>
+                                اطلاعات مشتری
+                            </strong>
+
+                            <p>
+                                نام، تلفن، ایمیل و مشخصات پایه
+                                برای شناسایی سریع مشتری.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۳</span>
+
+                        <div>
+                            <strong>
+                                اطلاعات حقوقی خریدار
+                            </strong>
+
+                            <p>
+                                اطلاعات موردنیاز فاکتور رسمی،
+                                شرکت، شناسه ملی، کد اقتصادی،
+                                کدپستی و آدرس.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۴</span>
+
+                        <div>
+                            <strong>
+                                اقلام و قیمت‌گذاری
+                            </strong>
+
+                            <p>
+                                مشاهده کالاها و در صورت نیاز
+                                ثبت یا اصلاح قیمت و هزینه ارسال.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۵</span>
+
+                        <div>
+                            <strong>
+                                پرداخت
+                            </strong>
+
+                            <p>
+                                مشاهده خلاصه پرداخت و در صورت
+                                نیاز ثبت یا اصلاح اطلاعات واریز.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۶</span>
+
+                        <div>
+                            <strong>
+                                ارسال و تحویل
+                            </strong>
+
+                            <p>
+                                ثبت روش ارسال، باربری،
+                                رهگیری، کرایه و پیشرفت
+                                وضعیت ارسال.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۷</span>
+
+                        <div>
+                            <strong>
+                                مراحل سفارش
+                            </strong>
+
+                            <p>
+                                مسیر کلی پرونده و مراحل طی‌شده
+                                را به‌صورت خلاصه نشان می‌دهد.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۸</span>
+
+                        <div>
+                            <strong>
+                                سوابق و رخدادها
+                            </strong>
+
+                            <p>
+                                برای بررسی دقیق اینکه چه کاری،
+                                چه زمانی و توسط چه کسی انجام شده است.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🚦
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            تشخیص اقدام بعدی
+                        </span>
+
+                        <h2>
+                            وضعیت پرونده به شما می‌گوید چه کاری لازم است
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-status-table">
+
+                    <div class="hom-help-status-row">
+                        <strong>پیش‌فاکتور جدید</strong>
+                        <span>
+                            اطلاعات مشتری را بررسی کنید،
+                            سپس اقلام را قیمت‌گذاری کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>تأیید شده</strong>
+                        <span>
+                            قیمت‌گذاری انجام شده و پرونده
+                            برای ادامه فرایند پرداخت آماده است.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>انتظار پرداخت</strong>
+                        <span>
+                            وضعیت پرداخت مشتری را بررسی کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>در انتظار بررسی</strong>
+                        <span>
+                            پرونده نیازمند بررسی واحد فروش است.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>در حال آماده‌سازی</strong>
+                        <span>
+                            سفارش وارد عملیات تأمین،
+                            جمع‌آوری یا بسته‌بندی شده است.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>آماده ارسال</strong>
+                        <span>
+                            اطلاعات ارسال را کنترل و
+                            ارسال سفارش را ثبت کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>ارسال شده</strong>
+                        <span>
+                            کد رهگیری و وضعیت تحویل
+                            را در صورت نیاز بررسی کنید.
+                        </span>
+                    </div>
+
+
+                    <div class="hom-help-status-row">
+                        <strong>تحویل شده</strong>
+                        <span>
+                            عملیات اصلی پرونده پایان یافته است.
+                            فقط در صورت نیاز سوابق را بررسی کنید.
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        👤
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            شناخت مشتری
+                        </span>
+
+                        <h2>
+                            اطلاعات مشتری و اطلاعات حقوقی
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-two-column">
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            اطلاعات مشتری
+                        </h3>
+
+                        <p>
+                            این قسمت برای شناسایی سریع شخصی است
+                            که پرونده به او مربوط می‌شود.
+                        </p>
+
+                        <ul>
+                            <li>نام مشتری</li>
+                            <li>شماره تماس</li>
+                            <li>ایمیل</li>
+                            <li>شناسه مشتری</li>
+                        </ul>
+
+                        <p>
+                            اگر اطلاعاتی موجود نباشد،
+                            عبارت «تکمیل نشده» نمایش داده می‌شود.
+                            این یک خطای سیستم نیست.
+                        </p>
+
+                    </article>
+
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            اطلاعات حقوقی خریدار
+                        </h3>
+
+                        <p>
+                            این اطلاعات برای فاکتور و امور
+                            مالی و حقوقی خریدار استفاده می‌شود.
+                        </p>
+
+                        <ul>
+                            <li>نام حقوقی یا شرکت</li>
+                            <li>شناسه ملی</li>
+                            <li>کد اقتصادی</li>
+                            <li>شماره ثبت</li>
+                            <li>کدپستی</li>
+                            <li>آدرس فاکتور</li>
+                        </ul>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        برای ویرایش اطلاعات چه کار کنم؟
+                    </strong>
+
+                    <p>
+                        روی «ویرایش اطلاعات حقوقی» کلیک کنید.
+                        فرم فقط در همان زمان باز می‌شود.
+                        پس از پایان کار آن را دوباره ببندید
+                        تا صفحه خلوت باقی بماند.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        💰
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            عملیات فروش
+                        </span>
+
+                        <h2>
+                            اقلام و قیمت‌گذاری پیش‌فاکتور
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+                        <span>۱</span>
+                        <div>
+                            <strong>
+                                آکاردئون اقلام و قیمت‌گذاری را باز کنید
+                            </strong>
+                            <p>
+                                در حالت عادی بسته است و فقط
+                                تعداد اقلام و مبلغ کل را نشان می‌دهد.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۲</span>
+                        <div>
+                            <strong>
+                                اقلام و تعداد را کنترل کنید
+                            </strong>
+                            <p>
+                                نام محصول، SKU، تعداد،
+                                قیمت واحد و جمع هر ردیف
+                                در جدول دیده می‌شود.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۳</span>
+                        <div>
+                            <strong>
+                                قیمت‌ها را وارد کنید
+                            </strong>
+                            <p>
+                                فقط در زمانی که پرونده نیازمند
+                                قیمت‌گذاری است قیمت واحد
+                                و هزینه ارسال را ثبت کنید.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۴</span>
+                        <div>
+                            <strong>
+                                ذخیره و تأیید کنید
+                            </strong>
+                            <p>
+                                ابتدا قیمت‌ها را ذخیره کنید.
+                                سپس در زمان مناسب پیش‌فاکتور
+                                را برای پرداخت تأیید کنید.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-warning">
+
+                    اگر قیمت قبلاً ثبت شده باشد و بخواهید
+                    آن را تغییر دهید، سیستم دلیل اصلاح می‌خواهد.
+                    دلیل را کوتاه، دقیق و قابل فهم بنویسید؛
+                    مانند «اصلاح قیمت طبق اعلام تأمین‌کننده».
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        💳
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            امور مالی
+                        </span>
+
+                        <h2>
+                            بخش پرداخت چگونه استفاده می‌شود؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        ابتدا خلاصه پرداخت را نگاه کنید.
+                    </strong>
+
+                    <p>
+                        بدون باز کردن هیچ فرمی می‌توانید
+                        مبلغ، مرجع پرداخت، ثبت‌کننده،
+                        زمان ثبت و وضعیت تأیید را ببینید.
+                    </p>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+                        <span>۱</span>
+                        <div>
+                            <strong>
+                                پرداخت هنوز ثبت نشده
+                            </strong>
+                            <p>
+                                فقط پس از مشاهده و اطمینان
+                                از واریز واقعی مشتری،
+                                «ثبت و تأیید پرداخت دستی»
+                                را باز کنید.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۲</span>
+                        <div>
+                            <strong>
+                                مبلغ و مرجع پرداخت
+                            </strong>
+                            <p>
+                                مبلغ دریافتی و شماره پیگیری
+                                یا مرجع بانکی را با دقت ثبت کنید.
+                            </p>
+                        </div>
+                    </article>
+
+
+                    <article>
+                        <span>۳</span>
+                        <div>
+                            <strong>
+                                پرداخت قبلاً ثبت شده
+                            </strong>
+                            <p>
+                                فرم اصلاح را فقط زمانی باز کنید
+                                که مرجع یا توضیحات پرداخت
+                                اشتباه ثبت شده باشد.
+                            </p>
+                        </div>
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-warning">
+
+                    تأیید پرداخت یک اقدام مهم مالی است.
+                    قبل از ثبت، صرفاً به گفته مشتری اکتفا نکنید
+                    و واریز را از روش مورد تأیید شرکت بررسی کنید.
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🖨️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            دسترسی سریع
+                        </span>
+
+                        <h2>
+                            فاکتور، برگه انبار و برچسب ارسال
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-document-grid">
+
+                    <article>
+
+                        <span>🧾</span>
+
+                        <div>
+                            <strong>
+                                فاکتور
+                            </strong>
+
+                            <p>
+                                برای مشاهده یا چاپ سند مالی
+                                مشتری استفاده کنید.
+                            </p>
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>📦</span>
+
+                        <div>
+                            <strong>
+                                برگه انبار بدون قیمت
+                            </strong>
+
+                            <p>
+                                برای تحویل به انبار و آماده‌سازی
+                                کالا بدون نمایش اطلاعات مالی.
+                            </p>
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>🏷️</span>
+
+                        <div>
+                            <strong>
+                                برچسب ارسال
+                            </strong>
+
+                            <p>
+                                برای آماده‌سازی بسته و اطلاعات
+                                موردنیاز ارسال استفاده کنید.
+                            </p>
+                        </div>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    این سه گزینه در بالای پرونده قرار دارند؛
+                    لازم نیست برای چاپ اسناد در صفحه
+                    به دنبال بخش دیگری بگردید.
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🚚
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            عملیات ارسال
+                        </span>
+
+                        <h2>
+                            ارسال و تحویل سفارش
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <p class="hom-help-lead">
+                    در حالت بسته، مهم‌ترین اطلاعات ارسال
+                    به‌صورت خلاصه نمایش داده می‌شود.
+                    برای انجام عملیات، بخش را باز کنید.
+                </p>
+
+
+                <div class="hom-help-field-guide">
+
+                    <div>
+                        <strong>روش ارسال</strong>
+                        <span>
+                            نوع ارسال انتخاب‌شده برای سفارش.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>شرکت / باربری / شعبه</strong>
+                        <span>
+                            نام شرکت حمل، پیک، باربری
+                            یا شعبه مقصد.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>کد رهگیری / بارنامه</strong>
+                        <span>
+                            شماره‌ای که برای پیگیری ارسال
+                            استفاده می‌شود.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>وضعیت کرایه</strong>
+                        <span>
+                            مشخص می‌کند هزینه حمل پرداخت شده
+                            یا پس‌کرایه است.
+                        </span>
+                    </div>
+
+                    <div>
+                        <strong>توضیحات ارسال</strong>
+                        <span>
+                            فقط نکات ضروری و کاربردی ارسال
+                            را در این قسمت بنویسید.
+                        </span>
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-warning">
+
+                    اگر فقط مرحله سفارش را جلو می‌برید
+                    و اطلاعات ارسال را تغییر نداده‌اید،
+                    لازم نیست دلیل اصلاح بنویسید.
+                    دلیل اصلاح فقط برای تغییر اطلاعات
+                    قبلاً ثبت‌شده است.
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🪜
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            مسیر پرونده
+                        </span>
+
+                        <h2>
+                            بخش «مراحل سفارش» چه کاربردی دارد؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <p>
+                        اگر می‌خواهید سریع بفهمید پرونده
+                        تا کجا پیش رفته است،
+                        ابتدا «مراحل سفارش» را باز کنید.
+                    </p>
+
+                    <p>
+                        این بخش خلاصه مسیر پرونده است
+                        و برای پیگیری روزانه بسیار مناسب‌تر
+                        از بخش سوابق و رخدادهاست.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+
+            <section
+                id="hom-help-customer-audit"
+                class="hom-help-topic hom-help-audit-guide"
+            >
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🕘
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            بررسی سابقه پرونده
+                        </span>
+
+                        <h2>
+                            «سوابق و رخدادها» دقیقاً برای چه کاری است؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-audit-important">
+
+                    <strong>
+                        این بخش محل پیگیری روزانه سفارش نیست.
+                    </strong>
+
+                    <p>
+                        اگر می‌خواهید بدانید سفارش در چه مرحله‌ای است،
+                        ابتدا وضعیت بالای پرونده و سپس
+                        «مراحل سفارش» را بررسی کنید.
+                    </p>
+
+                    <p>
+                        «سوابق و رخدادها» زمانی استفاده می‌شود
+                        که بخواهید اتفاقات گذشته پرونده را
+                        مانند یک گزارش دقیق بررسی کنید.
+                    </p>
+
+                </div>
+
+
+                <div class="hom-help-question-grid">
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            چه کسی قیمت را تغییر داده است؟
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            پرداخت در چه زمانی تأیید شده است؟
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            چه کسی شماره پیگیری را اصلاح کرده است؟
+                        </p>
+                    </article>
+
+                    <article>
+                        <span>؟</span>
+                        <p>
+                            اطلاعات مشتری قبلاً چه مقداری داشته است؟
+                        </p>
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-audit-grid">
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۱
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                سوابق و رخدادها را باز کنید
+                            </h3>
+
+                            <p>
+                                این قسمت عمداً در حالت عادی بسته است
+                                تا صفحه کار شما شلوغ نشود.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۲
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                ردیف موردنظر را پیدا کنید
+                            </h3>
+
+                            <p>
+                                در هر ردیف، عنوان رخداد،
+                                نام انجام‌دهنده و زمان اقدام
+                                نمایش داده می‌شود.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۳
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                همان رخداد را باز کنید
+                            </h3>
+
+                            <p>
+                                فقط جزئیات همان اتفاق باز می‌شود
+                                و سایر رخدادها همچنان جمع می‌مانند.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۴
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                قبل و بعد را مقایسه کنید
+                            </h3>
+
+                            <p>
+                                اگر تغییری انجام شده باشد،
+                                مقدار قبل و بعد را کنار هم
+                                مشاهده خواهید کرد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۵
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                دلیل اصلاح را بخوانید
+                            </h3>
+
+                            <p>
+                                برای تغییرات اصلاحی،
+                                علت ثبت‌شده توسط اپراتور
+                                نیز در همان رخداد دیده می‌شود.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span class="hom-help-audit-number">
+                            ۶
+                        </span>
+
+                        <div>
+
+                            <h3>
+                                انجام‌دهنده را شناسایی کنید
+                            </h3>
+
+                            <p>
+                                نام کاربر، نقش او،
+                                حساب کاربری و منبع ثبت عملیات
+                                در جزئیات رخداد قابل مشاهده است.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-audit-example">
+
+                    <strong>
+                        مثال عملی:
+                    </strong>
+
+                    فرض کنید شماره پیگیری پرداخت با چیزی
+                    که اکنون در پرونده دیده می‌شود متفاوت است.
+                    برای فهمیدن علت، وارد «سوابق و رخدادها» شوید،
+                    رخداد مربوط به پرداخت را پیدا کنید و باز کنید.
+                    سپس مقدار قبلی، مقدار جدید، زمان تغییر،
+                    نام انجام‌دهنده و دلیل اصلاح را بررسی کنید.
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ✏️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            اصلاح اطلاعات
+                        </span>
+
+                        <h2>
+                            دلیل اصلاح را چگونه بنویسیم؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-do-dont">
+
+                    <div class="is-good">
+
+                        <strong>
+                            مناسب
+                        </strong>
+
+                        <ul>
+                            <li>
+                                اصلاح قیمت طبق اعلام تأمین‌کننده
+                            </li>
+
+                            <li>
+                                اصلاح شماره پیگیری ثبت‌شده اشتباه
+                            </li>
+
+                            <li>
+                                تغییر باربری طبق درخواست مشتری
+                            </li>
+
+                            <li>
+                                اصلاح شناسه ملی طبق مدرک مشتری
+                            </li>
+                        </ul>
+
+                    </div>
+
+
+                    <div class="is-bad">
+
+                        <strong>
+                            نامناسب
+                        </strong>
+
+                        <ul>
+                            <li>اصلاح شد</li>
+                            <li>اشتباه بود</li>
+                            <li>تغییر</li>
+                            <li>اوکی شد</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+
+                <p class="hom-help-lead">
+                    هدف از دلیل اصلاح این است که اگر چند روز
+                    یا چند ماه بعد شخص دیگری پرونده را بررسی کرد،
+                    بدون سؤال از اپراتور قبلی متوجه علت تغییر شود.
+                </p>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🔍
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            پیدا کردن سریع پاسخ
+                        </span>
+
+                        <h2>
+                            دنبال چه چیزی هستید؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-find-answer">
+
+                    <div>
+                        <strong>
+                            سفارش الان در چه مرحله‌ای است؟
+                        </strong>
+                        <span>
+                            وضعیت بالای پرونده + مراحل سفارش
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            مشتری چه کسی است؟
+                        </strong>
+                        <span>
+                            اطلاعات مشتری
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            اطلاعات فاکتور رسمی چیست؟
+                        </strong>
+                        <span>
+                            اطلاعات حقوقی خریدار
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            قیمت‌ها چقدر هستند؟
+                        </strong>
+                        <span>
+                            اقلام و قیمت‌گذاری
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            پرداخت تأیید شده است؟
+                        </strong>
+                        <span>
+                            خلاصه پرداخت
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            سفارش چگونه ارسال شده؟
+                        </strong>
+                        <span>
+                            ارسال و تحویل
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            چه کسی این اطلاعات را تغییر داده؟
+                        </strong>
+                        <span>
+                            سوابق و رخدادها
+                        </span>
+                    </div>
+
+
+                    <div>
+                        <strong>
+                            فاکتور یا برگه انبار می‌خواهم
+                        </strong>
+                        <span>
+                            دسترسی سریع بالای پرونده
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ✅
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            روال پیشنهادی
+                        </span>
+
+                        <h2>
+                            روش ساده کار با هر پرونده
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <ol class="hom-help-daily-checklist">
+
+                    <li>
+                        ابتدا وضعیت بالای پرونده را ببینید.
+                    </li>
+
+                    <li>
+                        نام مشتری و اطلاعات ضروری را کنترل کنید.
+                    </li>
+
+                    <li>
+                        فقط بخش مربوط به اقدام فعلی را باز کنید.
+                    </li>
+
+                    <li>
+                        عملیات موردنیاز را انجام و ذخیره کنید.
+                    </li>
+
+                    <li>
+                        وضعیت جدید پرونده را بررسی کنید.
+                    </li>
+
+                    <li>
+                        اگر نیاز به سند دارید از دسترسی سریع
+                        بالای صفحه استفاده کنید.
+                    </li>
+
+                    <li>
+                        فقط در صورت وجود سؤال درباره اتفاقات گذشته،
+                        به «سوابق و رخدادها» مراجعه کنید.
+                    </li>
+
+                </ol>
+
+            </section>
+
+
+
+            <?php
+            self::render_help_security_content();
+            ?>
+
+
+            <div class="hom-help-page-back">
+
+                <a
+                    href="<?php echo esc_url($help_index_url); ?>"
+                    class="hom-help-action hom-help-action-secondary"
+                >
+                    <span aria-hidden="true">←</span>
+                    بازگشت به راهنمای پنل
+                </a>
+
+            </div>
+
+
+        </div>
+
+        <?php
+    }
+
+
+
+    private static function render_help_product_images_content() {
+
+        $products_url =
+            add_query_arg(
+                'view',
+                'products',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_index_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+        ?>
+
+        <div class="hom-help-page">
+
+            <section class="hom-help-hero">
+
+                <div class="hom-help-hero__icon">
+                    🖼️
+                </div>
+
+                <div class="hom-help-hero__content">
+
+                    <span class="hom-help-kicker">
+                        راهنمای مدیریت تصاویر محصولات
+                    </span>
+
+                    <h1>
+                        راهنمای کامل مدیریت تصاویر محصولات
+                    </h1>
+
+                    <p>
+                        در این صفحه روش پیدا کردن محصول صحیح،
+                        کنترل کدهای فنی، انتخاب تصویر اصلی،
+                        مدیریت گالری، کار با ویرایشگر، واترمارک،
+                        آپلود و ذخیره نهایی تصاویر توضیح داده شده است.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <div class="hom-help-page-back">
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $help_index_url
+                    );
+                    ?>"
+                    class="hom-help-action hom-help-action-secondary"
+                >
+                    <span aria-hidden="true">←</span>
+                    بازگشت به راهنمای پنل
+                </a>
+
+            </div>
+
+
+            <section
+                id="hom-help-product-images"
+                class="hom-help-topic"
+            >
+
+                <div class="hom-help-topic__head">
+
+                    <div class="hom-help-topic__icon">
+                        🖼️
+                    </div>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            راهنمای مدیریت تصاویر محصولات
+                        </span>
+
+                        <h2>
+                            روش صحیح اصلاح تصویر اصلی و گالری
+                        </h2>
+
+                        <p>
+                            محصول صحیح را پیدا کنید، تصاویر را
+                            انتخاب و ویرایش کنید و در پایان تغییرات
+                            را روی محصول ثبت نمایید.
+                        </p>
+
+                    </div>
+
+                    <a
+                        href="<?php
+                        echo esc_url(
+                            $products_url
+                        );
+                        ?>"
+                        class="hom-help-action hom-help-action-primary"
+                    >
+                        رفتن به مدیریت تصاویر محصولات
+                    </a>
+
+                </div>
+
+
+                <section class="hom-help-important">
+
+                    <div class="hom-help-important__icon">
+                        ℹ️
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            کدهای محصول را بشناسید
+                        </strong>
+
+                        <p>
+                            <strong>ID:</strong>
+                            شناسه داخلی محصول در وردپرس و ووکامرس.
+                        </p>
+
+                        <p>
+                            <strong>SKU:</strong>
+                            کد انبار یا کد فروش محصول.
+                        </p>
+
+                        <p>
+                            <strong>Part Number:</strong>
+                            کد یا شماره فنی محصول که معمولاً روی
+                            کالا، جعبه یا کاتالوگ دیده می‌شود.
+                        </p>
+
+                        <p>
+                            محصول را می‌توانید با نام، ID، SKU،
+                            Part Number یا برند جستجو کنید.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <div class="hom-help-section-heading">
+                    <span>مسیر استاندارد کار</span>
+                    <h2>مراحل مدیریت تصاویر</h2>
+                </div>
+
+
+                <section class="hom-help-steps">
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۱</div>
+                        <div class="hom-help-step__icon">🔎</div>
+                        <h3>محصول را پیدا کنید</h3>
+                        <p>
+                            با نام، ID، SKU، Part Number یا برند
+                            محصول صحیح را جستجو کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۲</div>
+                        <div class="hom-help-step__icon">🏷️</div>
+                        <h3>مشخصات را کنترل کنید</h3>
+                        <p>
+                            نام، برند و کدهای محصول را قبل از
+                            تغییر تصویر بررسی کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۳</div>
+                        <div class="hom-help-step__icon">🖼️</div>
+                        <h3>تصویر اصلی را انتخاب کنید</h3>
+                        <p>
+                            واضح‌ترین و مناسب‌ترین نمای همان کالا
+                            را به‌عنوان تصویر اصلی انتخاب کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۴</div>
+                        <div class="hom-help-step__icon">🗂️</div>
+                        <h3>گالری را تکمیل کنید</h3>
+                        <p>
+                            تصاویر تکمیلی، زوایای دیگر، بسته‌بندی،
+                            نقشه یا ابعاد فنی را اضافه کنید.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۵</div>
+                        <div class="hom-help-step__icon">✥</div>
+                        <h3>تصویر را تنظیم کنید</h3>
+                        <p>
+                            تصویر را جابه‌جا، زوم و بچرخانید.
+                            خروجی نهایی مربع ۱:۱ است.
+                        </p>
+                    </article>
+
+                    <article class="hom-help-step">
+                        <div class="hom-help-step__number">۶</div>
+                        <div class="hom-help-step__icon">✅</div>
+                        <h3>آپلود و ذخیره کنید</h3>
+                        <p>
+                            پس از آماده‌سازی تصاویر، آپلود را
+                            انجام دهید و در پایان حتماً
+                            «ذخیره تغییرات» را بزنید.
+                        </p>
+                    </article>
+
+                </section>
+
+
+                <section class="hom-help-important hom-help-image-editor-guide">
+
+                    <div class="hom-help-important__icon">
+                        !
+                    </div>
+
+                    <div>
+
+                        <strong>
+                            نکات مهم ویرایشگر تصویر
+                        </strong>
+
+                        <p>
+                            تصاویر انتخاب‌شده از دستگاه، دوربین
+                            یا Media Library قبل از آپلود وارد
+                            ویرایشگر می‌شوند.
+                        </p>
+
+                        <p>
+                            امکان جابه‌جایی، زوم، چرخش آزاد،
+                            مشاهده درجه چرخش و صفر کردن زاویه وجود
+                            دارد. در موبایل زوم و چرخش با دو انگشت
+                            نیز قابل انجام است.
+                        </p>
+
+                        <p>
+                            خروجی نهایی همیشه مربع ۱:۱ است.
+                            بهتر است اطراف کالا فضای مناسب باقی بماند.
+                        </p>
+
+                        <p>
+                            ابزار «حاشیه سفید» کل کالا را با فضای
+                            مناسب داخل کادر نگه می‌دارد و
+                            «پر کردن کادر» تصویر را تا لبه‌های
+                            مربع گسترش می‌دهد.
+                        </p>
+
+                        <p>
+                            واترمارک «صنعت گستران الفت» به‌صورت
+                            خودکار روی نسخه جدید اعمال می‌شود.
+                        </p>
+
+                        <p>
+                            فایل اصلی Media Library تغییر نمی‌کند؛
+                            سیستم نسخه جدید ویرایش‌شده ایجاد می‌کند.
+                        </p>
+
+                        <p>
+                            «جدا کردن از محصول» فایل را حذف نمی‌کند
+                            و فقط ارتباط آن تصویر با محصول را برمی‌دارد.
+                        </p>
+
+                    </div>
+
+                </section>
+
+
+                <div class="hom-help-section-heading">
+                    <span>ابزارهای تصاویر</span>
+                    <h2>هر دکمه چه کاری انجام می‌دهد؟</h2>
+                </div>
+
+
+                <section class="hom-help-tools">
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">📁</span>
+                        <div>
+                            <h3>انتخاب از دستگاه</h3>
+                            <p>انتخاب عکس از کامپیوتر یا موبایل.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">📷</span>
+                        <div>
+                            <h3>دوربین موبایل</h3>
+                            <p>گرفتن مستقیم عکس با دوربین دستگاه.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">▦</span>
+                        <div>
+                            <h3>رسانه‌های سایت</h3>
+                            <p>انتخاب تصویر موجود در Media Library.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">⬆️</span>
+                        <div>
+                            <h3>آپلود همه تصاویر</h3>
+                            <p>انتقال تصاویر آماده‌شده به سایت.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">↺</span>
+                        <div>
+                            <h3>لغو تغییرات</h3>
+                            <p>بازگشت تغییرات ذخیره‌نشده به وضعیت اولیه.</p>
+                        </div>
+                    </article>
+
+                    <article class="hom-help-tool">
+                        <span class="hom-help-tool__icon">✓</span>
+                        <div>
+                            <h3>ذخیره تغییرات</h3>
+                            <p>ثبت نهایی تصویر اصلی و گالری روی محصول.</p>
+                        </div>
+                    </article>
+
+                </section>
+
+
+                <section class="hom-help-warning">
+
+                    <div class="hom-help-warning__head">
+
+                        <span class="hom-help-warning__icon">⚠️</span>
+
+                        <div>
+                            <span>قبل از ذخیره</span>
+                            <h2>نکات مهم تصاویر محصولات</h2>
+                        </div>
+
+                    </div>
+
+                    <ul>
+                        <li>
+                            کد، برند و مدل محصول را با تصویر تطبیق دهید.
+                        </li>
+                        <li>
+                            اگر درباره تصویر مطمئن نیستید، آن را ذخیره نکنید.
+                        </li>
+                        <li>
+                            هنگام آپلود صفحه را نبندید.
+                        </li>
+                        <li>
+                            تصویر محصول یا برند دیگری را استفاده نکنید.
+                        </li>
+                        <li>
+                            از تصاویر بی‌کیفیت و نامرتبط خودداری کنید.
+                        </li>
+                        <li>
+                            قبل از ذخیره نهایی، تصویر اصلی و گالری
+                            را دوباره کنترل کنید.
+                        </li>
+                    </ul>
+
+                </section>
+
+            </section>
+
+
+            <?php
+            self::render_help_security_content();
+            ?>
+
+        </div>
+
+        <?php
+    }
+
+
+
+    private static function render_help_warehouse_staff_content() {
+
+        $staff_url =
+            add_query_arg(
+                'view',
+                'warehouse-staff',
+                HOM_Router::panel_url()
+            );
+
+
+        $help_index_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+        ?>
+
+        <div class="hom-help-page hom-warehouse-help-page">
+
+            <section class="hom-help-hero">
+
+                <div class="hom-help-hero__icon">
+                    📦
+                </div>
+
+                <div class="hom-help-hero__content">
+
+                    <span class="hom-help-kicker">
+                        راهنمای انبار و کنترل نهایی
+                    </span>
+
+                    <h1>
+                        راهنمای مسئولین تأیید انبار
+                    </h1>
+
+                    <p>
+                        این بخش نحوه تعریف مسئول انبار،
+                        جداسازی حساب او از مدیر فروشگاه،
+                        ورود از QR، کنترل تمام اقلام سفارش
+                        و ثبت تأیید نهایی انبار را توضیح می‌دهد.
                     </p>
 
                     <div class="hom-help-hero__actions">
 
                         <a
-                            href="<?php
-                            echo esc_url(
-                                $products_url
-                            );
-                            ?>"
+                            href="<?php echo esc_url($staff_url); ?>"
                             class="hom-help-action hom-help-action-primary"
                         >
-                            <span>▦</span>
-                            رفتن به محصولات
+                            مدیریت مسئولین انبار
                         </a>
 
                         <a
-                            href="<?php
-                            echo esc_url(
-                                HOM_Auth::account_url()
-                            );
-                            ?>"
+                            href="<?php echo esc_url($help_index_url); ?>"
                             class="hom-help-action hom-help-action-secondary"
                         >
-                            <span>←</span>
-                            پنل کاربری
+                            ← بازگشت به راهنمای پنل
                         </a>
 
                     </div>
@@ -817,449 +5521,708 @@ class HOM_View {
             </section>
 
 
-            <section class="hom-help-important">
+            <section class="hom-help-topic">
 
-                <div class="hom-help-important__icon">
-                    ✓
-                </div>
+                <div class="hom-help-topic__heading">
 
-                <div>
-                    <strong>
-                        چرا همکاری شما مهم است؟
-                    </strong>
-
-                    <p>
-                        بهترین فرد برای تشخیص اینکه تصویر واقعاً
-                        متعلق به کدام محصول، برند و مدل است کسی است
-                        که با خود کالاها آشنایی دارد. کمک شما باعث
-                        افزایش دقت کاتالوگ، اعتماد مشتری و مدیریت
-                        بهتر وب‌سایت خواهد شد.
-                    </p>
-                </div>
-
-            </section>
-
-
-            <div class="hom-help-section-heading">
-
-                <span>
-                    راهنمای سریع
-                </span>
-
-                <h2>
-                    روش صحیح کار در پنل
-                </h2>
-
-                <p>
-                    مراحل زیر را به‌ترتیب انجام دهید.
-                </p>
-
-            </div>
-
-
-            <section class="hom-help-important">
-
-                <div class="hom-help-important__icon">
-                    ℹ️
-                </div>
-
-                <div>
-                    <strong>
-                        این کدها یعنی چه؟
-                    </strong>
-
-                    <p>
-                        <strong>شناسه محصول (ID):</strong>
-                        شماره داخلی محصول در همین سایت است که وردپرس/ووکامرس آن را می‌سازد. این شماره ممکن است در نسخه‌های مختلف سایت متفاوت باشد؛ بنابراین برای جستجوی روزمره بهتر است از SKU یا Part Number استفاده کنید.
-                    </p>
-
-                    <p>
-                        <strong>SKU:</strong>
-                        کد انبار یا کد فروش محصول است. معمولاً برای تشخیص نسخه‌های مختلف کالا استفاده می‌شود.
-                    </p>
-
-                    <p>
-                        <strong>Part Number:</strong>
-                        کد فنی یا شماره فنی محصول است که معمولاً روی خود کالا، جعبه، کاتالوگ یا اطلاعات فنی دیده می‌شود.
-                    </p>
-
-                    <p>
-                        در بخش «محصولات» می‌توانید با نام محصول، ID، SKU، Part Number یا برند جستجو کنید. اگر فقط یک عدد یا کد دارید، همان را دقیق وارد کنید.
-                    </p>
-                </div>
-
-            </section>
-
-            <section class="hom-help-steps">
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۱
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🔎
-                    </div>
-
-                    <h3>
-                        محصول را پیدا کنید
-                    </h3>
-
-                    <p>
-                        وارد بخش «محصولات» شوید و با نام محصول،
-                        ID، SKU، Part Number یا برند جستجو کنید.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۲
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🏷️
-                    </div>
-
-                    <h3>
-                        مشخصات را کنترل کنید
-                    </h3>
-
-                    <p>
-                        قبل از تغییر تصویر، نام محصول، شناسه،
-                        SKU، Part Number و برند را بررسی کنید
-                        تا تصویر روی محصول اشتباه قرار نگیرد.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۳
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🖼️
-                    </div>
-
-                    <h3>
-                        تصویر اصلی را انتخاب کنید
-                    </h3>
-
-                    <p>
-                        تصویر اصلی باید واضح، مرتبط با همان محصول
-                        و بهترین نمای کالا برای مشتری باشد. تصویر
-                        انتخاب‌شده، حتی اگر از قبل مربع باشد، قبل
-                        از آپلود وارد ویرایشگر تصویر می‌شود.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۴
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        🗂️
-                    </div>
-
-                    <h3>
-                        گالری را تکمیل کنید
-                    </h3>
-
-                    <p>
-                        تصاویر تکمیلی، زوایای دیگر محصول،
-                        بسته‌بندی، نقشه یا ابعاد فنی را در گالری
-                        قرار دهید. تصاویر گالری نیز قبل از آپلود
-                        از همان ویرایشگر عبور می‌کنند.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۵
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        ✥
-                    </div>
-
-                    <h3>
-                        تصویر را تنظیم و تأیید کنید
-                    </h3>
-
-                    <p>
-                        در ویرایشگر می‌توانید تصویر را جابه‌جا،
-                        زوم، کوچک، بزرگ و آزادانه بچرخانید.
-                        خروجی همیشه مربع ۱:۱ است. بهتر است اطراف
-                        خود محصول کمی فضای سفید باقی بماند.
-                    </p>
-
-                </article>
-
-
-                <article class="hom-help-step">
-
-                    <div class="hom-help-step__number">
-                        ۶
-                    </div>
-
-                    <div class="hom-help-step__icon">
-                        ✅
-                    </div>
-
-                    <h3>
-                        آپلود و ذخیره نهایی را انجام دهید
-                    </h3>
-
-                    <p>
-                        پس از تأیید ویرایش، تصویر را آپلود کنید.
-                        واترمارک به‌صورت خودکار روی نسخه جدید
-                        اعمال می‌شود. در پایان حتماً دکمه
-                        «ذخیره تغییرات» را بزنید.
-                    </p>
-
-                </article>
-
-            </section>
-
-
-
-            <section class="hom-help-important hom-help-image-editor-guide">
-
-                <div class="hom-help-important__icon">
-                    !
-                </div>
-
-                <div>
-
-                    <strong>
-                        نکات مهم ویرایش و مدیریت تصاویر
-                    </strong>
-
-                    <p>
-                        تمام تصاویر محصول، چه از دستگاه و دوربین
-                        و چه از Media Library انتخاب شوند، قبل
-                        از آپلود وارد ویرایشگر می‌شوند. خروجی
-                        نهایی همیشه مربع با نسبت ۱:۱ است.
-                    </p>
-
-                    <p>
-                        برای نمایش حرفه‌ای محصول بهتر است کالا
-                        کاملاً به لبه‌های تصویر نچسبد. با ابزار
-                        «حاشیه سفید» می‌توانید کل محصول را با
-                        فضای مناسب داخل کادر نگه دارید و با
-                        «پر کردن کادر» تصویر را تا لبه‌های مربع
-                        گسترش دهید.
-                    </p>
-
-                    <p>
-                        امکان جابه‌جایی تصویر، زوم، چرخش آزاد،
-                        مشاهده درجه چرخش و صفر کردن زاویه وجود
-                        دارد. در موبایل ابزارهای اصلی در نوار
-                        ابزار کنار تصویر قرار دارند و زوم و
-                        چرخش با دو انگشت نیز امکان‌پذیر است.
-                    </p>
-
-                    <p>
-                        سیستم به‌صورت خودکار آرم
-                        «صنعت گستران الفت» را به‌عنوان واترمارک
-                        روی نسخه نهایی تولیدشده قرار می‌دهد.
-                        محل و ظاهر تقریبی واترمارک را قبل از
-                        آپلود در همان کادر ویرایش به‌صورت
-                        پیش‌نمایش مشاهده می‌کنید.
-                    </p>
-
-                    <p>
-                        فایل اصلی انتخاب‌شده از Media Library
-                        تغییر نمی‌کند. سیستم پس از ویرایش یک
-                        تصویر جدید می‌سازد و واترمارک روی همان
-                        نسخه جدید اعمال می‌شود.
-                    </p>
-
-                    <p>
-                        گزینه «جدا کردن از محصول» فقط ارتباط
-                        تصویر با محصول را حذف می‌کند و خود فایل
-                        تصویر از Media Library یا سرور حذف
-                        نمی‌شود. لغو تغییرات نیز هیچ فایل
-                        رسانه‌ای را حذف نمی‌کند.
-                    </p>
-
-                    <p>
-                        پس از آپلود تصاویر، برای ثبت قطعی تصویر
-                        اصلی و گالری روی محصول حتماً دکمه
-                        «ذخیره تغییرات» را بزنید.
-                    </p>
-
-                </div>
-
-            </section>
-
-
-
-            <div class="hom-help-section-heading">
-
-                <span>
-                    ابزارهای پنل
-                </span>
-
-                <h2>
-                    هر ابزار چه کاری انجام می‌دهد؟
-                </h2>
-
-            </div>
-
-
-            <section class="hom-help-tools">
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">📁</span>
-
-                    <div>
-                        <h3>انتخاب از دستگاه</h3>
-                        <p>
-                            انتخاب عکس از کامپیوتر، لپ‌تاپ یا
-                            حافظه موبایل.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">📷</span>
-
-                    <div>
-                        <h3>دوربین موبایل</h3>
-                        <p>
-                            گرفتن عکس مستقیم از محصول با دوربین
-                            دستگاه در صورت پشتیبانی مرورگر.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">▦</span>
-
-                    <div>
-                        <h3>رسانه‌های سایت</h3>
-                        <p>
-                            استفاده از تصویری که قبلاً در سایت
-                            وجود دارد، بدون نیاز به آپلود دوباره.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">⬆️</span>
-
-                    <div>
-                        <h3>آپلود همه تصاویر</h3>
-                        <p>
-                            تصاویر آماده‌شده برای گالری را
-                            به سایت منتقل می‌کند.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">↺</span>
-
-                    <div>
-                        <h3>بازنشانی</h3>
-                        <p>
-                            اگر هنوز ذخیره نهایی نکرده‌اید،
-                            تغییرات صفحه را به وضعیت اولیه
-                            برمی‌گرداند.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article class="hom-help-tool">
-                    <span class="hom-help-tool__icon">✓</span>
-
-                    <div>
-                        <h3>ذخیره تغییرات</h3>
-                        <p>
-                            مرحله نهایی اتصال تصویر اصلی و
-                            تصاویر گالری به محصول است.
-                        </p>
-                    </div>
-                </article>
-
-            </section>
-
-
-            <section class="hom-help-warning">
-
-                <div class="hom-help-warning__head">
-
-                    <span class="hom-help-warning__icon">
-                        ⚠️
+                    <span class="hom-help-topic__icon">
+                        🔐
                     </span>
 
                     <div>
-                        <span>
-                            قبل از هر تغییر
+
+                        <span class="hom-help-topic__eyebrow">
+                            اصل امنیتی
                         </span>
 
                         <h2>
-                            چند نکته بسیار مهم
+                            حساب مدیر فروشگاه و مسئول انبار باید جدا باشد
                         </h2>
+
                     </div>
 
                 </div>
 
-                <ul>
-                    <li>
-                        قبل از انتخاب تصویر، حتماً کد و برند
-                        محصول را با تصویر تطبیق دهید.
-                    </li>
 
-                    <li>
-                        اگر درباره تصویر یا محصول مطمئن نیستید،
-                        تغییر را ذخیره نکنید.
-                    </li>
+                <div class="hom-help-important hom-warehouse-help-important-featured">
 
-                    <li>
-                        هنگام آپلود، صفحه را نبندید و تا پایان
-                        کامل انتقال تصاویر صبر کنید.
-                    </li>
+                    <div class="hom-help-important__icon">
+                        !
+                    </div>
 
-                    <li>
-                        از قرار دادن تصویر نامرتبط، تصویر محصول
-                        برند دیگر یا عکس بی‌کیفیت خودداری کنید.
-                    </li>
+                    <div>
 
-                    <li>
-                        قبل از «ذخیره تغییرات» پیش‌نمایش تصویر
-                        اصلی و گالری را یک بار دیگر بررسی کنید.
-                    </li>
+                        <strong>
+                            مدیر فروشگاه نمی‌تواند با همان حساب
+                            مسئول تأیید انبار باشد.
+                        </strong>
 
-                    <li>
-                        تصاویر موجود در «رسانه‌های سایت» ممکن است
-                        در بخش‌های دیگری نیز استفاده شده باشند؛
-                        فقط تصویر مناسب را انتخاب کنید و از
-                        ایجاد نسخه‌های تکراری غیرضروری بپرهیزید.
-                    </li>
-                </ul>
+                        <p>
+                            برای هر مسئول تأیید انبار باید یک
+                            نام کاربری و رمز عبور مستقل ساخته شود.
+                            حتی اگر خود مدیر فروشگاه بخواهد عملیات
+                            انبار را انجام دهد، باید برای این کار
+                            یک حساب مستقل انبار داشته باشد.
+                        </p>
+
+                        <p>
+                            این جداسازی باعث می‌شود در گزارش‌ها
+                            و سوابق سفارش دقیقاً مشخص باشد
+                            چه حسابی کنترل نهایی انبار را انجام داده است.
+                        </p>
+
+                    </div>
+
+                </div>
 
             </section>
 
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        👤
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            تعریف کاربر
+                        </span>
+
+                        <h2>
+                            مسئول جدید انبار را چگونه ایجاد کنیم؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+
+                        <span>۱</span>
+
+                        <div>
+
+                            <strong>
+                                وارد «مسئولین تأیید انبار» شوید
+                            </strong>
+
+                            <p>
+                                این بخش فقط در اختیار مدیر فروشگاه
+                                و مدیر سیستم قرار دارد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۲</span>
+
+                        <div>
+
+                            <strong>
+                                نام و نام خانوادگی را وارد کنید
+                            </strong>
+
+                            <p>
+                                نام واقعی فرد را ثبت کنید تا
+                                در سوابق تأیید سفارش قابل شناسایی باشد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۳</span>
+
+                        <div>
+
+                            <strong>
+                                نام کاربری مستقل تعیین کنید
+                            </strong>
+
+                            <p>
+                                نام کاربری نباید متعلق به مدیر فروشگاه
+                                یا حساب موجود دیگری باشد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۴</span>
+
+                        <div>
+
+                            <strong>
+                                رمز عبور اولیه بسازید
+                            </strong>
+
+                            <p>
+                                رمز باید حداقل ۸ کاراکتر باشد و
+                                فقط در اختیار همان مسئول انبار قرار گیرد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ⚡
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            مدیریت دسترسی
+                        </span>
+
+                        <h2>
+                            فعال و غیرفعال کردن مسئول انبار
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-two-column">
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            وضعیت فعال
+                        </h3>
+
+                        <p>
+                            کاربر فعال اجازه ورود به لینک QR
+                            و تأیید سفارش‌های مجاز انبار را دارد.
+                        </p>
+
+                    </article>
+
+
+                    <article class="hom-help-info-panel">
+
+                        <h3>
+                            وضعیت غیرفعال
+                        </h3>
+
+                        <p>
+                            با غیرفعال کردن دسترسی، حساب WordPress
+                            حذف نمی‌شود؛ اما مجوز تأیید انبار
+                            بلافاصله از آن حساب گرفته می‌شود.
+                        </p>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        غیرفعال کردن با حذف حساب متفاوت است.
+                    </strong>
+
+                    <p>
+                        اگر مسئول انبار موقتاً نباید دسترسی داشته باشد،
+                        فقط دسترسی او را غیرفعال کنید.
+                        در صورت نیاز می‌توان همان حساب را دوباره فعال کرد.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        📱
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            ورود از QR
+                        </span>
+
+                        <h2>
+                            مسئول انبار چگونه وارد صفحه کنترل می‌شود؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-flow">
+
+                    <article>
+
+                        <span>۱</span>
+
+                        <div>
+
+                            <strong>
+                                QR روی برگه انبار اسکن می‌شود
+                            </strong>
+
+                            <p>
+                                هر سفارش لینک و Token اختصاصی خود را دارد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۲</span>
+
+                        <div>
+
+                            <strong>
+                                در صورت نیاز وارد حساب شوید
+                            </strong>
+
+                            <p>
+                                اگر مسئول هنوز وارد نشده باشد،
+                                سیستم او را به صفحه ورود هدایت می‌کند.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۳</span>
+
+                        <div>
+
+                            <strong>
+                                بعد از ورود به همان سفارش برگردید
+                            </strong>
+
+                            <p>
+                                لینک امن سفارش نگهداری می‌شود و
+                                کاربر مجاز بعد از ورود دوباره
+                                به همان صفحه کنترل انبار بازمی‌گردد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+
+                    <article>
+
+                        <span>۴</span>
+
+                        <div>
+
+                            <strong>
+                                فقط صفحه مخصوص انبار نمایش داده می‌شود
+                            </strong>
+
+                            <p>
+                                مسئول انبار به داشبورد مدیریت فروشگاه،
+                                مدیریت محصولات یا پرونده مشتریان
+                                دسترسی ندارد.
+                            </p>
+
+                        </div>
+
+                    </article>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        ✅
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            کنترل فیزیکی سفارش
+                        </span>
+
+                        <h2>
+                            مراحل تأیید نهایی انبار
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <ol class="hom-help-daily-checklist">
+
+                    <li>
+                        شماره سفارش و اطلاعات کلی صفحه را کنترل کنید.
+                    </li>
+
+                    <li>
+                        هر کالا را با کالای واقعی آماده‌شده تطبیق دهید.
+                    </li>
+
+                    <li>
+                        نام محصول، SKU، Part Number و تعداد را بررسی کنید.
+                    </li>
+
+                    <li>
+                        فقط بعد از کنترل واقعی هر ردیف، تیک همان ردیف را بزنید.
+                    </li>
+
+                    <li>
+                        تا زمانی که تمام اقلام تیک نخورند،
+                        تأیید نهایی انجام نمی‌شود.
+                    </li>
+
+                    <li>
+                        پس از اطمینان از تمام اقلام،
+                        دکمه تأیید نهایی انبار را بزنید.
+                    </li>
+
+                    <li>
+                        بعد از ثبت موفق، وضعیت سفارش باید
+                        به «آماده ارسال» تغییر کند.
+                    </li>
+
+                </ol>
+
+
+                <div class="hom-help-warning">
+                    هیچ ردیفی را قبل از مشاهده و کنترل کالای واقعی
+                    تیک نزنید. تیک هر کالا به معنی تأیید فیزیکی
+                    همان ردیف توسط مسئول انبار است.
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        👁
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            محدوده دسترسی
+                        </span>
+
+                        <h2>
+                            مسئول انبار چه چیزهایی را می‌بیند؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-do-dont">
+
+                    <div class="is-good">
+
+                        <strong>
+                            دسترسی دارد
+                        </strong>
+
+                        <ul>
+                            <li>صفحه کنترل QR سفارش مجاز</li>
+                            <li>نام کالا</li>
+                            <li>SKU</li>
+                            <li>Part Number</li>
+                            <li>تعداد</li>
+                            <li>تیک کنترل هر ردیف</li>
+                            <li>تأیید نهایی انبار</li>
+                        </ul>
+
+                    </div>
+
+
+                    <div class="is-bad">
+
+                        <strong>
+                            دسترسی ندارد
+                        </strong>
+
+                        <ul>
+                            <li>قیمت کالاها</li>
+                            <li>داشبورد مدیر فروشگاه</li>
+                            <li>مدیریت مشتریان و سفارش‌ها</li>
+                            <li>مدیریت تصاویر محصولات</li>
+                            <li>اطلاعات فروشگاه</li>
+                            <li>مدیریت سایر مسئولین انبار</li>
+                        </ul>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🧾
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            ثبت سابقه
+                        </span>
+
+                        <h2>
+                            بعد از تأیید انبار چه اطلاعاتی ثبت می‌شود؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-customer-help-principles">
+
+                    <article>
+
+                        <strong>
+                            زمان تأیید
+                        </strong>
+
+                        <p>
+                            زمان انجام کنترل نهایی روی سفارش ذخیره می‌شود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            مسئول انجام‌دهنده
+                        </strong>
+
+                        <p>
+                            شناسه حسابی که تأیید را انجام داده
+                            روی سفارش ثبت می‌شود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            اقلام کنترل‌شده
+                        </strong>
+
+                        <p>
+                            Item ID تمام ردیف‌هایی که کنترل شده‌اند
+                            در سابقه سفارش نگهداری می‌شود.
+                        </p>
+
+                    </article>
+
+
+                    <article>
+
+                        <strong>
+                            Audit و Order Note
+                        </strong>
+
+                        <p>
+                            رخداد تأیید انبار و توضیح آن
+                            در سوابق عملیاتی سفارش ثبت می‌شود.
+                        </p>
+
+                    </article>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <strong>
+                        تأیید نهایی قابل تکرار نیست.
+                    </strong>
+
+                    <p>
+                        بعد از تأیید موفق و انتقال سفارش
+                        به مرحله «آماده ارسال»، همان کنترل نهایی
+                        دوباره قابل ثبت نیست.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        🛡️
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            نکات امنیتی
+                        </span>
+
+                        <h2>
+                            چه مواردی را همیشه رعایت کنیم؟
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <ol class="hom-help-daily-checklist">
+
+                    <li>
+                        حساب مدیر فروشگاه را برای تأیید انبار استفاده نکنید.
+                    </li>
+
+                    <li>
+                        برای هر مسئول، حساب مستقل تعریف کنید.
+                    </li>
+
+                    <li>
+                        رمز عبور یک مسئول را در اختیار فرد دیگری قرار ندهید.
+                    </li>
+
+                    <li>
+                        لینک یا تصویر QR سفارش را برای افراد غیرمجاز ارسال نکنید.
+                    </li>
+
+                    <li>
+                        در صورت قطع همکاری یا توقف دسترسی،
+                        حساب مسئول را فوراً غیرفعال کنید.
+                    </li>
+
+                    <li>
+                        تأیید نهایی را فقط بعد از کنترل فیزیکی
+                        تمام اقلام انجام دهید.
+                    </li>
+
+                </ol>
+
+            </section>
+
+
+            <section class="hom-help-topic">
+
+                <div class="hom-help-topic__heading">
+
+                    <span class="hom-help-topic__icon">
+                        📲
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-topic__eyebrow">
+                            احراز هویت
+                        </span>
+
+                        <h2>
+                            وضعیت فعلی ورود و OTP
+                        </h2>
+
+                    </div>
+
+                </div>
+
+
+                <div class="hom-help-important">
+
+                    <p>
+                        در نسخه فعلی، مسئولین انبار با
+                        نام کاربری و رمز عبور مستقل وارد می‌شوند.
+                    </p>
+
+                    <p>
+                        اتصال شماره موبایل و OTP در مرحله بعد
+                        روی همین حساب‌ها اضافه خواهد شد؛
+                        بنابراین نیازی به ساخت مجدد ساختار
+                        نقش و دسترسی انبار نخواهد بود.
+                    </p>
+
+                </div>
+
+            </section>
+
+
+            <div class="hom-help-page-back">
+
+                <a
+                    href="<?php echo esc_url($help_index_url); ?>"
+                    class="hom-help-action hom-help-action-secondary"
+                >
+                    <span aria-hidden="true">←</span>
+                    بازگشت به راهنمای پنل
+                </a>
+
+            </div>
+
+        </div>
+
+        <?php
+    }
+
+
+
+    private static function render_help_security_content() {
+
+        ?>
 
             <section class="hom-help-security">
 
@@ -1278,119 +6241,39 @@ class HOM_View {
                     </h2>
 
                     <p>
-                        این حساب امکان انجام تغییرات واقعی در
-                        محصولات فروشگاه را دارد. نام کاربری،
-                        رمز عبور و اطلاعات یا لینک‌های دسترسی
-                        مدیریتی را در اختیار افراد غیرمجاز
-                        قرار ندهید.
+                        این حساب امکان ایجاد تغییرات واقعی در
+                        فروشگاه را دارد. نام کاربری، رمز عبور
+                        و لینک‌های مدیریتی را در اختیار افراد
+                        غیرمجاز قرار ندهید.
                     </p>
 
                     <div class="hom-help-security__rules">
 
                         <div>
                             <strong>رمز عبور</strong>
-                            <span>
-                                آن را برای دیگران ارسال نکنید.
-                            </span>
+                            <span>آن را برای دیگران ارسال نکنید.</span>
                         </div>
 
                         <div>
                             <strong>دستگاه مشترک</strong>
-                            <span>
-                                پس از پایان کار حتماً از حساب
-                                خارج شوید.
-                            </span>
+                            <span>پس از پایان کار از حساب خارج شوید.</span>
                         </div>
 
                         <div>
-                            <strong>لینک مدیریتی</strong>
-                            <span>
-                                آن را عمومی منتشر نکنید و فقط
-                                با افراد مجاز به اشتراک بگذارید.
-                            </span>
+                            <strong>ثبت اطلاعات</strong>
+                            <span>پیش از ذخیره هر تغییر، اطلاعات را کنترل کنید.</span>
                         </div>
 
                         <div>
                             <strong>فعالیت مشکوک</strong>
-                            <span>
-                                در صورت مشاهده مورد غیرعادی،
-                                موضوع را سریعاً به مدیر اصلی
-                                سایت اطلاع دهید.
-                            </span>
+                            <span>موضوع را سریعاً به مدیر اصلی سایت اطلاع دهید.</span>
                         </div>
 
                     </div>
 
-                    <div class="hom-help-security__note">
-                        توجه: محرمانه نگه‌داشتن آدرس پنل به‌تنهایی
-                        جایگزین رمز عبور قوی و حفاظت از حساب
-                        کاربری نیست.
-                    </div>
-
                 </div>
 
             </section>
-
-
-            <section class="hom-help-navigation">
-
-                <article>
-                    <span>←</span>
-
-                    <div>
-                        <strong>
-                            بازگشت به پنل کاربری
-                        </strong>
-
-                        <p>
-                            شما را به My Account برمی‌گرداند
-                            و همچنان وارد حساب باقی می‌مانید.
-                        </p>
-                    </div>
-                </article>
-
-
-                <article>
-                    <span>↪</span>
-
-                    <div>
-                        <strong>
-                            خروج از حساب
-                        </strong>
-
-                        <p>
-                            نشست کاربری را کاملاً پایان می‌دهد.
-                            روی دستگاه‌های مشترک حتماً از این
-                            گزینه استفاده کنید.
-                        </p>
-                    </div>
-                </article>
-
-            </section>
-
-
-            <section class="hom-help-thanks">
-
-                <div class="hom-help-thanks__icon">
-                    ★
-                </div>
-
-                <div>
-                    <h2>
-                        از همکاری شما سپاسگزاریم
-                    </h2>
-
-                    <p>
-                        مشارکت شما در تکمیل و کنترل تصاویر
-                        محصولات، بخش مهمی از مدیریت حرفه‌ای
-                        فروشگاه است و به ارائه اطلاعات دقیق‌تر
-                        و تجربه بهتر مشتریان کمک می‌کند.
-                    </p>
-                </div>
-
-            </section>
-
-        </div>
 
         <?php
     }
@@ -1444,6 +6327,14 @@ class HOM_View {
         $items =
             $result['items'];
 
+
+        $images_help_url =
+            add_query_arg(
+                'view',
+                'help-product-images',
+                HOM_Router::panel_url()
+            );
+
         ?>
 
         <div class="hom-page-heading hom-products-heading">
@@ -1455,12 +6346,28 @@ class HOM_View {
                 </span>
 
                 <h1>
-                    محصولات
+                    مدیریت تصاویر محصولات
                 </h1>
 
                 <p>
-                    جستجو بر اساس نام محصول، شناسه محصول (ID)، کد SKU، Part Number یا برند. اگر فقط شماره یا کد دارید، همان را وارد کنید.
+                    محصول را با نام، شناسه محصول (ID)، کد SKU،
+                    Part Number یا برند پیدا کنید و تصویر اصلی
+                    و گالری آن را مدیریت نمایید.
                 </p>
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $images_help_url
+                    );
+                    ?>"
+                    class="hom-section-help-link"
+                >
+                    <span aria-hidden="true">👁</span>
+                    <span>
+                        راهنمای مدیریت تصاویر محصولات
+                    </span>
+                </a>
 
             </div>
 

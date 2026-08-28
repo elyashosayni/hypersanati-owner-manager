@@ -5652,3 +5652,7096 @@ input[type="range"] {
         height: 38px;
     }
 }
+
+
+/* ==========================================================
+   ORDER OPERATIONS
+   ========================================================== */
+
+.hom-order-status-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            7,
+            minmax(110px, 1fr)
+        );
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.hom-order-status-card {
+    display: flex;
+    min-height: 82px;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    padding: 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #fff;
+    color: #374151;
+    text-decoration: none;
+    transition:
+        border-color 0.15s ease,
+        box-shadow 0.15s ease,
+        transform 0.15s ease;
+}
+
+.hom-order-status-card:hover {
+    transform: translateY(-1px);
+    border-color: #d1d5db;
+    box-shadow:
+        0 8px 22px
+        rgba(15, 23, 42, 0.06);
+}
+
+.hom-order-status-card.is-active {
+    border-color: #eab308;
+    box-shadow:
+        0 0 0 2px
+        rgba(234, 179, 8, 0.13);
+}
+
+.hom-order-status-card strong {
+    color: #111827;
+    font-size: 22px;
+}
+
+.hom-order-status-card span {
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+.hom-orders-panel {
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    background: #fff;
+}
+
+.hom-orders-empty {
+    padding: 54px 20px;
+    text-align: center;
+}
+
+.hom-orders-empty strong {
+    display: block;
+    margin-bottom: 8px;
+    color: #111827;
+    font-size: 17px;
+}
+
+.hom-orders-empty p {
+    margin: 0;
+    color: #6b7280;
+    line-height: 1.9;
+}
+
+.hom-order-customer {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.hom-order-customer strong {
+    color: #111827;
+}
+
+.hom-order-customer span {
+    color: #6b7280;
+    font-size: 12px;
+}
+
+.hom-order-status-badge {
+    display: inline-flex;
+    padding: 5px 9px;
+    border-radius: 999px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 11px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+@media (max-width: 1180px) {
+    .hom-order-status-grid {
+        grid-template-columns:
+            repeat(
+                4,
+                minmax(120px, 1fr)
+            );
+    }
+}
+
+@media (max-width: 720px) {
+    .hom-order-status-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+    .hom-order-status-card {
+        min-height: 72px;
+    }
+
+    .hom-orders-table td {
+        min-height: 42px;
+    }
+}
+
+
+/* HOM ORDER TIMELINE */
+
+.hom-order-timeline__items {
+    display: grid;
+    margin-top: 18px;
+}
+
+.hom-order-timeline__item {
+    position: relative;
+    display: flex;
+    gap: 14px;
+    padding-bottom: 20px;
+}
+
+.hom-order-timeline__item:not(:last-child)::before {
+    position: absolute;
+    top: 12px;
+    right: 5px;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+    content: "";
+}
+
+.hom-order-timeline__dot {
+    position: relative;
+    z-index: 1;
+    width: 12px;
+    height: 12px;
+    flex: 0 0 12px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: #eab308;
+}
+
+.hom-order-timeline__item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.hom-order-timeline__item span,
+.hom-order-timeline__item small {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+
+/* HOM ORDER AUDIT */
+
+.hom-order-audit h2 {
+    margin-top: 0;
+}
+
+.hom-order-audit__list {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.hom-order-audit__item {
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(150px, 220px)
+        130px;
+    gap: 16px;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+}
+
+.hom-order-audit__item > div {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.hom-order-audit__item span,
+.hom-order-audit__item small,
+.hom-order-audit__item time {
+    color: #6b7280;
+    font-size: 11px;
+}
+
+.hom-order-audit__actor strong {
+    color: #111827;
+}
+
+@media (max-width: 720px) {
+
+    .hom-order-audit__item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+}
+
+
+/* HOM GLOBAL FORM FIELD STATES
+-------------------------------------------------------------- */
+
+.hom-page input.hom-field-is-filled,
+.hom-page select.hom-field-is-filled,
+.hom-page textarea.hom-field-is-filled {
+    background-color: #f3faf5 !important;
+    border-color: #b8d7c0 !important;
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(70, 125, 84, 0.04);
+}
+
+
+.hom-page input.hom-field-is-required-empty,
+.hom-page select.hom-field-is-required-empty,
+.hom-page textarea.hom-field-is-required-empty {
+    background-color: #fff5f5 !important;
+    border-color: #e3b8b8 !important;
+    box-shadow:
+        inset 0 0 0 1px
+        rgba(160, 75, 75, 0.035);
+}
+
+
+.hom-page input.hom-field-is-filled:focus,
+.hom-page select.hom-field-is-filled:focus,
+.hom-page textarea.hom-field-is-filled:focus {
+    border-color: #8fbea0 !important;
+}
+
+
+.hom-page input.hom-field-is-required-empty:focus,
+.hom-page select.hom-field-is-required-empty:focus,
+.hom-page textarea.hom-field-is-required-empty:focus {
+    border-color: #cf9696 !important;
+}
+
+
+/* HOM HELP CENTER V2 */
+
+.hom-section-help-link,
+.hom-section-help-link:link,
+.hom-section-help-link:visited {
+    width: fit-content;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 8px 13px;
+    border: 1px solid rgba(159, 133, 97, 0.34);
+    border-radius: 10px;
+    background: #fffaf0;
+    color: #68480c;
+    font-size: 11px;
+    font-weight: 800;
+    text-decoration: none;
+}
+
+.hom-section-help-link:hover {
+    border-color: #ffa800;
+    transform: translateY(-1px);
+}
+
+.hom-help-branch-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.hom-help-branch-card,
+.hom-help-branch-card:link,
+.hom-help-branch-card:visited {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr) auto;
+    gap: 15px;
+    align-items: center;
+    padding: 21px;
+    border: 1px solid rgba(159, 133, 97, 0.25);
+    border-radius: 17px;
+    background: #fff;
+    color: inherit;
+    text-decoration: none;
+    box-shadow: 0 8px 24px rgba(94, 68, 32, 0.055);
+}
+
+.hom-help-branch-card.is-primary {
+    border-color: rgba(255, 168, 0, 0.55);
+    background: linear-gradient(135deg, #fffdf8 0%, #fff8e9 100%);
+}
+
+.hom-help-branch-card:hover {
+    border-color: #ffa800;
+    transform: translateY(-2px);
+}
+
+.hom-help-branch-card__icon {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    border-radius: 15px;
+    background: #f4f1eb;
+    font-size: 26px;
+}
+
+.hom-help-branch-card.is-primary .hom-help-branch-card__icon {
+    background: rgba(255, 168, 0, 0.14);
+}
+
+.hom-help-branch-card h2 {
+    margin: 3px 0 5px;
+    color: #493416;
+    font-size: 16px;
+    line-height: 1.7;
+}
+
+.hom-help-branch-card p {
+    margin: 0;
+    color: #786f65;
+    font-size: 11px;
+    line-height: 1.9;
+}
+
+.hom-help-branch-card__arrow {
+    color: #9f8561;
+    font-size: 20px;
+    font-weight: 900;
+}
+
+.hom-help-topic {
+    scroll-margin-top: 24px;
+    display: grid;
+    gap: 22px;
+    padding-top: 4px;
+}
+
+.hom-help-topic + .hom-help-topic {
+    margin-top: 16px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(159, 133, 97, 0.24);
+}
+
+.hom-help-topic__head {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr) auto;
+    gap: 17px;
+    align-items: center;
+    padding: 22px;
+    border: 1px solid rgba(159, 133, 97, 0.28);
+    border-radius: 17px;
+    background: linear-gradient(135deg, #fff 0%, #fcfaf7 100%);
+    box-shadow: 0 8px 22px rgba(94, 68, 32, 0.055);
+}
+
+.hom-help-topic__icon {
+    width: 60px;
+    height: 60px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: rgba(255, 168, 0, 0.12);
+    font-size: 28px;
+}
+
+.hom-help-topic__head h2 {
+    margin: 3px 0 5px;
+    color: #493416;
+    font-size: 20px;
+}
+
+.hom-help-topic__head p {
+    max-width: 760px;
+    margin: 0;
+    color: #786f65;
+    font-size: 12px;
+    line-height: 1.9;
+}
+
+.hom-help-important p + p {
+    margin-top: 8px;
+}
+
+@media (max-width: 900px) {
+
+    .hom-help-branch-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-help-topic__head {
+        grid-template-columns: 56px minmax(0, 1fr);
+    }
+
+    .hom-help-topic__head .hom-help-action {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+}
+
+@media (max-width: 560px) {
+
+    .hom-help-branch-card {
+        grid-template-columns: 48px minmax(0, 1fr);
+        padding: 16px;
+    }
+
+    .hom-help-branch-card__icon {
+        width: 46px;
+        height: 46px;
+        font-size: 22px;
+    }
+
+    .hom-help-branch-card__arrow {
+        display: none;
+    }
+
+    .hom-help-topic__head {
+        grid-template-columns: 1fr;
+        padding: 18px;
+    }
+
+    .hom-section-help-link {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+
+/* HELP PAGE BACK BUTTON */
+
+.hom-help-page-back {
+    display: flex;
+    justify-content: flex-start;
+}
+
+
+.hom-help-page-back .hom-help-action-secondary,
+.hom-help-page-back .hom-help-action-secondary:link,
+.hom-help-page-back .hom-help-action-secondary:visited {
+    min-height: 42px;
+
+    padding: 8px 16px;
+
+    border: 1px solid #d8c49d;
+    border-radius: 11px;
+
+    background: #ffffff;
+
+    color: #5e4420 !important;
+
+    font-size: 12px;
+    font-weight: 850;
+
+    box-shadow:
+        0 5px 16px
+        rgba(94, 68, 32, 0.08);
+
+    transition:
+        background 150ms ease,
+        border-color 150ms ease,
+        transform 150ms ease,
+        box-shadow 150ms ease;
+}
+
+
+.hom-help-page-back .hom-help-action-secondary:hover {
+    background: #fff7e6;
+
+    border-color: #ffa800;
+
+    color: #493416 !important;
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 20px
+        rgba(94, 68, 32, 0.12);
+}
+
+
+@media (max-width: 560px) {
+
+    .hom-help-page-back .hom-help-action-secondary {
+        width: 100%;
+    }
+}
+
+
+/* HOM ORDER DETAIL UX V2 */
+
+.hom-order-detail-header {
+    margin-bottom: 20px;
+    padding: 24px;
+
+    border: 1px solid #e5ddd0;
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #fbf8f3 100%
+        );
+
+    box-shadow:
+        0 8px 26px
+        rgba(73, 52, 22, 0.055);
+}
+
+
+.hom-order-detail-header__nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+
+    margin-bottom: 22px;
+}
+
+
+.hom-order-back-link,
+.hom-order-help-link {
+    min-height: 38px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+
+    padding: 7px 11px;
+
+    border-radius: 9px;
+
+    color: #68480c;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-decoration: none;
+}
+
+
+.hom-order-back-link {
+    background: #f7f3ec;
+}
+
+
+.hom-order-help-link {
+    border: 1px solid #ead5a8;
+    background: #fff9ec;
+}
+
+
+.hom-order-back-link:hover,
+.hom-order-help-link:hover {
+    background: #fff1cf;
+}
+
+
+.hom-order-detail-header__main {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+
+.hom-order-detail-kicker {
+    margin-bottom: 5px;
+
+    color: #9f8561;
+
+    font-size: 10px;
+    font-weight: 850;
+}
+
+
+.hom-order-detail-title-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+}
+
+
+.hom-order-detail-title-row h1 {
+    margin: 0;
+
+    color: #342616;
+
+    font-size: clamp(23px, 3vw, 32px);
+}
+
+
+.hom-order-detail-status {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 30px;
+
+    padding: 4px 10px;
+
+    border-radius: 999px;
+
+    background: #edf7ef;
+    color: #26703e;
+
+    font-size: 11px;
+    font-weight: 850;
+}
+
+
+.hom-order-detail-total {
+    min-width: 170px;
+
+    padding: 12px 15px;
+
+    border: 1px solid #eee4d5;
+    border-radius: 12px;
+
+    background: #ffffff;
+
+    text-align: left;
+}
+
+
+.hom-order-detail-total span,
+.hom-order-detail-total strong {
+    display: block;
+}
+
+
+.hom-order-detail-total span {
+    margin-bottom: 4px;
+
+    color: #85796d;
+
+    font-size: 10px;
+}
+
+
+.hom-order-detail-total strong {
+    color: #342616;
+
+    font-size: 18px;
+}
+
+
+.hom-order-summary-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+
+    margin-top: 20px;
+}
+
+
+.hom-order-summary-item {
+    min-width: 0;
+
+    padding: 12px 13px;
+
+    border: 1px solid #eee8df;
+    border-radius: 11px;
+
+    background: rgba(255, 255, 255, 0.8);
+}
+
+
+.hom-order-summary-item__label {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #8c8176;
+
+    font-size: 9px;
+    font-weight: 750;
+}
+
+
+.hom-order-summary-item strong {
+    display: block;
+
+    overflow-wrap: anywhere;
+
+    color: #342616;
+
+    font-size: 12px;
+}
+
+
+.hom-order-missing {
+    color: #a4937c !important;
+
+    font-size: 11px;
+    font-weight: 650;
+}
+
+
+.hom-order-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 16px;
+    padding-top: 15px;
+
+    border-top: 1px solid #eee8df;
+}
+
+
+.hom-order-quick-actions__label {
+    margin-left: 4px;
+
+    color: #8c8176;
+
+    font-size: 10px;
+}
+
+
+.hom-order-quick-actions a {
+    min-height: 34px;
+
+    display: inline-flex;
+    align-items: center;
+
+    padding: 6px 10px;
+
+    border: 1px solid #e2d7c5;
+    border-radius: 9px;
+
+    background: #ffffff;
+    color: #5e4420;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    text-decoration: none;
+}
+
+
+.hom-order-quick-actions a:hover {
+    border-color: #ffa800;
+    background: #fff9ec;
+}
+
+
+.hom-order-customer-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(280px, 0.8fr)
+        minmax(0, 1.6fr);
+
+    gap: 16px;
+
+    margin-bottom: 20px;
+}
+
+
+.hom-order-info-card {
+    min-width: 0;
+
+    padding: 20px;
+
+    border: 1px solid #e7e1d8;
+    border-radius: 16px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 5px 18px
+        rgba(73, 52, 22, 0.035);
+}
+
+
+.hom-order-info-card__head {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    margin-bottom: 17px;
+}
+
+
+.hom-order-info-card__icon {
+    width: 43px;
+    height: 43px;
+
+    display: grid;
+    place-items: center;
+
+    flex: 0 0 43px;
+
+    border-radius: 12px;
+
+    background: #f7f2e8;
+
+    font-size: 19px;
+}
+
+
+.hom-order-info-card__head span:not(
+    .hom-order-info-card__icon
+) {
+    display: block;
+
+    margin-bottom: 1px;
+
+    color: #9b8d7b;
+
+    font-size: 9px;
+    font-weight: 800;
+}
+
+
+.hom-order-info-card__head h2 {
+    margin: 0;
+
+    color: #493416;
+
+    font-size: 15px;
+}
+
+
+.hom-order-data-list {
+    display: grid;
+    gap: 0;
+
+    margin: 0;
+}
+
+
+.hom-order-data-list > div {
+    display: grid;
+
+    grid-template-columns:
+        minmax(90px, 0.7fr)
+        minmax(0, 1.3fr);
+
+    gap: 10px;
+
+    padding: 10px 0;
+
+    border-bottom: 1px solid #f0ece6;
+}
+
+
+.hom-order-data-list > div:last-child {
+    border-bottom: 0;
+}
+
+
+.hom-order-data-list dt {
+    color: #8b8178;
+
+    font-size: 10px;
+}
+
+
+.hom-order-data-list dd {
+    min-width: 0;
+
+    margin: 0;
+
+    overflow-wrap: anywhere;
+
+    color: #342616;
+
+    font-size: 11px;
+    font-weight: 750;
+}
+
+
+.hom-order-data-list--legal {
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    column-gap: 18px;
+}
+
+
+.hom-order-data-list--legal > div {
+    grid-template-columns: 1fr;
+    gap: 4px;
+}
+
+
+.hom-order-data-list--legal .is-wide {
+    grid-column: 1 / -1;
+}
+
+
+.hom-order-edit-disclosure {
+    margin-top: 16px;
+
+    border: 1px solid #eadfcd;
+    border-radius: 12px;
+
+    background: #fcfaf6;
+}
+
+
+.hom-order-edit-disclosure > summary {
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 13px;
+
+    cursor: pointer;
+
+    color: #68480c;
+
+    font-size: 11px;
+    font-weight: 850;
+
+    list-style: none;
+}
+
+
+.hom-order-edit-disclosure > summary::-webkit-details-marker {
+    display: none;
+}
+
+
+.hom-order-edit-disclosure > summary::after {
+    content: "+";
+
+    margin-right: auto;
+
+    color: #9f8561;
+
+    font-size: 18px;
+}
+
+
+.hom-order-edit-disclosure[open] > summary::after {
+    content: "−";
+}
+
+
+.hom-order-edit-disclosure__body {
+    padding: 16px;
+
+    border-top: 1px solid #eadfcd;
+
+    background: #ffffff;
+}
+
+
+.hom-order-form-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+}
+
+
+.hom-order-field-wide {
+    margin-top: 12px;
+}
+
+
+.hom-order-correction-box {
+    margin-top: 14px;
+    padding: 12px;
+
+    border: 1px solid #eee2cd;
+    border-radius: 10px;
+
+    background: #fffaf1;
+}
+
+
+.hom-order-correction-box small {
+    display: block;
+
+    margin-top: 6px;
+
+    color: #8c795a;
+
+    font-size: 9px;
+    line-height: 1.8;
+}
+
+
+.hom-order-form-actions {
+    display: flex;
+    justify-content: flex-start;
+
+    margin-top: 14px;
+}
+
+
+@media (max-width: 1050px) {
+
+    .hom-order-summary-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .hom-order-customer-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 620px) {
+
+    .hom-order-detail-header {
+        padding: 17px;
+    }
+
+
+    .hom-order-detail-header__main {
+        display: grid;
+    }
+
+
+    .hom-order-detail-total {
+        width: 100%;
+
+        text-align: right;
+    }
+
+
+    .hom-order-summary-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    .hom-order-form-grid,
+    .hom-order-data-list--legal {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-order-data-list--legal .is-wide {
+        grid-column: auto;
+    }
+
+
+    .hom-order-detail-header__nav {
+        display: grid;
+    }
+
+
+    .hom-order-back-link,
+    .hom-order-help-link {
+        width: 100%;
+
+        justify-content: center;
+    }
+}
+
+
+@media (max-width: 420px) {
+
+    .hom-order-summary-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* HOM ORDER DETAIL UX V3 */
+
+
+/* ---------------------------------------------------------
+   FINAL TOTAL — QUIET, COMPACT, OPERATIONAL
+--------------------------------------------------------- */
+
+.hom-order-detail-total {
+    min-width: auto;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 8px 11px;
+
+    border: 0;
+    border-right: 3px solid #d4a72c;
+    border-radius: 9px;
+
+    background: #f8f4ed;
+
+    text-align: right;
+
+    box-shadow: none;
+}
+
+
+.hom-order-detail-total span,
+.hom-order-detail-total strong {
+    display: inline;
+    margin: 0;
+}
+
+
+.hom-order-detail-total span {
+    color: #897968;
+
+    font-size: 9px;
+    font-weight: 700;
+}
+
+
+.hom-order-detail-total strong {
+    color: #493416;
+
+    font-size: 13px;
+    font-weight: 900;
+
+    white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------
+   GENERIC OPERATION ACCORDION
+--------------------------------------------------------- */
+
+.hom-order-accordion {
+    margin-top: 14px;
+
+    border: 1px solid #e6dfd4;
+    border-radius: 13px;
+
+    background: #fff;
+
+    overflow: hidden;
+}
+
+
+.hom-order-accordion > summary {
+    min-height: 58px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    padding: 10px 14px;
+
+    cursor: pointer;
+
+    list-style: none;
+
+    user-select: none;
+}
+
+
+.hom-order-accordion > summary::-webkit-details-marker {
+    display: none;
+}
+
+
+.hom-order-accordion > summary::after {
+    content: "+";
+
+    width: 26px;
+    height: 26px;
+
+    display: grid;
+    place-items: center;
+
+    flex: 0 0 26px;
+
+    margin-right: 2px;
+
+    border-radius: 8px;
+
+    background: #f5f0e8;
+    color: #705324;
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+
+.hom-order-accordion[open] > summary::after {
+    content: "−";
+}
+
+
+.hom-order-accordion > summary:hover {
+    background: #fcfaf6;
+}
+
+
+.hom-order-accordion__identity {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+
+.hom-order-accordion__identity > span:last-child {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+
+.hom-order-accordion__identity strong {
+    color: #493416;
+
+    font-size: 12px;
+    font-weight: 850;
+}
+
+
+.hom-order-accordion__identity small {
+    color: #918678;
+
+    font-size: 9px;
+    font-weight: 600;
+}
+
+
+.hom-order-accordion__icon {
+    width: 32px;
+    height: 32px;
+
+    display: grid;
+    place-items: center;
+
+    flex: 0 0 32px;
+
+    border-radius: 9px;
+
+    background: #f7f2e9;
+
+    font-size: 14px;
+}
+
+
+.hom-order-accordion__summary-value,
+.hom-order-accordion__count {
+    margin-right: auto;
+
+    color: #725626;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    white-space: nowrap;
+}
+
+
+.hom-order-accordion__body {
+    padding: 14px;
+
+    border-top: 1px solid #eee8df;
+
+    background: #fff;
+}
+
+
+/* ---------------------------------------------------------
+   ITEMS / PRICING
+--------------------------------------------------------- */
+
+.hom-order-items-table-wrap {
+    overflow-x: auto;
+}
+
+
+.hom-order-items-accordion .hom-products-table {
+    margin: 0;
+}
+
+
+.hom-order-price-input {
+    width: 110px !important;
+    max-width: 110px !important;
+    min-height: 38px !important;
+
+    padding: 6px 9px !important;
+}
+
+
+.hom-order-pricing-footer {
+    display: grid;
+
+    grid-template-columns:
+        minmax(150px, 220px)
+        minmax(220px, 1fr)
+        auto;
+
+    gap: 12px;
+    align-items: end;
+
+    margin-top: 14px;
+    padding-top: 14px;
+
+    border-top: 1px solid #eee8df;
+}
+
+
+.hom-order-pricing-footer .hom-field input,
+.hom-order-pricing-footer .hom-field textarea {
+    min-height: 40px;
+}
+
+
+.hom-order-pricing-footer textarea {
+    resize: vertical;
+}
+
+
+.hom-order-approve-form {
+    display: flex;
+
+    margin-top: 10px;
+    padding-top: 10px;
+
+    border-top: 1px dashed #e7dfd1;
+}
+
+
+/* ---------------------------------------------------------
+   PAYMENT / FULFILLMENT
+--------------------------------------------------------- */
+
+.hom-order-operation-card {
+    margin-top: 14px;
+    padding: 16px;
+
+    border: 1px solid #e5dfd6;
+    border-radius: 14px;
+
+    background: #fff;
+
+    box-shadow:
+        0 3px 12px
+        rgba(73, 52, 22, 0.025);
+}
+
+
+.hom-order-operation-card__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+
+    margin-bottom: 12px;
+}
+
+
+.hom-order-operation-card__eyebrow {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #9b8b75;
+
+    font-size: 8px;
+    font-weight: 800;
+}
+
+
+.hom-order-operation-card__head h2 {
+    margin: 0;
+
+    color: #493416;
+
+    font-size: 14px;
+}
+
+
+.hom-order-operation-status {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    white-space: nowrap;
+}
+
+
+.hom-order-operation-status.is-complete {
+    background: #edf7ef;
+    color: #26703e;
+}
+
+
+.hom-order-operation-status.is-pending {
+    background: #fff6df;
+    color: #8a651d;
+}
+
+
+.hom-order-operation-summary {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 8px;
+}
+
+
+.hom-order-operation-summary > div {
+    min-width: 0;
+
+    padding: 9px 10px;
+
+    border-radius: 9px;
+
+    background: #f8f7f5;
+}
+
+
+.hom-order-operation-summary span {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #93887b;
+
+    font-size: 8px;
+    font-weight: 650;
+}
+
+
+.hom-order-operation-summary strong {
+    display: block;
+
+    overflow-wrap: anywhere;
+
+    color: #443322;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+
+/* ---------------------------------------------------------
+   ACTION DISCLOSURE INSIDE PAYMENT / SHIPPING
+--------------------------------------------------------- */
+
+.hom-order-action-disclosure {
+    margin-top: 11px;
+
+    border: 1px solid #e9e1d5;
+    border-radius: 10px;
+
+    background: #fcfaf7;
+
+    overflow: hidden;
+}
+
+
+.hom-order-action-disclosure > summary {
+    min-height: 43px;
+
+    display: flex;
+    align-items: center;
+    gap: 9px;
+
+    padding: 8px 11px;
+
+    cursor: pointer;
+
+    list-style: none;
+}
+
+
+.hom-order-action-disclosure > summary::-webkit-details-marker {
+    display: none;
+}
+
+
+.hom-order-action-disclosure > summary::after {
+    content: "+";
+
+    margin-right: auto;
+
+    color: #8b6a33;
+
+    font-size: 16px;
+    font-weight: 900;
+}
+
+
+.hom-order-action-disclosure[open] > summary::after {
+    content: "−";
+}
+
+
+.hom-order-action-disclosure > summary span {
+    color: #674b20;
+
+    font-size: 10px;
+    font-weight: 850;
+}
+
+
+.hom-order-action-disclosure > summary small {
+    color: #9a8c79;
+
+    font-size: 8px;
+}
+
+
+.hom-order-action-disclosure__body {
+    padding: 13px;
+
+    border-top: 1px solid #e9e1d5;
+
+    background: #fff;
+}
+
+
+.hom-order-action-disclosure__body
+.hom-field input,
+.hom-order-action-disclosure__body
+.hom-field select {
+    min-height: 40px;
+}
+
+
+.hom-order-action-disclosure__body
+.hom-field textarea {
+    min-height: 64px;
+}
+
+
+.hom-order-action-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+
+    margin-top: 13px;
+}
+
+
+/* ---------------------------------------------------------
+   TIMELINE — SMALLER
+--------------------------------------------------------- */
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__items {
+    margin-top: 0;
+}
+
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__item {
+    gap: 10px;
+
+    padding-bottom: 12px;
+}
+
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__item strong {
+    font-size: 10px;
+}
+
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__item span,
+.hom-order-timeline-disclosure
+.hom-order-timeline__item small {
+    font-size: 9px;
+}
+
+
+/* ---------------------------------------------------------
+   AUDIT — MASTER COLLAPSED + EACH EVENT COLLAPSED
+--------------------------------------------------------- */
+
+.hom-order-audit__list {
+    display: grid;
+    gap: 6px;
+
+    margin: 0;
+}
+
+
+.hom-order-audit__event {
+    border: 1px solid #ece7df;
+    border-radius: 9px;
+
+    background: #fff;
+
+    overflow: hidden;
+}
+
+
+.hom-order-audit__event > summary {
+    min-height: 40px;
+
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1fr)
+        minmax(100px, 160px)
+        110px
+        20px;
+
+    gap: 10px;
+    align-items: center;
+
+    padding: 7px 10px;
+
+    cursor: pointer;
+
+    list-style: none;
+}
+
+
+.hom-order-audit__event > summary::-webkit-details-marker {
+    display: none;
+}
+
+
+.hom-order-audit__event > summary::after {
+    content: "+";
+
+    color: #90764d;
+
+    font-size: 14px;
+    font-weight: 900;
+
+    text-align: center;
+}
+
+
+.hom-order-audit__event[open]
+> summary::after {
+    content: "−";
+}
+
+
+.hom-order-audit__event
+> summary:hover {
+    background: #faf8f4;
+}
+
+
+.hom-order-audit__event
+> summary strong {
+    overflow: hidden;
+
+    color: #443322;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.hom-order-audit__event
+> summary span,
+.hom-order-audit__event
+> summary time {
+    overflow: hidden;
+
+    color: #8a8075;
+
+    font-size: 8px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.hom-order-audit__event-body {
+    padding: 10px 12px;
+
+    border-top: 1px solid #eee9e2;
+
+    background: #fcfbf9;
+}
+
+
+.hom-order-audit__description {
+    margin: 0 0 9px;
+
+    color: #655d55;
+
+    font-size: 9px;
+    line-height: 1.8;
+}
+
+
+.hom-order-audit__changes {
+    display: grid;
+    gap: 5px;
+}
+
+
+.hom-order-audit__change {
+    display: grid;
+
+    grid-template-columns:
+        minmax(120px, 0.8fr)
+        minmax(0, 1fr)
+        minmax(0, 1fr);
+
+    gap: 8px;
+    align-items: center;
+
+    padding: 7px 9px;
+
+    border: 1px solid #ece7df;
+    border-radius: 7px;
+
+    background: #fff;
+
+    font-size: 9px;
+}
+
+
+.hom-order-audit__change > strong {
+    color: #493416;
+
+    font-size: 9px;
+}
+
+
+.hom-order-audit__change > span {
+    min-width: 0;
+
+    color: #655d55;
+
+    overflow-wrap: anywhere;
+}
+
+
+.hom-order-audit__change small {
+    display: inline-block;
+
+    margin-left: 4px;
+
+    color: #9a9085;
+
+    font-size: 7px;
+}
+
+
+.hom-order-audit__reason {
+    margin-top: 8px;
+    padding: 7px 9px;
+
+    border-right: 2px solid #d4a72c;
+    border-radius: 6px;
+
+    background: #fff9ec;
+    color: #675532;
+
+    font-size: 9px;
+}
+
+
+.hom-order-audit__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+
+    margin-top: 9px;
+    padding-top: 8px;
+
+    border-top: 1px dashed #e8e1d7;
+}
+
+
+.hom-order-audit__meta span {
+    padding: 3px 6px;
+
+    border-radius: 6px;
+
+    background: #f0ede8;
+    color: #777068;
+
+    font-size: 7px;
+}
+
+
+/* ---------------------------------------------------------
+   NO LONGER NEED THE DUPLICATE DOCUMENT CARD
+--------------------------------------------------------- */
+
+.hom-order-document-actions {
+    display: none !important;
+}
+
+
+/* ---------------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------------- */
+
+@media (max-width: 850px) {
+
+    .hom-order-operation-summary {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .hom-order-pricing-footer {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    .hom-order-pricing-footer
+    .hom-button {
+        width: fit-content;
+    }
+}
+
+
+@media (max-width: 650px) {
+
+    .hom-order-accordion > summary {
+        gap: 8px;
+
+        padding: 9px 10px;
+    }
+
+
+    .hom-order-accordion__summary-value {
+        display: none;
+    }
+
+
+    .hom-order-operation-summary,
+    .hom-order-pricing-footer {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-order-audit__event
+    > summary {
+        grid-template-columns:
+            minmax(0, 1fr)
+            85px
+            20px;
+    }
+
+
+    .hom-order-audit__event
+    > summary time {
+        display: none;
+    }
+
+
+    .hom-order-audit__change {
+        grid-template-columns: 1fr;
+        gap: 4px;
+    }
+
+
+    .hom-order-detail-total {
+        width: auto;
+    }
+}
+
+
+/* HOM ORDER DETAIL UX V3 - TYPOGRAPHY POLISH
+-------------------------------------------------------------- */
+
+/*
+ * Keep the page compact, but do not sacrifice readability.
+ * This screen is an internal daily-work interface.
+ */
+
+
+/* Header summary */
+
+.hom-order-detail-kicker {
+    font-size: 12px;
+}
+
+
+.hom-order-detail-status {
+    font-size: 12px;
+}
+
+
+.hom-order-detail-total span {
+    font-size: 11px;
+}
+
+
+.hom-order-detail-total strong {
+    font-size: 15px;
+}
+
+
+.hom-order-summary-item__label {
+    font-size: 11px;
+}
+
+
+.hom-order-summary-item strong {
+    font-size: 13px;
+}
+
+
+.hom-order-missing {
+    font-size: 12px;
+}
+
+
+/* Quick actions */
+
+.hom-order-quick-actions__label {
+    font-size: 11px;
+}
+
+
+.hom-order-quick-actions a {
+    font-size: 11px;
+}
+
+
+/* Customer / legal cards */
+
+.hom-order-info-card__head span:not(
+    .hom-order-info-card__icon
+) {
+    font-size: 10px;
+}
+
+
+.hom-order-info-card__head h2 {
+    font-size: 16px;
+}
+
+
+.hom-order-data-list dt {
+    font-size: 11px;
+}
+
+
+.hom-order-data-list dd {
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+/* Generic accordion */
+
+.hom-order-accordion__identity strong {
+    font-size: 13px;
+}
+
+
+.hom-order-accordion__identity small {
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+
+.hom-order-accordion__summary-value,
+.hom-order-accordion__count {
+    font-size: 12px;
+}
+
+
+/* Product table */
+
+.hom-order-items-accordion .hom-products-table th {
+    font-size: 11px;
+}
+
+
+.hom-order-items-accordion .hom-products-table td {
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+.hom-order-price-input {
+    font-size: 12px !important;
+}
+
+
+/* Payment / fulfillment */
+
+.hom-order-operation-card__eyebrow {
+    font-size: 10px;
+}
+
+
+.hom-order-operation-card__head h2 {
+    font-size: 16px;
+}
+
+
+.hom-order-operation-status {
+    font-size: 11px;
+}
+
+
+.hom-order-operation-summary span {
+    font-size: 10px;
+}
+
+
+.hom-order-operation-summary strong {
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+
+/* Inner operation accordion */
+
+.hom-order-action-disclosure > summary span {
+    font-size: 12px;
+}
+
+
+.hom-order-action-disclosure > summary small {
+    font-size: 10px;
+}
+
+
+/* Forms */
+
+.hom-order-action-disclosure__body .hom-field,
+.hom-order-edit-disclosure__body .hom-field,
+.hom-order-pricing-footer .hom-field {
+    font-size: 12px;
+}
+
+
+.hom-order-action-disclosure__body input,
+.hom-order-action-disclosure__body select,
+.hom-order-action-disclosure__body textarea,
+.hom-order-edit-disclosure__body input,
+.hom-order-edit-disclosure__body select,
+.hom-order-edit-disclosure__body textarea,
+.hom-order-pricing-footer input,
+.hom-order-pricing-footer textarea {
+    font-size: 12px;
+}
+
+
+/* Timeline */
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__item strong {
+    font-size: 12px;
+}
+
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__item span,
+.hom-order-timeline-disclosure
+.hom-order-timeline__item small {
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+
+/* Audit rows */
+
+.hom-order-audit__event > summary {
+    min-height: 46px;
+}
+
+
+.hom-order-audit__event
+> summary strong {
+    font-size: 12px;
+}
+
+
+.hom-order-audit__event
+> summary span,
+.hom-order-audit__event
+> summary time {
+    font-size: 10px;
+}
+
+
+.hom-order-audit__description {
+    font-size: 11px;
+    line-height: 1.9;
+}
+
+
+.hom-order-audit__change {
+    font-size: 11px;
+    line-height: 1.7;
+}
+
+
+.hom-order-audit__change > strong {
+    font-size: 11px;
+}
+
+
+.hom-order-audit__change small {
+    font-size: 9px;
+}
+
+
+.hom-order-audit__reason {
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+.hom-order-audit__meta span {
+    font-size: 9px;
+}
+
+
+/* Mobile readability */
+
+@media (max-width: 650px) {
+
+    .hom-order-data-list dt {
+        font-size: 11px;
+    }
+
+
+    .hom-order-data-list dd {
+        font-size: 12px;
+    }
+
+
+    .hom-order-operation-summary span {
+        font-size: 10px;
+    }
+
+
+    .hom-order-operation-summary strong {
+        font-size: 12px;
+    }
+
+
+    .hom-order-audit__event
+    > summary strong {
+        font-size: 11px;
+    }
+}
+
+
+/* HOM ORDER DETAIL READABILITY V4
+-------------------------------------------------------------- */
+
+/*
+ * Internal daily-use interface:
+ * prioritize long-session readability over tiny typography.
+ */
+
+
+/* Main order header */
+
+.hom-order-detail-header {
+    background: #ffffff;
+}
+
+
+.hom-order-detail-kicker {
+    color: #725f48;
+    font-size: 13px;
+}
+
+
+.hom-order-detail-status {
+    font-size: 13px;
+}
+
+
+.hom-order-detail-total span {
+    color: #665b50;
+    font-size: 12px;
+}
+
+
+.hom-order-detail-total strong {
+    color: #342616;
+    font-size: 16px;
+}
+
+
+.hom-order-summary-item {
+    background: #ffffff;
+}
+
+
+.hom-order-summary-item__label {
+    color: #665f58;
+    font-size: 12px;
+}
+
+
+.hom-order-summary-item strong {
+    color: #30271f;
+    font-size: 14px;
+    line-height: 1.75;
+}
+
+
+.hom-order-missing {
+    color: #796b5c !important;
+    font-size: 13px;
+}
+
+
+/* Customer / legal information */
+
+.hom-order-info-card__head span:not(
+    .hom-order-info-card__icon
+) {
+    color: #74695e;
+    font-size: 11px;
+}
+
+
+.hom-order-info-card__head h2 {
+    color: #3c2c18;
+    font-size: 17px;
+}
+
+
+.hom-order-data-list dt {
+    color: #625b54;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.hom-order-data-list dd {
+    color: #26211d;
+    font-size: 14px;
+    font-weight: 750;
+    line-height: 1.9;
+}
+
+
+/* Accordions */
+
+.hom-order-accordion__identity strong {
+    color: #382b1c;
+    font-size: 14px;
+}
+
+
+.hom-order-accordion__identity small {
+    color: #665f57;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+.hom-order-accordion__summary-value,
+.hom-order-accordion__count {
+    color: #5f4824;
+    font-size: 13px;
+}
+
+
+/* Products */
+
+.hom-order-items-accordion
+.hom-products-table th {
+    color: #514a43;
+    font-size: 12px;
+}
+
+
+.hom-order-items-accordion
+.hom-products-table td {
+    color: #27231f;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+.hom-order-price-input {
+    color: #211e1b !important;
+    font-size: 13px !important;
+}
+
+
+/* Payment / shipping */
+
+.hom-order-operation-card {
+    background: #ffffff;
+}
+
+
+.hom-order-operation-card__eyebrow {
+    color: #6e6255;
+    font-size: 11px;
+}
+
+
+.hom-order-operation-card__head h2 {
+    color: #382a18;
+    font-size: 17px;
+}
+
+
+.hom-order-operation-status {
+    font-size: 12px;
+}
+
+
+.hom-order-operation-summary > div {
+    background: #f7f5f2;
+}
+
+
+.hom-order-operation-summary span {
+    color: #625b54;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+.hom-order-operation-summary strong {
+    color: #28231e;
+    font-size: 13px;
+    line-height: 1.8;
+}
+
+
+/* Action accordions */
+
+.hom-order-action-disclosure > summary span {
+    color: #503a19;
+    font-size: 13px;
+}
+
+
+.hom-order-action-disclosure > summary small {
+    color: #6c6257;
+    font-size: 11px;
+}
+
+
+.hom-order-action-disclosure__body .hom-field,
+.hom-order-edit-disclosure__body .hom-field,
+.hom-order-pricing-footer .hom-field {
+    color: #403a34;
+    font-size: 13px;
+}
+
+
+/* Timeline */
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__item strong {
+    color: #302920;
+    font-size: 13px;
+}
+
+
+.hom-order-timeline-disclosure
+.hom-order-timeline__item span,
+.hom-order-timeline-disclosure
+.hom-order-timeline__item small {
+    color: #635c54;
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+/* Audit master */
+
+.hom-order-audit__event > summary {
+    min-height: 50px;
+}
+
+
+.hom-order-audit__event
+> summary strong {
+    color: #302820;
+    font-size: 13px;
+}
+
+
+.hom-order-audit__event
+> summary span,
+.hom-order-audit__event
+> summary time {
+    color: #625b54;
+    font-size: 11px;
+}
+
+
+.hom-order-audit__event-body {
+    background: #ffffff;
+}
+
+
+.hom-order-audit__description {
+    color: #4d4741;
+    font-size: 12px;
+    line-height: 1.95;
+}
+
+
+.hom-order-audit__change {
+    color: #403a35;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+.hom-order-audit__change > strong {
+    color: #34291d;
+    font-size: 12px;
+}
+
+
+.hom-order-audit__change small {
+    color: #625a52;
+    font-size: 10px;
+}
+
+
+.hom-order-audit__reason {
+    color: #514329;
+    font-size: 12px;
+    line-height: 1.9;
+}
+
+
+.hom-order-audit__meta span {
+    color: #575049;
+    font-size: 10px;
+}
+
+
+/* ---------------------------------------------------------
+   HELP: AUDIT GUIDE
+--------------------------------------------------------- */
+
+.hom-help-audit-guide {
+    margin-top: 24px;
+}
+
+
+.hom-help-audit-important {
+    margin-top: 16px;
+    padding: 18px;
+
+    border: 1px solid #ead8ac;
+    border-right: 4px solid #c6942f;
+    border-radius: 12px;
+
+    background: #fffaf0;
+
+    color: #493c2b;
+}
+
+
+.hom-help-audit-important strong {
+    display: block;
+
+    margin-bottom: 9px;
+
+    color: #5f4317;
+
+    font-size: 14px;
+}
+
+
+.hom-help-audit-important p {
+    margin: 6px 0 0;
+
+    color: #574d42;
+
+    font-size: 13px;
+    line-height: 2;
+}
+
+
+.hom-help-audit-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+
+    margin-top: 14px;
+}
+
+
+.hom-help-audit-grid article {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    padding: 15px;
+
+    border: 1px solid #e5e0d8;
+    border-radius: 12px;
+
+    background: #ffffff;
+}
+
+
+.hom-help-audit-number {
+    width: 30px;
+    height: 30px;
+
+    display: grid;
+    place-items: center;
+
+    flex: 0 0 30px;
+
+    border-radius: 50%;
+
+    background: #f1e7d4;
+    color: #674918;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+.hom-help-audit-grid h3 {
+    margin: 0 0 5px;
+
+    color: #3e3020;
+
+    font-size: 14px;
+}
+
+
+.hom-help-audit-grid p {
+    margin: 0;
+
+    color: #5c544c;
+
+    font-size: 12px;
+    line-height: 1.95;
+}
+
+
+.hom-help-audit-example {
+    margin-top: 14px;
+    padding: 15px 17px;
+
+    border-radius: 11px;
+
+    background: #f5f7f8;
+    color: #494f54;
+
+    font-size: 12px;
+    line-height: 2;
+}
+
+
+.hom-help-audit-example strong {
+    color: #302d29;
+}
+
+
+@media (max-width: 760px) {
+
+    .hom-help-audit-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-order-data-list dd {
+        font-size: 13px;
+    }
+
+
+    .hom-order-summary-item strong {
+        font-size: 13px;
+    }
+}
+
+/* ==========================================================================
+   HOM CUSTOMER OPERATIONS GUIDE V4
+   Scoped specifically to customer/order help page.
+   ========================================================================== */
+
+.hom-customer-help-page {
+    --hom-guide-text: #332d27;
+    --hom-guide-muted: #62594f;
+    --hom-guide-soft: #7a6f63;
+    --hom-guide-brown: #5f4317;
+    --hom-guide-dark: #3f2d16;
+    --hom-guide-gold: #c6922d;
+    --hom-guide-border: #e5ddd1;
+    --hom-guide-bg: #f8f6f2;
+    --hom-guide-card: #ffffff;
+
+    display: grid;
+    gap: 18px;
+
+    color: var(--hom-guide-text);
+}
+
+
+/* --------------------------------------------------------------------------
+   GENERAL TYPOGRAPHY
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page p,
+.hom-customer-help-page li {
+    color: var(--hom-guide-muted);
+
+    font-size: 14px;
+    line-height: 2;
+
+    text-wrap: pretty;
+}
+
+
+.hom-customer-help-page strong {
+    color: var(--hom-guide-dark);
+}
+
+
+.hom-customer-help-page ul {
+    margin-top: 9px;
+    margin-bottom: 9px;
+}
+
+
+/* --------------------------------------------------------------------------
+   HERO
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page .hom-help-hero {
+    position: relative;
+
+    display: grid;
+    grid-template-columns:
+        minmax(0, 1fr)
+        auto;
+
+    gap: 28px;
+    align-items: center;
+
+    overflow: hidden;
+
+    padding: 28px 30px;
+
+    border: 1px solid #6b4e25;
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #493416 0%,
+            #67491d 100%
+        );
+
+    box-shadow:
+        0 10px 30px
+        rgba(73, 52, 22, 0.12);
+}
+
+
+.hom-customer-help-page .hom-help-hero::after {
+    position: absolute;
+
+    top: -90px;
+    left: -70px;
+
+    width: 210px;
+    height: 210px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(255, 168, 0, 0.08);
+
+    content: "";
+
+    pointer-events: none;
+}
+
+
+.hom-customer-help-page .hom-help-hero > div {
+    position: relative;
+    z-index: 1;
+
+    min-width: 0;
+}
+
+
+.hom-customer-help-page .hom-help-hero__eyebrow {
+    display: block;
+
+    margin-bottom: 8px;
+
+    color: #f5c86c;
+
+    font-size: 12px;
+    font-weight: 850;
+}
+
+
+.hom-customer-help-page .hom-help-hero h1 {
+    margin: 0 0 10px;
+
+    color: #ffffff;
+
+    font-size: clamp(
+        24px,
+        3vw,
+        32px
+    );
+
+    line-height: 1.55;
+}
+
+
+.hom-customer-help-page .hom-help-hero p {
+    max-width: 850px;
+
+    margin: 0;
+
+    color: #f2ede5;
+
+    font-size: 14px;
+    line-height: 2;
+}
+
+
+.hom-customer-help-page .hom-help-hero__actions {
+    display: grid;
+    gap: 9px;
+
+    min-width: 210px;
+
+    margin: 0;
+}
+
+
+.hom-customer-help-page
+.hom-help-hero__actions
+.hom-help-action {
+    width: 100%;
+
+    white-space: nowrap;
+}
+
+
+.hom-customer-help-page
+.hom-help-hero__actions
+.hom-help-action-primary {
+    border-color: #f4bd4f;
+
+    background: #f4bd4f;
+    color: #493416 !important;
+}
+
+
+.hom-customer-help-page
+.hom-help-hero__actions
+.hom-help-action-secondary {
+    border:
+        1px solid
+        rgba(255, 255, 255, 0.34);
+
+    background:
+        rgba(255, 255, 255, 0.1);
+
+    color: #ffffff !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   MAIN HELP TOPICS
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page .hom-help-topic {
+    display: grid;
+    gap: 16px;
+
+    margin: 0;
+    padding: 22px;
+
+    border: 1px solid var(--hom-guide-border);
+    border-radius: 16px;
+
+    background: var(--hom-guide-card);
+
+    box-shadow:
+        0 4px 16px
+        rgba(73, 52, 22, 0.035);
+}
+
+
+.hom-customer-help-page
+.hom-help-topic
++
+.hom-help-topic {
+    margin-top: 0;
+    padding-top: 22px;
+
+    border-top:
+        1px solid
+        var(--hom-guide-border);
+}
+
+
+/* New HTML uses __heading, not old __head */
+
+.hom-customer-help-page .hom-help-topic__heading {
+    display: grid;
+    grid-template-columns:
+        50px
+        minmax(0, 1fr);
+
+    gap: 13px;
+    align-items: center;
+
+    padding-bottom: 14px;
+
+    border-bottom:
+        1px solid
+        #eee8df;
+}
+
+
+.hom-customer-help-page .hom-help-topic__icon {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: #f7eedf;
+
+    font-size: 22px;
+}
+
+
+.hom-customer-help-page .hom-help-topic__eyebrow {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #8b6a35;
+
+    font-size: 11px;
+    font-weight: 850;
+}
+
+
+.hom-customer-help-page .hom-help-topic__heading h2 {
+    margin: 0;
+
+    color: var(--hom-guide-dark);
+
+    font-size: 19px;
+    line-height: 1.7;
+}
+
+
+/* --------------------------------------------------------------------------
+   THREE PRINCIPLES
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-customer-help-principles {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 11px;
+}
+
+
+.hom-customer-help-page
+.hom-customer-help-principles article {
+    padding: 16px;
+
+    border: 1px solid #e7dfd3;
+    border-radius: 12px;
+
+    background: #faf8f4;
+}
+
+
+.hom-customer-help-page
+.hom-customer-help-principles strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+
+.hom-customer-help-page
+.hom-customer-help-principles p {
+    margin: 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   PAGE MAP
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-customer-help-map {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.hom-customer-help-page
+.hom-customer-help-map article {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+
+    min-width: 0;
+
+    padding: 14px;
+
+    border: 1px solid #e6dfd5;
+    border-radius: 11px;
+
+    background: #fbfaf8;
+}
+
+
+.hom-customer-help-page
+.hom-customer-help-map article > span {
+    width: 31px;
+    height: 31px;
+
+    display: grid;
+    place-items: center;
+
+    flex: 0 0 31px;
+
+    border-radius: 9px;
+
+    background: #efe2cc;
+    color: #684a19;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+.hom-customer-help-page
+.hom-customer-help-map strong {
+    display: block;
+
+    color: #3f3122;
+
+    font-size: 14px;
+}
+
+
+.hom-customer-help-page
+.hom-customer-help-map p {
+    margin: 4px 0 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   STATUS TABLE
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-status-table {
+    overflow: hidden;
+
+    border: 1px solid #e3dbcf;
+    border-radius: 12px;
+
+    background: #ffffff;
+}
+
+
+.hom-customer-help-page
+.hom-help-status-row {
+    display: grid;
+    grid-template-columns:
+        minmax(145px, 0.42fr)
+        minmax(0, 1.58fr);
+
+    gap: 18px;
+
+    padding: 13px 15px;
+
+    border-bottom: 1px solid #ede8e0;
+}
+
+
+.hom-customer-help-page
+.hom-help-status-row:nth-child(even) {
+    background: #faf8f5;
+}
+
+
+.hom-customer-help-page
+.hom-help-status-row:last-child {
+    border-bottom: 0;
+}
+
+
+.hom-customer-help-page
+.hom-help-status-row strong {
+    font-size: 13px;
+}
+
+
+.hom-customer-help-page
+.hom-help-status-row span {
+    color: #514a43;
+
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+
+/* --------------------------------------------------------------------------
+   TWO COLUMN INFO CARDS
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-two-column {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 11px;
+}
+
+
+.hom-customer-help-page
+.hom-help-info-panel {
+    padding: 17px;
+
+    border: 1px solid #e4ddd3;
+    border-radius: 12px;
+
+    background: #faf9f7;
+}
+
+
+.hom-customer-help-page
+.hom-help-info-panel h3 {
+    margin: 0 0 8px;
+
+    color: #463419;
+
+    font-size: 16px;
+}
+
+
+.hom-customer-help-page
+.hom-help-info-panel p {
+    margin: 6px 0;
+}
+
+
+.hom-customer-help-page
+.hom-help-info-panel li {
+    margin-bottom: 2px;
+}
+
+
+/* --------------------------------------------------------------------------
+   IMPORTANT BOX
+   Fix legacy grid expecting an icon.
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-important {
+    display: block;
+
+    margin: 0;
+    padding: 15px 17px;
+
+    border: 1px solid #ead7aa;
+    border-right: 4px solid #c38d28;
+    border-radius: 11px;
+
+    background: #fff9ec;
+}
+
+
+.hom-customer-help-page
+.hom-help-important strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #5b4015;
+
+    font-size: 14px;
+}
+
+
+.hom-customer-help-page
+.hom-help-important p {
+    margin: 4px 0;
+
+    color: #554b3e;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   WORKFLOW STEPS
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-flow {
+    display: grid;
+    gap: 8px;
+}
+
+
+.hom-customer-help-page
+.hom-help-flow article {
+    display: grid;
+    grid-template-columns:
+        32px
+        minmax(0, 1fr);
+
+    gap: 12px;
+    align-items: flex-start;
+
+    padding: 13px 14px;
+
+    border: 1px solid #e6dfd6;
+    border-radius: 10px;
+
+    background: #fbfaf8;
+}
+
+
+.hom-customer-help-page
+.hom-help-flow article > span {
+    width: 31px;
+    height: 31px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ede0c9;
+    color: #654718;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+.hom-customer-help-page
+.hom-help-flow strong {
+    color: #3d3023;
+
+    font-size: 14px;
+}
+
+
+.hom-customer-help-page
+.hom-help-flow p {
+    margin: 3px 0 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   WARNING
+   Legacy styling is reset for plain-text warning boxes.
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-warning {
+    display: block;
+
+    margin: 0;
+    padding: 14px 16px;
+
+    border: 1px solid #e5cb91;
+    border-radius: 11px;
+
+    background: #fff8e7;
+    color: #56472f;
+
+    font-size: 13px;
+    line-height: 2;
+}
+
+
+/* --------------------------------------------------------------------------
+   DOCUMENTS
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-document-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.hom-customer-help-page
+.hom-help-document-grid article {
+    display: grid;
+    grid-template-columns:
+        34px
+        minmax(0, 1fr);
+
+    gap: 10px;
+    align-items: flex-start;
+
+    padding: 14px;
+
+    border: 1px solid #e5ded4;
+    border-radius: 11px;
+
+    background: #faf9f7;
+}
+
+
+.hom-customer-help-page
+.hom-help-document-grid article > span {
+    font-size: 21px;
+}
+
+
+.hom-customer-help-page
+.hom-help-document-grid strong {
+    display: block;
+
+    font-size: 14px;
+}
+
+
+.hom-customer-help-page
+.hom-help-document-grid p {
+    margin: 3px 0 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   SHIPPING FIELD GUIDE
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-field-guide {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 9px;
+}
+
+
+.hom-customer-help-page
+.hom-help-field-guide > div {
+    padding: 13px 14px;
+
+    border: 1px solid #e6dfd6;
+    border-radius: 10px;
+
+    background: #faf9f7;
+}
+
+
+.hom-customer-help-page
+.hom-help-field-guide strong,
+.hom-customer-help-page
+.hom-help-field-guide span {
+    display: block;
+}
+
+
+.hom-customer-help-page
+.hom-help-field-guide strong {
+    margin-bottom: 4px;
+
+    font-size: 13px;
+}
+
+
+.hom-customer-help-page
+.hom-help-field-guide span {
+    color: #554e47;
+
+    font-size: 13px;
+    line-height: 1.9;
+}
+
+
+.hom-customer-help-page
+.hom-help-lead {
+    margin: 0;
+
+    color: #4f4841;
+
+    font-size: 14px;
+    line-height: 2;
+}
+
+
+/* --------------------------------------------------------------------------
+   AUDIT GUIDE
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-audit-guide {
+    margin-top: 0;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-important {
+    margin: 0;
+    padding: 17px;
+
+    border: 1px solid #e6cf99;
+    border-right: 4px solid #bd8620;
+    border-radius: 11px;
+
+    background: #fff8e8;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-important strong {
+    display: block;
+
+    margin-bottom: 7px;
+
+    color: #5b4015;
+
+    font-size: 15px;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-important p {
+    margin: 5px 0;
+
+    color: #50483e;
+
+    font-size: 13px;
+}
+
+
+.hom-customer-help-page
+.hom-help-question-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 8px;
+}
+
+
+.hom-customer-help-page
+.hom-help-question-grid article {
+    display: grid;
+    grid-template-columns:
+        27px
+        minmax(0, 1fr);
+
+    gap: 9px;
+    align-items: center;
+
+    padding: 11px 12px;
+
+    border: 1px solid #e7dfd3;
+    border-radius: 9px;
+
+    background: #faf9f7;
+}
+
+
+.hom-customer-help-page
+.hom-help-question-grid article > span {
+    width: 27px;
+    height: 27px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #eee1c9;
+    color: #634516;
+
+    font-weight: 900;
+}
+
+
+.hom-customer-help-page
+.hom-help-question-grid p {
+    margin: 0;
+
+    color: #443d36;
+
+    font-size: 13px;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-grid {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 9px;
+
+    margin: 0;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-grid article {
+    display: grid;
+    grid-template-columns:
+        33px
+        minmax(0, 1fr);
+
+    gap: 11px;
+    align-items: flex-start;
+
+    padding: 14px;
+
+    border: 1px solid #e6dfd5;
+    border-radius: 10px;
+
+    background: #faf9f7;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-number {
+    width: 31px;
+    height: 31px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ecdfc8;
+    color: #654719;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-grid h3 {
+    margin: 0 0 4px;
+
+    color: #3d3022;
+
+    font-size: 14px;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-grid p {
+    margin: 0;
+
+    color: #554e47;
+
+    font-size: 13px;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-example {
+    margin: 0;
+    padding: 15px 17px;
+
+    border: 1px solid #dfe2e3;
+    border-radius: 10px;
+
+    background: #f4f6f6;
+    color: #434b4c;
+
+    font-size: 13px;
+    line-height: 2;
+}
+
+
+.hom-customer-help-page
+.hom-help-audit-example strong {
+    color: #2f3535;
+}
+
+
+/* --------------------------------------------------------------------------
+   DO / DON'T
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-do-dont {
+    display: grid;
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.hom-customer-help-page
+.hom-help-do-dont > div {
+    padding: 15px 17px;
+
+    border-radius: 11px;
+}
+
+
+.hom-customer-help-page
+.hom-help-do-dont .is-good {
+    border: 1px solid #bcd8c4;
+
+    background: #f3faf5;
+}
+
+
+.hom-customer-help-page
+.hom-help-do-dont .is-bad {
+    border: 1px solid #e5c7c7;
+
+    background: #fff6f6;
+}
+
+
+.hom-customer-help-page
+.hom-help-do-dont strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+}
+
+
+.hom-customer-help-page
+.hom-help-do-dont .is-good strong {
+    color: #2f6641;
+}
+
+
+.hom-customer-help-page
+.hom-help-do-dont .is-bad strong {
+    color: #8b4747;
+}
+
+
+/* --------------------------------------------------------------------------
+   FIND ANSWER
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-find-answer {
+    display: grid;
+    gap: 7px;
+}
+
+
+.hom-customer-help-page
+.hom-help-find-answer > div {
+    display: grid;
+    grid-template-columns:
+        minmax(210px, 0.8fr)
+        minmax(0, 1.2fr);
+
+    gap: 15px;
+
+    padding: 11px 13px;
+
+    border: 1px solid #e6dfd6;
+    border-radius: 9px;
+
+    background: #faf9f7;
+}
+
+
+.hom-customer-help-page
+.hom-help-find-answer strong {
+    font-size: 13px;
+}
+
+
+.hom-customer-help-page
+.hom-help-find-answer span {
+    color: #554e47;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   DAILY CHECKLIST
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-daily-checklist {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    counter-reset: hom-guide-daily;
+}
+
+
+.hom-customer-help-page
+.hom-help-daily-checklist li {
+    position: relative;
+
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    margin: 0 0 7px;
+    padding:
+        10px
+        48px
+        10px
+        13px;
+
+    border: 1px solid #e5ded5;
+    border-radius: 9px;
+
+    background: #faf9f7;
+
+    counter-increment: hom-guide-daily;
+}
+
+
+.hom-customer-help-page
+.hom-help-daily-checklist li::before {
+    position: absolute;
+
+    top: 50%;
+    right: 11px;
+
+    width: 27px;
+    height: 27px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ebdec6;
+    color: #624517;
+
+    content:
+        counter(
+            hom-guide-daily
+        );
+
+    font-size: 11px;
+    font-weight: 900;
+
+    transform:
+        translateY(-50%);
+}
+
+
+/* --------------------------------------------------------------------------
+   BOTTOM BACK BUTTON
+   -------------------------------------------------------------------------- */
+
+.hom-customer-help-page
+.hom-help-page-back {
+    display: flex;
+
+    justify-content: flex-start;
+
+    margin-top: 2px;
+}
+
+
+.hom-customer-help-page
+.hom-help-page-back
+.hom-help-action-secondary,
+.hom-customer-help-page
+.hom-help-page-back
+.hom-help-action-secondary:link,
+.hom-customer-help-page
+.hom-help-page-back
+.hom-help-action-secondary:visited {
+    border: 1px solid #d9c8a7;
+
+    background: #ffffff;
+
+    color: #5e4420 !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1050px) {
+
+    .hom-customer-help-page
+    .hom-help-hero {
+        grid-template-columns: 1fr;
+
+        gap: 18px;
+    }
+
+
+    .hom-customer-help-page
+    .hom-help-hero__actions {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+
+        min-width: 0;
+    }
+
+
+    .hom-customer-help-page
+    .hom-customer-help-principles,
+    .hom-customer-help-page
+    .hom-help-document-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 760px) {
+
+    .hom-customer-help-page
+    .hom-customer-help-map,
+
+    .hom-customer-help-page
+    .hom-help-two-column,
+
+    .hom-customer-help-page
+    .hom-help-field-guide,
+
+    .hom-customer-help-page
+    .hom-help-question-grid,
+
+    .hom-customer-help-page
+    .hom-help-audit-grid,
+
+    .hom-customer-help-page
+    .hom-help-do-dont {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-customer-help-page
+    .hom-help-status-row,
+
+    .hom-customer-help-page
+    .hom-help-find-answer {
+        grid-template-columns: 1fr;
+
+        gap: 4px;
+    }
+}
+
+
+@media (max-width: 560px) {
+
+    .hom-customer-help-page
+    .hom-help-hero {
+        padding: 21px 18px;
+    }
+
+
+    .hom-customer-help-page
+    .hom-help-hero__actions {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-customer-help-page
+    .hom-help-topic {
+        padding: 17px;
+    }
+
+
+    .hom-customer-help-page
+    .hom-help-topic__heading {
+        grid-template-columns:
+            42px
+            minmax(0, 1fr);
+
+        gap: 10px;
+    }
+
+
+    .hom-customer-help-page
+    .hom-help-topic__icon {
+        width: 40px;
+        height: 40px;
+
+        font-size: 18px;
+    }
+
+
+    .hom-customer-help-page
+    .hom-help-topic__heading h2 {
+        font-size: 17px;
+    }
+
+
+    .hom-customer-help-page
+    p,
+    .hom-customer-help-page
+    li {
+        font-size: 13px;
+    }
+}
+
+
+/* ==========================================================================
+   HOM ORDERS LIST UX V2
+   ========================================================================== */
+
+
+/* --------------------------------------------------------------------------
+   SEARCH
+   -------------------------------------------------------------------------- */
+
+.hom-orders-search {
+    display: grid;
+    grid-template-columns:
+        minmax(260px, 1fr)
+        auto;
+
+    gap: 9px;
+
+    margin-bottom: 14px;
+    padding: 11px;
+
+    border: 1px solid #e3ddd4;
+    border-radius: 14px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 4px 15px
+        rgba(73, 52, 22, 0.03);
+}
+
+
+.hom-orders-search input[type="search"] {
+    width: 100%;
+    min-height: 44px;
+
+    padding: 8px 13px;
+
+    border: 1px solid #dcd5cb;
+    border-radius: 10px;
+
+    background: #faf9f7;
+    color: #302920;
+
+    font-size: 13px;
+
+    outline: none;
+}
+
+
+.hom-orders-search input[type="search"]:focus {
+    border-color: #b99453;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(185, 148, 83, 0.10);
+}
+
+
+.hom-orders-search .hom-button {
+    min-width: 100px;
+    min-height: 44px;
+}
+
+
+/* --------------------------------------------------------------------------
+   STATUS FILTERS
+   -------------------------------------------------------------------------- */
+
+.hom-order-status-grid {
+    grid-template-columns:
+        repeat(
+            9,
+            minmax(95px, 1fr)
+        );
+
+    gap: 8px;
+
+    margin-bottom: 18px;
+}
+
+
+.hom-order-status-card {
+    position: relative;
+
+    min-height: 76px;
+
+    gap: 4px;
+
+    padding: 11px 12px;
+
+    overflow: hidden;
+
+    border-color: #e4ddd3;
+    border-radius: 12px;
+
+    color: #3d352c;
+}
+
+
+.hom-order-status-card::after {
+    position: absolute;
+
+    right: 0;
+    bottom: 0;
+    left: 0;
+
+    height: 3px;
+
+    background: transparent;
+
+    content: "";
+}
+
+
+.hom-order-status-card:hover {
+    border-color: #cbb795;
+
+    background: #fffdf9;
+}
+
+
+.hom-order-status-card.is-active {
+    border-color: #d6a83f;
+
+    background:
+        linear-gradient(
+            135deg,
+            #fffdf8 0%,
+            #fff8e8 100%
+        );
+
+    box-shadow:
+        0 0 0 2px
+        rgba(214, 168, 63, 0.10);
+}
+
+
+.hom-order-status-card.is-active::after {
+    background: #d6a83f;
+}
+
+
+.hom-order-status-card strong {
+    color: #30271e;
+
+    font-size: 20px;
+}
+
+
+.hom-order-status-card span {
+    color: #665d53;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+
+/* --------------------------------------------------------------------------
+   TABLE CONTAINER
+   -------------------------------------------------------------------------- */
+
+.hom-orders-panel {
+    overflow: visible;
+
+    border: 0;
+
+    background: transparent;
+}
+
+
+.hom-orders-panel .hom-table-wrap {
+    overflow-x: auto;
+
+    border: 0;
+    border-radius: 0;
+
+    background: transparent;
+}
+
+
+.hom-orders-table {
+    min-width: 1480px;
+
+    border-collapse: separate;
+    border-spacing: 0 8px;
+
+    font-size: 12px;
+}
+
+
+.hom-orders-table thead th {
+    padding: 8px 12px;
+
+    border: 0;
+
+    background: transparent;
+    color: #6d645b;
+
+    font-size: 11px;
+}
+
+
+.hom-orders-table tbody td {
+    padding: 12px 12px;
+
+    border-top: 1px solid #e4ddd4;
+    border-bottom: 1px solid #e4ddd4;
+
+    background: #ffffff;
+
+    color: #332d27;
+
+    font-size: 12px;
+
+    transition:
+        background 140ms ease,
+        border-color 140ms ease;
+}
+
+
+.hom-orders-table tbody td:first-child {
+    border-right: 1px solid #e4ddd4;
+
+    border-radius:
+        0
+        12px
+        12px
+        0;
+}
+
+
+.hom-orders-table tbody td:last-child {
+    border-left: 1px solid #e4ddd4;
+
+    border-radius:
+        12px
+        0
+        0
+        12px;
+}
+
+
+/* --------------------------------------------------------------------------
+   CLICKABLE ROW
+   -------------------------------------------------------------------------- */
+
+.hom-order-row {
+    cursor: pointer;
+
+    outline: none;
+}
+
+
+.hom-order-row:hover td {
+    border-color: #d4c4aa;
+
+    background: #fffdf9;
+}
+
+
+.hom-order-row:focus-visible td {
+    border-top-color: #c6922d;
+    border-bottom-color: #c6922d;
+
+    background: #fffaf0;
+}
+
+
+.hom-order-row:focus-visible td:first-child {
+    border-right-color: #c6922d;
+}
+
+
+.hom-order-row:focus-visible td:last-child {
+    border-left-color: #c6922d;
+}
+
+
+/* --------------------------------------------------------------------------
+   ORDER NUMBER
+   -------------------------------------------------------------------------- */
+
+.hom-order-number-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+
+.hom-order-number-link {
+    position: relative;
+    z-index: 2;
+
+    color: #624516;
+
+    font-size: 13px;
+    font-weight: 900;
+
+    text-decoration: none;
+}
+
+
+.hom-order-number-link:hover {
+    color: #9a6919;
+
+    text-decoration: underline;
+}
+
+
+.hom-order-number-cell > span {
+    color: #81766b;
+
+    font-size: 9px;
+}
+
+
+/* --------------------------------------------------------------------------
+   TYPE / STATUS
+   -------------------------------------------------------------------------- */
+
+.hom-order-type-badge {
+    display: inline-flex;
+    align-items: center;
+
+    min-height: 27px;
+
+    padding: 4px 8px;
+
+    border-radius: 8px;
+
+    background: #f5f1ea;
+    color: #604c32;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    white-space: nowrap;
+}
+
+
+.hom-orders-table
+.hom-order-status-badge {
+    padding: 6px 10px;
+
+    background: #f3f4f5;
+    color: #3d4650;
+
+    font-size: 10px;
+}
+
+
+/* --------------------------------------------------------------------------
+   CUSTOMER
+   -------------------------------------------------------------------------- */
+
+.hom-orders-table .hom-order-customer {
+    min-width: 155px;
+
+    gap: 3px;
+}
+
+
+.hom-orders-table
+.hom-order-customer strong {
+    color: #29231d;
+
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+
+.hom-orders-table
+.hom-order-customer span {
+    color: #615a53;
+
+    font-size: 10px;
+}
+
+
+.hom-order-customer__missing {
+    color: #887968 !important;
+}
+
+
+.hom-order-customer__email {
+    max-width: 190px;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+/* --------------------------------------------------------------------------
+   ASSIGNEE / TOTAL
+   -------------------------------------------------------------------------- */
+
+.hom-order-assignee strong {
+    color: #3a332d;
+
+    font-size: 12px;
+}
+
+
+.hom-order-list-total {
+    color: #382a18;
+
+    font-size: 12px;
+
+    white-space: nowrap;
+}
+
+
+/* --------------------------------------------------------------------------
+   SHIPPING
+   -------------------------------------------------------------------------- */
+
+.hom-order-shipping-summary {
+    min-width: 115px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+
+.hom-order-shipping-summary strong {
+    color: #3a332c;
+
+    font-size: 11px;
+}
+
+
+.hom-order-shipping-summary span {
+    color: #6b6259;
+
+    font-size: 9px;
+}
+
+
+.hom-order-list-date {
+    color: #4f4943;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+}
+
+
+.hom-order-list-muted {
+    color: #958a7d;
+}
+
+
+/* --------------------------------------------------------------------------
+   QUICK ACTIONS
+   -------------------------------------------------------------------------- */
+
+.hom-order-row-actions {
+    position: relative;
+    z-index: 3;
+
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 5px;
+
+    min-width: 185px;
+}
+
+
+.hom-order-row-action,
+.hom-order-row-action:link,
+.hom-order-row-action:visited {
+    min-height: 30px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 8px;
+
+    border: 1px solid #dfd4c3;
+    border-radius: 8px;
+
+    background: #faf8f4;
+    color: #59431f;
+
+    font-size: 9px;
+    font-weight: 850;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+
+    transition:
+        border-color 130ms ease,
+        background 130ms ease,
+        color 130ms ease,
+        transform 130ms ease;
+}
+
+
+.hom-order-row-action:hover {
+    border-color: #c49332;
+
+    background: #fff5da;
+    color: #493416;
+
+    transform: translateY(-1px);
+}
+
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1500px) {
+
+    .hom-order-status-grid {
+        grid-template-columns:
+            repeat(
+                5,
+                minmax(105px, 1fr)
+            );
+    }
+}
+
+
+@media (max-width: 1000px) {
+
+    .hom-order-status-grid {
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(105px, 1fr)
+            );
+    }
+}
+
+
+@media (max-width: 720px) {
+
+    .hom-orders-search {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-orders-search .hom-button {
+        width: 100%;
+    }
+
+
+    .hom-order-status-grid {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .hom-orders-table {
+        min-width: 0;
+
+        border-spacing: 0;
+    }
+
+
+    .hom-orders-table tbody {
+        gap: 12px;
+    }
+
+
+    .hom-orders-table
+    .hom-order-row {
+        overflow: hidden;
+
+        border: 1px solid #dfd7cc;
+        border-radius: 14px;
+
+        background: #ffffff;
+    }
+
+
+    .hom-orders-table
+    .hom-order-row:hover {
+        background: #ffffff;
+    }
+
+
+    .hom-orders-table
+    tbody td,
+    .hom-orders-table
+    tbody td:first-child,
+    .hom-orders-table
+    tbody td:last-child {
+        border: 0;
+        border-bottom: 1px solid #ebe5dc;
+
+        border-radius: 0;
+
+        background: #ffffff;
+    }
+
+
+    .hom-orders-table
+    tbody td:last-child {
+        border-bottom: 0;
+    }
+
+
+    .hom-order-row-actions {
+        width: 100%;
+        min-width: 0;
+
+        display: grid;
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .hom-order-row-action {
+        width: 100%;
+    }
+
+
+    .hom-order-number-cell > span {
+        display: none;
+    }
+}
+
+
+@media (max-width: 430px) {
+
+    .hom-order-status-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+
+    .hom-order-row-actions {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+/* HOM ORDERS LIST - REMOVE DESKTOP HORIZONTAL SCROLL
+-------------------------------------------------------------- */
+
+@media (min-width: 721px) {
+
+    .hom-orders-panel .hom-table-wrap {
+        width: 100%;
+        overflow-x: visible;
+    }
+
+
+    .hom-orders-table {
+        width: 100%;
+        min-width: 0;
+        table-layout: fixed;
+    }
+
+
+    .hom-orders-table th,
+    .hom-orders-table td {
+        min-width: 0;
+    }
+
+
+    /* پرونده */
+    .hom-orders-table th:nth-child(1),
+    .hom-orders-table td:nth-child(1) {
+        width: 8%;
+    }
+
+
+    /* نوع */
+    .hom-orders-table th:nth-child(2),
+    .hom-orders-table td:nth-child(2) {
+        width: 8%;
+    }
+
+
+    /* مشتری */
+    .hom-orders-table th:nth-child(3),
+    .hom-orders-table td:nth-child(3) {
+        width: 15%;
+    }
+
+
+    /* شهر */
+    .hom-orders-table th:nth-child(4),
+    .hom-orders-table td:nth-child(4) {
+        width: 6%;
+    }
+
+
+    /* وضعیت */
+    .hom-orders-table th:nth-child(5),
+    .hom-orders-table td:nth-child(5) {
+        width: 12%;
+    }
+
+
+    /* مسئول */
+    .hom-orders-table th:nth-child(6),
+    .hom-orders-table td:nth-child(6) {
+        width: 9%;
+    }
+
+
+    /* مبلغ */
+    .hom-orders-table th:nth-child(7),
+    .hom-orders-table td:nth-child(7) {
+        width: 9%;
+    }
+
+
+    /* ارسال */
+    .hom-orders-table th:nth-child(8),
+    .hom-orders-table td:nth-child(8) {
+        width: 10%;
+    }
+
+
+    /* تاریخ */
+    .hom-orders-table th:nth-child(9),
+    .hom-orders-table td:nth-child(9) {
+        width: 10%;
+    }
+
+
+    /* دسترسی سریع */
+    .hom-orders-table th:nth-child(10),
+    .hom-orders-table td:nth-child(10) {
+        width: 13%;
+    }
+
+
+    .hom-order-row-actions {
+        min-width: 0;
+        width: 100%;
+
+        display: grid;
+        grid-template-columns:
+            repeat(
+                3,
+                minmax(0, 1fr)
+            );
+
+        gap: 4px;
+    }
+
+
+    .hom-order-row-action,
+    .hom-order-row-action:link,
+    .hom-order-row-action:visited {
+        min-width: 0;
+        width: 100%;
+
+        padding-right: 5px;
+        padding-left: 5px;
+    }
+
+
+    .hom-orders-table
+    .hom-order-customer {
+        min-width: 0;
+    }
+
+
+    .hom-order-customer__email,
+    .hom-order-customer__phone {
+        max-width: 100%;
+
+        overflow: hidden;
+
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+
+    .hom-order-shipping-summary {
+        min-width: 0;
+    }
+
+
+    .hom-order-status-badge {
+        max-width: 100%;
+
+        white-space: normal;
+
+        text-align: center;
+        line-height: 1.6;
+    }
+}
+
+
+/* ==========================================================================
+   HOM OPERATIONAL DASHBOARD V1
+   ========================================================================== */
+
+.hom-dashboard {
+    color: #302a24;
+}
+
+
+.hom-dashboard-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+
+.hom-dashboard-heading h1 {
+    margin-bottom: 6px;
+}
+
+
+.hom-dashboard-heading p {
+    max-width: 760px;
+}
+
+
+.hom-dashboard-help,
+.hom-dashboard-help:link,
+.hom-dashboard-help:visited {
+    min-height: 40px;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 7px 12px;
+
+    border: 1px solid #dbcaa9;
+    border-radius: 10px;
+
+    background: #fffaf0;
+    color: #604518;
+
+    font-size: 11px;
+    font-weight: 800;
+
+    text-decoration: none;
+
+    white-space: nowrap;
+}
+
+
+.hom-dashboard-help > span {
+    width: 23px;
+    height: 23px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ead9b9;
+}
+
+
+/* --------------------------------------------------------------------------
+   KPI
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-kpis {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 12px;
+
+    margin-bottom: 18px;
+}
+
+
+.hom-dashboard-kpi,
+.hom-dashboard-kpi:link,
+.hom-dashboard-kpi:visited {
+    min-width: 0;
+
+    display: grid;
+    grid-template-columns:
+        46px
+        minmax(0, 1fr);
+
+    gap: 12px;
+    align-items: center;
+
+    padding: 17px;
+
+    border: 1px solid #e2dbd1;
+    border-radius: 14px;
+
+    background: #ffffff;
+    color: inherit;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 4px 15px
+        rgba(73, 52, 22, 0.035);
+
+    transition:
+        border-color 140ms ease,
+        transform 140ms ease,
+        box-shadow 140ms ease;
+}
+
+
+.hom-dashboard-kpi:hover {
+    border-color: #c8b28d;
+
+    transform: translateY(-2px);
+
+    box-shadow:
+        0 8px 22px
+        rgba(73, 52, 22, 0.07);
+}
+
+
+.hom-dashboard-kpi.is-attention {
+    border-color: #e3c26f;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ffffff 0%,
+            #fffaf0 100%
+        );
+}
+
+
+.hom-dashboard-kpi__icon {
+    width: 45px;
+    height: 45px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 12px;
+
+    background: #f4eee4;
+
+    color: #674817;
+
+    font-size: 18px;
+    font-weight: 900;
+}
+
+
+.hom-dashboard-kpi span:not(
+    .hom-dashboard-kpi__icon
+) {
+    display: block;
+
+    color: #655d54;
+
+    font-size: 10px;
+    font-weight: 750;
+}
+
+
+.hom-dashboard-kpi strong {
+    display: block;
+
+    margin: 2px 0;
+
+    color: #33271a;
+
+    font-size: 23px;
+    line-height: 1.3;
+}
+
+
+.hom-dashboard-kpi small {
+    display: block;
+
+    color: #756c63;
+
+    font-size: 9px;
+    line-height: 1.7;
+}
+
+
+/* --------------------------------------------------------------------------
+   SECTION
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-section {
+    margin-bottom: 18px;
+    padding: 19px;
+
+    border: 1px solid #e2dbd2;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 4px 16px
+        rgba(73, 52, 22, 0.03);
+}
+
+
+.hom-dashboard-section__head,
+.hom-dashboard-panel__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+
+.hom-dashboard-section__head {
+    margin-bottom: 14px;
+}
+
+
+.hom-dashboard-section__head > div > span,
+.hom-dashboard-panel__head > div > span {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #927a55;
+
+    font-size: 9px;
+    font-weight: 850;
+}
+
+
+.hom-dashboard-section__head h2,
+.hom-dashboard-panel__head h2 {
+    margin: 0;
+
+    color: #3d2e1c;
+
+    font-size: 16px;
+}
+
+
+.hom-dashboard-section__head p {
+    margin: 4px 0 0;
+
+    color: #70685f;
+
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+
+.hom-dashboard-section__head > a,
+.hom-dashboard-panel__head > a {
+    color: #684b1c;
+
+    font-size: 10px;
+    font-weight: 800;
+
+    text-decoration: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   NEEDS ATTENTION
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-actions {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0, 1fr)
+        );
+
+    gap: 9px;
+}
+
+
+.hom-dashboard-action,
+.hom-dashboard-action:link,
+.hom-dashboard-action:visited {
+    min-width: 0;
+
+    display: grid;
+
+    grid-template-columns:
+        37px
+        minmax(0, 1fr)
+        20px;
+
+    gap: 10px;
+    align-items: center;
+
+    padding: 12px;
+
+    border: 1px solid #e6dfd5;
+    border-radius: 11px;
+
+    background: #faf9f7;
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
+.hom-dashboard-action.has-items {
+    border-color: #dfc887;
+
+    background: #fffaf0;
+}
+
+
+.hom-dashboard-action:hover {
+    border-color: #c49a45;
+
+    background: #fff8e8;
+}
+
+
+.hom-dashboard-action__icon {
+    width: 36px;
+    height: 36px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    background: #eee6d9;
+
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+.hom-dashboard-action strong {
+    display: block;
+
+    color: #30261c;
+
+    font-size: 18px;
+}
+
+
+.hom-dashboard-action div > span {
+    display: block;
+
+    color: #443a30;
+
+    font-size: 11px;
+    font-weight: 800;
+}
+
+
+.hom-dashboard-action small {
+    display: block;
+
+    margin-top: 1px;
+
+    color: #786f65;
+
+    font-size: 9px;
+}
+
+
+.hom-dashboard-action__arrow {
+    color: #9a7c4a;
+
+    font-size: 14px;
+}
+
+
+/* --------------------------------------------------------------------------
+   MAIN GRID
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-main-grid {
+    display: grid;
+
+    grid-template-columns:
+        minmax(0, 1.65fr)
+        minmax(280px, 0.7fr);
+
+    gap: 14px;
+
+    margin-bottom: 18px;
+}
+
+
+.hom-dashboard-panel {
+    min-width: 0;
+
+    padding: 18px;
+
+    border: 1px solid #e2dbd2;
+    border-radius: 15px;
+
+    background: #ffffff;
+
+    box-shadow:
+        0 4px 16px
+        rgba(73, 52, 22, 0.03);
+}
+
+
+.hom-dashboard-panel__head {
+    margin-bottom: 13px;
+}
+
+
+.hom-dashboard-side {
+    display: grid;
+    gap: 14px;
+}
+
+
+/* --------------------------------------------------------------------------
+   RECENT ORDERS
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-recent-list {
+    display: grid;
+    gap: 6px;
+}
+
+
+.hom-dashboard-recent-row,
+.hom-dashboard-recent-row:link,
+.hom-dashboard-recent-row:visited {
+    display: grid;
+
+    grid-template-columns:
+        105px
+        minmax(150px, 1fr)
+        minmax(125px, auto)
+        minmax(90px, auto)
+        20px;
+
+    gap: 12px;
+    align-items: center;
+
+    padding: 11px 12px;
+
+    border: 1px solid #e8e2da;
+    border-radius: 10px;
+
+    background: #faf9f7;
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
+.hom-dashboard-recent-row:hover {
+    border-color: #cfbb98;
+
+    background: #fffdf9;
+}
+
+
+.hom-dashboard-recent-number,
+.hom-dashboard-recent-customer {
+    min-width: 0;
+
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+
+.hom-dashboard-recent-number strong {
+    color: #5a411a;
+
+    font-size: 12px;
+}
+
+
+.hom-dashboard-recent-number span {
+    color: #80766c;
+
+    font-size: 9px;
+}
+
+
+.hom-dashboard-recent-customer strong {
+    overflow: hidden;
+
+    color: #302820;
+
+    font-size: 11px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.hom-dashboard-recent-customer span {
+    overflow: hidden;
+
+    color: #736b63;
+
+    font-size: 9px;
+
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+
+.hom-dashboard-recent-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 5px 8px;
+
+    border-radius: 999px;
+
+    background: #f0f1f2;
+    color: #424a52;
+
+    font-size: 9px;
+    font-weight: 800;
+
+    text-align: center;
+}
+
+
+.hom-dashboard-recent-total {
+    color: #392b19;
+
+    font-size: 10px;
+
+    white-space: nowrap;
+}
+
+
+.hom-dashboard-recent-arrow {
+    color: #947747;
+
+    font-size: 14px;
+}
+
+
+.hom-dashboard-empty {
+    padding: 30px;
+
+    border: 1px dashed #ddd4c7;
+    border-radius: 10px;
+
+    color: #756c62;
+
+    text-align: center;
+
+    font-size: 11px;
+}
+
+
+/* --------------------------------------------------------------------------
+   IMAGE HEALTH
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-health-icon {
+    width: 35px;
+    height: 35px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    background: #f4eee4;
+
+    font-size: 16px;
+}
+
+
+.hom-dashboard-progress {
+    height: 8px;
+
+    overflow: hidden;
+
+    margin-bottom: 11px;
+
+    border-radius: 999px;
+
+    background: #ece8e2;
+}
+
+
+.hom-dashboard-progress > span {
+    display: block;
+
+    height: 100%;
+
+    border-radius: inherit;
+
+    background:
+        linear-gradient(
+            90deg,
+            #9f8561,
+            #c89b42
+        );
+}
+
+
+.hom-dashboard-image-health > strong {
+    display: block;
+
+    color: #3c3125;
+
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+.hom-dashboard-image-health p {
+    margin: 5px 0 12px;
+
+    color: #70675e;
+
+    font-size: 10px;
+    line-height: 1.8;
+}
+
+
+.hom-dashboard-panel-action,
+.hom-dashboard-panel-action:link,
+.hom-dashboard-panel-action:visited {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+
+    color: #664819;
+
+    font-size: 10px;
+    font-weight: 850;
+
+    text-decoration: none;
+}
+
+
+/* --------------------------------------------------------------------------
+   SELLER HEALTH
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-health-state {
+    display: grid;
+
+    grid-template-columns:
+        34px
+        minmax(0, 1fr);
+
+    gap: 10px;
+    align-items: center;
+
+    margin-bottom: 12px;
+    padding: 11px;
+
+    border-radius: 10px;
+}
+
+
+.hom-dashboard-health-state > span {
+    width: 33px;
+    height: 33px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    font-weight: 900;
+}
+
+
+.hom-dashboard-health-state strong,
+.hom-dashboard-health-state small {
+    display: block;
+}
+
+
+.hom-dashboard-health-state strong {
+    font-size: 11px;
+}
+
+
+.hom-dashboard-health-state small {
+    margin-top: 2px;
+
+    font-size: 9px;
+    line-height: 1.7;
+}
+
+
+.hom-dashboard-health-state.is-complete {
+    background: #f1f8f3;
+
+    color: #356246;
+}
+
+
+.hom-dashboard-health-state.is-complete > span {
+    background: #dcefe2;
+}
+
+
+.hom-dashboard-health-state.is-warning {
+    background: #fff8e9;
+
+    color: #73551d;
+}
+
+
+.hom-dashboard-health-state.is-warning > span {
+    background: #f6e8be;
+}
+
+
+/* --------------------------------------------------------------------------
+   SHORTCUTS
+   -------------------------------------------------------------------------- */
+
+.hom-dashboard-shortcuts {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            4,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.hom-dashboard-shortcuts > a,
+.hom-dashboard-shortcuts > a:link,
+.hom-dashboard-shortcuts > a:visited {
+    display: grid;
+
+    grid-template-columns:
+        38px
+        minmax(0, 1fr);
+
+    gap: 10px;
+    align-items: center;
+
+    padding: 13px;
+
+    border: 1px solid #e5ded4;
+    border-radius: 11px;
+
+    background: #faf9f7;
+    color: inherit;
+
+    text-decoration: none;
+}
+
+
+.hom-dashboard-shortcuts > a:hover {
+    border-color: #c9b38e;
+
+    background: #fffaf0;
+}
+
+
+.hom-dashboard-shortcuts > a > span {
+    width: 37px;
+    height: 37px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 10px;
+
+    background: #eee5d6;
+    color: #67491b;
+
+    font-size: 16px;
+    font-weight: 900;
+}
+
+
+.hom-dashboard-shortcuts strong {
+    display: block;
+
+    color: #392d20;
+
+    font-size: 11px;
+}
+
+
+.hom-dashboard-shortcuts small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #756d64;
+
+    font-size: 9px;
+    line-height: 1.7;
+}
+
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1150px) {
+
+    .hom-dashboard-kpis {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .hom-dashboard-actions {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .hom-dashboard-main-grid {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-dashboard-side {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+
+
+    .hom-dashboard-shortcuts {
+        grid-template-columns:
+            repeat(
+                2,
+                minmax(0, 1fr)
+            );
+    }
+}
+
+
+@media (max-width: 760px) {
+
+    .hom-dashboard-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+
+    .hom-dashboard-kpis,
+    .hom-dashboard-actions,
+    .hom-dashboard-side,
+    .hom-dashboard-shortcuts {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-dashboard-recent-row {
+        grid-template-columns:
+            90px
+            minmax(0, 1fr)
+            20px;
+    }
+
+
+    .hom-dashboard-recent-status,
+    .hom-dashboard-recent-total {
+        display: none;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .hom-dashboard-kpis {
+        gap: 8px;
+    }
+
+
+    .hom-dashboard-kpi {
+        padding: 13px;
+    }
+
+
+    .hom-dashboard-section,
+    .hom-dashboard-panel {
+        padding: 15px;
+    }
+}
+
+
+/* ==========================================================================
+   HOM STORE BRANDING V2
+   ========================================================================== */
+
+.hom-sidebar-brand {
+    min-height: 150px;
+
+    display: grid;
+    place-items: center;
+
+    padding:
+        18px
+        12px
+        22px;
+
+    text-align: center;
+}
+
+
+.hom-sidebar-store-brand {
+    width: 100%;
+
+    display: grid;
+    justify-items: center;
+
+    gap: 11px;
+}
+
+
+.hom-store-logo {
+    display: block;
+
+    object-fit: contain;
+}
+
+
+.hom-store-logo--sidebar {
+    width: 76px;
+    height: 76px;
+
+    max-width: none;
+    max-height: none;
+
+    object-fit: contain;
+
+    padding: 7px;
+
+    border-radius: 18px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.06
+        );
+
+    box-shadow:
+        inset 0 0 0 1px
+            rgba(
+                255,
+                255,
+                255,
+                0.08
+            );
+}
+
+
+.hom-sidebar-store-label {
+    display: block;
+
+    max-width: 205px;
+
+    margin: 0 !important;
+
+    color: #ffffff !important;
+
+    font-size: 12px !important;
+    font-weight: 850;
+
+    line-height: 1.8;
+}
+
+
+/* Fallback when no site logo exists */
+
+.hom-store-logo-fallback {
+    color: #ffffff;
+
+    font-size: 14px;
+    font-weight: 900;
+}
+
+
+/* ----------------------------------------------------------
+   Login branding keeps the website's full horizontal logo.
+   ---------------------------------------------------------- */
+
+.hom-login-store-brand {
+    display: grid;
+
+    justify-items: start;
+
+    gap: 10px;
+}
+
+
+.hom-store-logo--login {
+    width: auto;
+    max-width: 210px;
+
+    height: auto;
+    max-height: 85px;
+}
+
+
+.hom-login-store-brand > span {
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.82
+        );
+
+    font-size: 13px;
+    font-weight: 800;
+}
+
+
+/* Tablet / collapsed navigation */
+
+@media (max-width: 980px) {
+
+    .hom-sidebar-brand {
+        min-height: 64px;
+
+        display: flex;
+        justify-content: flex-start;
+
+        padding:
+            0
+            54px
+            12px
+            4px;
+
+        text-align: right;
+    }
+
+
+    .hom-sidebar-store-brand {
+        width: auto;
+
+        display: flex;
+        align-items: center;
+
+        gap: 9px;
+    }
+
+
+    .hom-store-logo--sidebar {
+        width: 46px;
+        height: 46px;
+
+        padding: 4px;
+
+        border-radius: 12px;
+    }
+
+
+    .hom-sidebar-store-label {
+        max-width: 190px;
+
+        font-size: 10px !important;
+    }
+}
+
+
+/* Mobile */
+
+@media (max-width: 560px) {
+
+    .hom-sidebar-store-label {
+        display: none;
+    }
+
+
+    .hom-store-logo--sidebar {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+
+/* ==========================================================
+   HOM WAREHOUSE QR VERIFICATION
+   ========================================================== */
+
+.hom-warehouse-check {
+    width: min(900px, 100%);
+    margin: 0 auto;
+}
+
+.hom-warehouse-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 20px 0;
+}
+
+.hom-warehouse-summary > div {
+    padding: 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.hom-warehouse-summary span {
+    display: block;
+    margin-bottom: 4px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-summary strong {
+    display: block;
+    color: #0f172a;
+}
+
+.hom-warehouse-form {
+    margin-top: 20px;
+}
+
+.hom-warehouse-items {
+    display: grid;
+    gap: 10px;
+}
+
+.hom-warehouse-item {
+    position: relative;
+
+    display: grid;
+    grid-template-columns:
+        30px
+        34px
+        minmax(0, 1fr)
+        auto;
+    align-items: center;
+    gap: 10px;
+
+    padding: 14px;
+
+    border: 1px solid #dbe3ec;
+    border-radius: 14px;
+
+    background: #fff;
+
+    cursor: pointer;
+}
+
+.hom-warehouse-item:has(input:checked) {
+    border-color: #16a34a;
+    background: #f0fdf4;
+}
+
+.hom-warehouse-item input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.hom-warehouse-item__check {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 28px;
+    height: 28px;
+
+    border: 2px solid #cbd5e1;
+    border-radius: 8px;
+
+    color: transparent;
+    font-weight: 800;
+}
+
+.hom-warehouse-item input:checked +
+.hom-warehouse-item__check {
+    border-color: #16a34a;
+    background: #16a34a;
+    color: #fff;
+}
+
+.hom-warehouse-item input:focus-visible +
+.hom-warehouse-item__check {
+    outline: 3px solid rgba(37, 99, 235, .22);
+    outline-offset: 2px;
+}
+
+.hom-warehouse-item__number {
+    color: #64748b;
+    font-weight: 700;
+    text-align: center;
+}
+
+.hom-warehouse-item__body {
+    min-width: 0;
+}
+
+.hom-warehouse-item__body > strong {
+    display: block;
+    margin-bottom: 4px;
+    color: #0f172a;
+}
+
+.hom-warehouse-item__body > span {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-item__body i {
+    font-style: normal;
+    color: #cbd5e1;
+}
+
+.hom-warehouse-item__qty {
+    min-width: 70px;
+    text-align: center;
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-item__qty strong {
+    display: block;
+    margin-top: 2px;
+    color: #0f172a;
+    font-size: 18px;
+}
+
+.hom-warehouse-progress {
+    margin-top: 20px;
+    padding: 14px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+
+    background: #fff;
+}
+
+.hom-warehouse-progress__bar {
+    height: 8px;
+    margin-top: 10px;
+
+    overflow: hidden;
+
+    border-radius: 999px;
+    background: #e2e8f0;
+}
+
+.hom-warehouse-progress__bar span {
+    display: block;
+
+    width: 0;
+    height: 100%;
+
+    border-radius: inherit;
+    background: #16a34a;
+
+    transition: width .18s ease;
+}
+
+.hom-warehouse-confirm {
+    width: 100%;
+    margin-top: 14px;
+}
+
+.hom-warehouse-confirm:disabled {
+    cursor: not-allowed;
+    opacity: .45;
+}
+
+.hom-warehouse-confirm-note {
+    margin: 8px 0 0;
+    color: #64748b;
+    font-size: 12px;
+    text-align: center;
+}
+
+.hom-warehouse-verified {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+
+    margin: 18px 0;
+    padding: 16px;
+
+    border: 1px solid #86efac;
+    border-radius: 14px;
+
+    background: #f0fdf4;
+}
+
+.hom-warehouse-verified__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 50%;
+
+    background: #16a34a;
+    color: #fff;
+
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.hom-warehouse-verified p {
+    margin: 3px 0 0;
+    color: #166534;
+    font-size: 12px;
+}
+
+
+@media (max-width: 760px) {
+
+    .hom-warehouse-summary {
+        grid-template-columns:
+            repeat(2, minmax(0, 1fr));
+    }
+
+    .hom-warehouse-item {
+        grid-template-columns:
+            30px
+            28px
+            minmax(0, 1fr);
+    }
+
+    .hom-warehouse-item__qty {
+        grid-column: 3;
+        min-width: 0;
+        text-align: right;
+    }
+
+    .hom-warehouse-item__qty strong {
+        display: inline;
+        margin-right: 5px;
+    }
+}
+
+
+@media (max-width: 460px) {
+
+    .hom-warehouse-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-warehouse-item {
+        padding: 12px 10px;
+    }
+}
+
+
+/* ==========================================================
+   HOM WAREHOUSE STAFF MANAGEMENT
+   ========================================================== */
+
+.hom-warehouse-staff-summary {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 12px;
+
+    margin: 20px 0;
+}
+
+.hom-warehouse-staff-summary > div {
+    padding: 16px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+
+    background: #fff;
+}
+
+.hom-warehouse-staff-summary span {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #64748b;
+    font-size: 12px;
+}
+
+.hom-warehouse-staff-summary strong {
+    color: #0f172a;
+    font-size: 26px;
+}
+
+.hom-warehouse-staff-summary .is-active {
+    border-color: #bbf7d0;
+}
+
+.hom-warehouse-staff-summary .is-active strong {
+    color: #15803d;
+}
+
+.hom-warehouse-staff-summary .is-inactive {
+    border-color: #e2e8f0;
+}
+
+.hom-warehouse-staff-summary .is-inactive strong {
+    color: #64748b;
+}
+
+
+.hom-warehouse-staff-layout {
+    display: grid;
+    grid-template-columns:
+        minmax(280px, 360px)
+        minmax(0, 1fr);
+
+    align-items: start;
+    gap: 18px;
+}
+
+
+.hom-warehouse-staff-section-head {
+    margin-bottom: 18px;
+}
+
+.hom-warehouse-staff-section-head span {
+    display: block;
+
+    margin-bottom: 3px;
+
+    color: #64748b;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.hom-warehouse-staff-section-head h2 {
+    margin: 0;
+
+    color: #0f172a;
+
+    font-size: 19px;
+}
+
+
+.hom-warehouse-staff-create .hom-field {
+    margin-bottom: 14px;
+}
+
+.hom-warehouse-staff-create .hom-field small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #64748b;
+    font-size: 11px;
+}
+
+
+.hom-warehouse-staff-future {
+    margin-top: 18px;
+    padding: 13px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+
+    background: #f8fafc;
+}
+
+.hom-warehouse-staff-future strong {
+    display: block;
+
+    margin-bottom: 4px;
+
+    color: #334155;
+    font-size: 12px;
+}
+
+.hom-warehouse-staff-future p {
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+.hom-warehouse-staff-users {
+    display: grid;
+    gap: 10px;
+}
+
+
+.hom-warehouse-staff-user {
+    display: grid;
+    grid-template-columns:
+        minmax(180px, 1fr)
+        minmax(150px, .65fr)
+        auto;
+
+    align-items: center;
+    gap: 14px;
+
+    padding: 13px;
+
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+
+    background: #fff;
+}
+
+.hom-warehouse-staff-user.is-active {
+    border-right:
+        4px solid #22c55e;
+}
+
+.hom-warehouse-staff-user.is-inactive {
+    border-right:
+        4px solid #94a3b8;
+
+    background: #f8fafc;
+}
+
+
+.hom-warehouse-staff-user__identity {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    min-width: 0;
+}
+
+.hom-warehouse-staff-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 38px;
+
+    width: 38px;
+    height: 38px;
+
+    border-radius: 11px;
+
+    background: #0f172a;
+    color: #fff;
+
+    font-size: 16px;
+    font-weight: 800;
+}
+
+.hom-warehouse-staff-user__identity strong {
+    display: block;
+
+    overflow: hidden;
+
+    color: #0f172a;
+
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.hom-warehouse-staff-user__identity span[dir="ltr"] {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #64748b;
+
+    font-size: 11px;
+    text-align: right;
+}
+
+
+.hom-warehouse-staff-user__meta {
+    min-width: 0;
+}
+
+.hom-warehouse-staff-user__meta small {
+    display: block;
+
+    margin-top: 5px;
+
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+
+.hom-warehouse-staff-status {
+    display: inline-flex;
+    align-items: center;
+
+    padding: 4px 9px;
+
+    border-radius: 999px;
+
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.hom-warehouse-staff-status.is-active {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.hom-warehouse-staff-status.is-inactive {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+
+.hom-warehouse-staff-empty {
+    padding: 28px 18px;
+
+    border: 1px dashed #cbd5e1;
+    border-radius: 14px;
+
+    text-align: center;
+}
+
+.hom-warehouse-staff-empty strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #334155;
+}
+
+.hom-warehouse-staff-empty p {
+    margin: 0;
+
+    color: #64748b;
+    font-size: 12px;
+}
+
+
+@media (max-width: 1050px) {
+
+    .hom-warehouse-staff-layout {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 720px) {
+
+    .hom-warehouse-staff-summary {
+        grid-template-columns:
+            repeat(3, minmax(0, 1fr));
+    }
+
+    .hom-warehouse-staff-user {
+        grid-template-columns: 1fr;
+    }
+
+    .hom-warehouse-staff-user form,
+    .hom-warehouse-staff-user form .hom-button {
+        width: 100%;
+    }
+}
+
+
+@media (max-width: 480px) {
+
+    .hom-warehouse-staff-summary {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+
+/* ==========================================================================
+   HOM WAREHOUSE HELP GUIDE
+   Scoped specifically to warehouse verifier management/help page.
+   ========================================================================== */
+
+.hom-warehouse-help-page {
+    --hom-warehouse-guide-text: #332d27;
+    --hom-warehouse-guide-muted: #62594f;
+    --hom-warehouse-guide-dark: #3f2d16;
+    --hom-warehouse-guide-border: #e5ddd1;
+    --hom-warehouse-guide-card: #ffffff;
+
+    display: grid;
+    gap: 18px;
+
+    color: var(--hom-warehouse-guide-text);
+}
+
+
+.hom-warehouse-help-page p,
+.hom-warehouse-help-page li {
+    color: var(--hom-warehouse-guide-muted);
+
+    font-size: 14px;
+    line-height: 2;
+
+    text-wrap: pretty;
+}
+
+
+.hom-warehouse-help-page strong {
+    color: var(--hom-warehouse-guide-dark);
+}
+
+
+.hom-warehouse-help-page ul {
+    margin-top: 9px;
+    margin-bottom: 9px;
+}
+
+
+/* --------------------------------------------------------------------------
+   HERO
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page .hom-help-hero__content {
+    position: relative;
+    z-index: 1;
+
+    min-width: 0;
+}
+
+
+.hom-warehouse-help-page .hom-help-hero__icon {
+    position: relative;
+    z-index: 1;
+}
+
+
+/* --------------------------------------------------------------------------
+   MAIN TOPICS
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page .hom-help-topic {
+    display: grid;
+    gap: 16px;
+
+    margin: 0;
+    padding: 22px;
+
+    border:
+        1px solid
+        var(--hom-warehouse-guide-border);
+
+    border-radius: 16px;
+
+    background:
+        var(--hom-warehouse-guide-card);
+
+    box-shadow:
+        0 4px 16px
+        rgba(73, 52, 22, 0.035);
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic
++
+.hom-help-topic {
+    margin-top: 0;
+    padding-top: 22px;
+
+    border-top:
+        1px solid
+        var(--hom-warehouse-guide-border);
+}
+
+
+/* New warehouse HTML uses __heading. */
+
+.hom-warehouse-help-page
+.hom-help-topic__heading {
+    display: grid;
+
+    grid-template-columns:
+        50px
+        minmax(0, 1fr);
+
+    gap: 13px;
+    align-items: center;
+
+    padding-bottom: 14px;
+
+    border-bottom:
+        1px solid #eee8df;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic__icon {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: #f7eedf;
+
+    font-size: 22px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic__eyebrow {
+    display: block;
+
+    margin-bottom: 2px;
+
+    color: #8b6a35;
+
+    font-size: 11px;
+    font-weight: 850;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-topic__heading h2 {
+    margin: 0;
+
+    color:
+        var(--hom-warehouse-guide-dark);
+
+    font-size: 19px;
+    line-height: 1.7;
+}
+
+
+/* --------------------------------------------------------------------------
+   IMPORTANT BOXES
+   -------------------------------------------------------------------------- */
+
+/*
+ * Most warehouse help callouts are plain text and do not have an icon.
+ * Override the old global two-column grid for those boxes.
+ */
+
+.hom-warehouse-help-page
+.hom-help-important {
+    display: block;
+
+    margin: 0;
+    padding: 15px 17px;
+
+    border: 1px solid #ead7aa;
+    border-right: 4px solid #c38d28;
+    border-radius: 11px;
+
+    background: #fff9ec;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-important strong {
+    display: block;
+
+    margin-bottom: 5px;
+
+    color: #5b4015;
+
+    font-size: 14px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-important p {
+    margin: 4px 0;
+
+    color: #554b3e;
+
+    font-size: 13px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-important p + p {
+    margin-top: 8px;
+}
+
+
+/*
+ * The first security callout intentionally has an icon.
+ */
+
+.hom-warehouse-help-page
+.hom-warehouse-help-important-featured {
+    display: grid;
+
+    grid-template-columns:
+        52px
+        minmax(0, 1fr);
+
+    gap: 16px;
+    align-items: start;
+}
+
+
+.hom-warehouse-help-page
+.hom-warehouse-help-important-featured
+.hom-help-important__icon {
+    width: 48px;
+    height: 48px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 13px;
+
+    background: #f0e3cb;
+    color: #5e4420;
+
+    font-size: 21px;
+    font-weight: 900;
+}
+
+
+/* --------------------------------------------------------------------------
+   WORKFLOW
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-flow {
+    display: grid;
+    gap: 8px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow article {
+    display: grid;
+
+    grid-template-columns:
+        32px
+        minmax(0, 1fr);
+
+    gap: 12px;
+    align-items: flex-start;
+
+    min-width: 0;
+
+    padding: 13px 14px;
+
+    border: 1px solid #e6dfd6;
+    border-radius: 10px;
+
+    background: #fbfaf8;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow article > span {
+    width: 31px;
+    height: 31px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ede0c9;
+    color: #654718;
+
+    font-size: 12px;
+    font-weight: 900;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow strong {
+    display: block;
+
+    color: #3d3023;
+
+    font-size: 14px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-flow p {
+    margin: 3px 0 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   TWO COLUMN STATUS CARDS
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-two-column {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 11px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-info-panel {
+    min-width: 0;
+
+    padding: 17px;
+
+    border: 1px solid #e4ddd3;
+    border-radius: 12px;
+
+    background: #faf9f7;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-info-panel h3 {
+    margin: 0 0 8px;
+
+    color: #463419;
+
+    font-size: 16px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-info-panel p {
+    margin: 6px 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   ACCESS: DO / DON'T
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-do-dont {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 10px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont > div {
+    min-width: 0;
+
+    padding: 15px 17px;
+
+    border-radius: 11px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-good {
+    border: 1px solid #bcd8c4;
+
+    background: #f3faf5;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-bad {
+    border: 1px solid #e5c7c7;
+
+    background: #fff6f6;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-good strong {
+    color: #2f6641;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-do-dont .is-bad strong {
+    color: #8b4747;
+}
+
+
+/* --------------------------------------------------------------------------
+   AUDIT / STORED DATA
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-customer-help-principles {
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0, 1fr)
+        );
+
+    gap: 11px;
+}
+
+
+.hom-warehouse-help-page
+.hom-customer-help-principles article {
+    min-width: 0;
+
+    padding: 16px;
+
+    border: 1px solid #e7dfd3;
+    border-radius: 12px;
+
+    background: #faf8f4;
+}
+
+
+.hom-warehouse-help-page
+.hom-customer-help-principles strong {
+    display: block;
+
+    margin-bottom: 6px;
+
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+
+.hom-warehouse-help-page
+.hom-customer-help-principles p {
+    margin: 0;
+
+    font-size: 13px;
+}
+
+
+/* --------------------------------------------------------------------------
+   PLAIN WARNING
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-warning {
+    display: block;
+
+    margin: 0;
+    padding: 14px 16px;
+
+    border: 1px solid #e5cb91;
+    border-radius: 11px;
+
+    background: #fff8e7;
+    color: #56472f;
+
+    font-size: 13px;
+    line-height: 2;
+}
+
+
+/* --------------------------------------------------------------------------
+   CHECKLIST
+   -------------------------------------------------------------------------- */
+
+.hom-warehouse-help-page
+.hom-help-daily-checklist {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    counter-reset:
+        hom-warehouse-guide-step;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-daily-checklist li {
+    position: relative;
+
+    min-height: 46px;
+
+    display: flex;
+    align-items: center;
+
+    margin: 0 0 7px;
+
+    padding:
+        10px
+        48px
+        10px
+        13px;
+
+    border: 1px solid #e5ded5;
+    border-radius: 9px;
+
+    background: #faf9f7;
+
+    counter-increment:
+        hom-warehouse-guide-step;
+}
+
+
+.hom-warehouse-help-page
+.hom-help-daily-checklist li::before {
+    position: absolute;
+
+    top: 50%;
+    right: 11px;
+
+    width: 27px;
+    height: 27px;
+
+    display: grid;
+    place-items: center;
+
+    border-radius: 50%;
+
+    background: #ebdec6;
+    color: #624517;
+
+    content:
+        counter(
+            hom-warehouse-guide-step
+        );
+
+    font-size: 11px;
+    font-weight: 900;
+
+    transform:
+        translateY(-50%);
+}
+
+
+/* --------------------------------------------------------------------------
+   RESPONSIVE
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 760px) {
+
+    .hom-warehouse-help-page
+    .hom-help-two-column,
+
+    .hom-warehouse-help-page
+    .hom-help-do-dont,
+
+    .hom-warehouse-help-page
+    .hom-customer-help-principles {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 560px) {
+
+    .hom-warehouse-help-page
+    .hom-help-topic {
+        padding: 17px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-help-topic__heading {
+        grid-template-columns:
+            42px
+            minmax(0, 1fr);
+
+        gap: 10px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-help-topic__icon {
+        width: 40px;
+        height: 40px;
+
+        font-size: 18px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-help-topic__heading h2 {
+        font-size: 17px;
+    }
+
+
+    .hom-warehouse-help-page
+    .hom-warehouse-help-important-featured {
+        grid-template-columns: 1fr;
+    }
+
+
+    .hom-warehouse-help-page p,
+    .hom-warehouse-help-page li {
+        font-size: 13px;
+    }
+}
