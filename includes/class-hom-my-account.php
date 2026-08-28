@@ -36,23 +36,33 @@ class HOM_My_Account {
             wp_get_current_user();
 
 
-        if (
-            !$user instanceof WP_User ||
-            !in_array(
-                HOM_Capabilities::ROLE,
-                (array) $user->roles,
-                true
-            )
-        ) {
+        if (!$user instanceof WP_User) {
             return false;
         }
 
 
         /*
-         * Administrators already have wp-admin and do not
-         * need the simplified Owner entry card.
+         * The My Account management entry is intentionally
+         * limited to these two roles only:
+         *
+         * - Dedicated Olfat shop-panel manager
+         * - WordPress Administrator
+         *
+         * Other roles must not receive this entry merely
+         * because they happen to have a plugin capability.
          */
-        if (current_user_can('manage_options')) {
+        $allowed_roles = [
+            HOM_Capabilities::ROLE,
+            'administrator',
+        ];
+
+
+        if (
+            !array_intersect(
+                $allowed_roles,
+                (array) $user->roles
+            )
+        ) {
             return false;
         }
 
