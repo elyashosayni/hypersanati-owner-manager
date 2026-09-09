@@ -632,6 +632,8 @@ class HOM_View {
             'help-customers',
             'help-product-images',
             'help-warehouse-staff',
+            'help-customer-center',
+            'customer-center',
         ];
 
         return in_array(
@@ -825,6 +827,50 @@ class HOM_View {
                     مدیریت سفارش‌ها
                 </span>
             </a>
+
+
+            <a
+                href="<?php
+                echo esc_url(
+                    add_query_arg(
+                        'view',
+                        'customer-center',
+                        HOM_Router::panel_url()
+                    )
+                );
+                ?>"
+                class="hom-nav-item <?php
+                echo 'customer-center' === $current_view
+                    ? 'is-active'
+                    : '';
+                ?>"
+            >
+                <span
+                    class="hom-nav-icon"
+                    aria-hidden="true"
+                >
+                    <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            d="M21 11.5C21 16.19 16.97 20 12 20C10.83 20 9.71 19.79 8.69 19.42L3 21L4.58 15.31C4.21 14.29 4 13.17 4 12C4 7.03 7.81 3 12.5 3C17.19 3 21 6.81 21 11.5Z"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        />
+                    </svg>
+                </span>
+
+                <span>
+                    پشتیبانی مشتریان
+                </span>
+            </a>
+
 
 
             <a
@@ -1123,6 +1169,10 @@ class HOM_View {
 
                 HOM_Seller_Settings_View::render();
 
+            } elseif ('customer-center' === $current_view) {
+
+                HOM_Customer_Center_View::render();
+
             } elseif ('help' === $current_view) {
 
                 self::render_help_index_content();
@@ -1147,6 +1197,13 @@ class HOM_View {
             ) {
 
                 self::render_help_warehouse_staff_content();
+
+            } elseif (
+                'help-customer-center' ===
+                $current_view
+            ) {
+
+                self::render_help_customer_center_content();
 
             } elseif ('product-images' === $current_view) {
 
@@ -3476,6 +3533,14 @@ class HOM_View {
                 HOM_Router::panel_url()
             );
 
+
+        $customer_center_help_url =
+            add_query_arg(
+                'view',
+                'help-customer-center',
+                HOM_Router::panel_url()
+            );
+
         ?>
 
         <div class="hom-help-page">
@@ -3625,6 +3690,45 @@ class HOM_View {
                     </span>
 
                 </a>
+
+
+                <a
+                    href="<?php
+                    echo esc_url(
+                        $customer_center_help_url
+                    );
+                    ?>"
+                    class="hom-help-branch-card"
+                >
+
+                    <span class="hom-help-branch-card__icon">
+                        👥
+                    </span>
+
+                    <div>
+
+                        <span class="hom-help-kicker">
+                            ارتباط با مشتری
+                        </span>
+
+                        <h2>
+                            راهنمای پشتیبانی مشتریان
+                        </h2>
+
+                        <p>
+                            مدیریت نقد و نظرات مشتریان،
+                            پرسش‌های محصولات، پاسخ‌گویی
+                            و بررسی بازخورد کاربران فروشگاه.
+                        </p>
+
+                    </div>
+
+                    <span class="hom-help-branch-card__arrow">
+                        ←
+                    </span>
+
+                </a>
+
 
             </section>
 
@@ -6220,6 +6324,298 @@ class HOM_View {
 
 
 
+
+
+
+    private static function render_help_customer_center_content() {
+
+        $customer_center_url =
+            add_query_arg(
+                'view',
+                'customer-center',
+                HOM_Router::panel_url()
+            );
+
+        $help_index_url =
+            add_query_arg(
+                'view',
+                'help',
+                HOM_Router::panel_url()
+            );
+
+?>
+
+<div class="hom-help-page hom-customer-center-help-page">
+
+
+<section class="hom-help-hero">
+
+                <div class="hom-help-hero__icon">
+                    📦
+                </div>
+
+                <div class="hom-help-hero__content">
+
+                    <span class="hom-help-kicker">
+                        راهنمای کار روزانه واحد پشتیبانی و کنترل نهایی
+                    </span>
+
+                    <h1>
+                        راهنمای پشتیبانی مشتریان
+                    </h1>
+
+                    <p>
+مدیریت نقد و نظرات مشتریان، پرسش‌های محصولات،
+پاسخ‌گویی کاربران و کنترل نمایش محتوای ثبت‌شده
+در فروشگاه از این بخش انجام می‌شود.
+</p>
+
+                    <div class="hom-help-hero__actions">
+
+                        <a
+                            href="<?php echo esc_url($customer_center_url); ?>"
+                            class="hom-help-action hom-help-action-primary"
+                        >
+                            مدیریت مسئولین انبار
+                        </a>
+
+                        <a
+                            href="<?php echo esc_url($help_index_url); ?>"
+                            class="hom-help-action hom-help-action-secondary"
+                        >
+                            ← بازگشت به راهنمای پنل
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+
+<section class="hom-help-topic">
+
+<div class="hom-help-topic__heading">
+<span class="hom-help-topic__icon">⭐</span>
+<div>
+<span class="hom-help-topic__eyebrow">
+نقد و نظرات
+</span>
+<h2>
+مدیریت نقد و نظرات مشتریان
+</h2>
+</div>
+</div>
+
+
+<section class="hom-help-tools">
+
+<article class="hom-help-tool">
+<span class="hom-help-tool__icon">✓</span>
+<div>
+<h3>تأیید نظر</h3>
+<p>نمایش نظر برای کاربران سایت.</p>
+</div>
+</article>
+
+
+<article class="hom-help-tool">
+<span class="hom-help-tool__icon">×</span>
+<div>
+<h3>عدم تأیید</h3>
+<p>جلوگیری از نمایش نظر.</p>
+</div>
+</article>
+
+
+<article class="hom-help-tool">
+<span class="hom-help-tool__icon">⌫</span>
+<div>
+<h3>حذف</h3>
+<p>پاک کردن کامل نظر.</p>
+</div>
+</article>
+
+
+<article class="hom-help-tool">
+<span class="hom-help-tool__icon">✎</span>
+<div>
+<h3>ویرایش</h3>
+<p>اصلاح متن ثبت‌شده.</p>
+</div>
+</article>
+
+</section>
+
+</section>
+
+
+
+<section class="hom-help-topic">
+
+<div class="hom-help-topic__heading">
+<span class="hom-help-topic__icon">❓</span>
+<div>
+<span class="hom-help-topic__eyebrow">
+محصولات
+</span>
+<h2>
+مدیریت پرسش‌های محصولات
+</h2>
+</div>
+</div>
+
+
+<section class="hom-help-steps">
+
+<article class="hom-help-step">
+<span>۱</span>
+<h3>ثبت سوال</h3>
+<p>مشتری سوال خود را در صفحه محصول ثبت می‌کند.</p>
+</article>
+
+<article class="hom-help-step">
+<span>۲</span>
+<h3>بررسی مدیر</h3>
+<p>سوال در پنل بررسی و مدیریت می‌شود.</p>
+</article>
+
+<article class="hom-help-step">
+<span>۳</span>
+<h3>پاسخ‌گویی</h3>
+<p>پاسخ مدیریت زیر سوال نمایش داده می‌شود.</p>
+</article>
+
+</section>
+
+
+</section>
+
+
+
+<section class="hom-help-topic">
+
+<div class="hom-help-topic__heading">
+<span class="hom-help-topic__icon">💬</span>
+<div>
+<span class="hom-help-topic__eyebrow">
+پاسخ مدیریت
+</span>
+<h2>
+ارسال و مدیریت پاسخ‌ها
+</h2>
+</div>
+</div>
+
+
+<section class="hom-help-tools">
+
+<article class="hom-help-tool">
+<span class="hom-help-tool__icon">+</span>
+<div>
+<h3>ارسال پاسخ</h3>
+<p>ثبت پاسخ جدید برای سوال مشتری.</p>
+</div>
+</article>
+
+
+<article class="hom-help-tool">
+<span class="hom-help-tool__icon">✎</span>
+<div>
+<h3>ویرایش پاسخ</h3>
+<p>اصلاح پاسخ‌های ثبت‌شده.</p>
+</div>
+</article>
+
+
+<article class="hom-help-tool">
+<span class="hom-help-tool__icon">⌫</span>
+<div>
+<h3>حذف پاسخ</h3>
+<p>حذف پاسخ‌های غیرضروری.</p>
+</div>
+</article>
+
+</section>
+
+</section>
+
+
+
+<section class="hom-help-warning">
+
+<div class="hom-help-warning__head">
+
+<span class="hom-help-warning__icon">
+⭐
+</span>
+
+<div>
+<span>
+امتیاز محصول
+</span>
+
+<h2>
+محاسبه ستاره‌های محصول
+</h2>
+
+</div>
+
+</div>
+
+<p>
+امتیاز محصول از میانگین امتیازهای تأییدشده مشتریان محاسبه می‌شود.
+</p>
+
+</section>
+
+
+
+<section class="hom-help-topic">
+
+<div class="hom-help-topic__heading">
+<span class="hom-help-topic__icon">🔎</span>
+<div>
+<span class="hom-help-topic__eyebrow">
+دسترسی سریع
+</span>
+<h2>
+پیدا کردن عملیات موردنظر
+</h2>
+</div>
+</div>
+
+
+<ul>
+
+<li>بررسی نظر مشتری → نقد و نظرات</li>
+<li>پاسخ به سوال → پرسش‌های محصولات</li>
+<li>اصلاح پاسخ → پاسخ‌های ثبت‌شده</li>
+
+</ul>
+
+</section>
+
+
+
+<div class="hom-help-page-back">
+
+<a href="<?php echo esc_url($help_index_url); ?>"
+class="hom-help-action hom-help-action-secondary">
+← بازگشت به راهنمای پنل
+</a>
+
+</div>
+
+
+</div>
+
+<?php
+
+    }
+
+
     private static function render_help_security_content() {
 
         ?>
@@ -7905,6 +8301,47 @@ class HOM_View {
         );
         ?>;
         </script>
+
+
+        <script>
+        window.HOMProductReviews = <?php
+        echo wp_json_encode(
+            [
+                'ajaxUrl' =>
+                    admin_url('admin-ajax.php'),
+
+                'nonce' =>
+                    wp_create_nonce(
+                        'hom_product_reviews'
+                    ),
+            ],
+            JSON_UNESCAPED_UNICODE
+            | JSON_UNESCAPED_SLASHES
+        );
+        ?>;
+        </script>
+
+
+        <script
+            src="<?php
+            echo esc_url(
+                HOM_URL .
+                'assets/js/product-reviews.js?ver=' .
+                (
+                    file_exists(
+                        HOM_PATH .
+                        'assets/js/product-reviews.js'
+                    )
+                        ? filemtime(
+                            HOM_PATH .
+                            'assets/js/product-reviews.js'
+                        )
+                        : HOM_VERSION
+                )
+            );
+            ?>"
+            defer
+        ></script>
 
 
         <script

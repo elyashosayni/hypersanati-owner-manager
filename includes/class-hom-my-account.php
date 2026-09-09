@@ -116,6 +116,30 @@ class HOM_My_Account {
             true
         );
 
+        $reviews_js_path =
+            HOM_PATH
+            . 'assets/js/product-reviews.js';
+
+        wp_enqueue_script(
+            'hom-product-reviews',
+            HOM_URL
+                . 'assets/js/product-reviews.js',
+            ['jquery'],
+            file_exists($reviews_js_path)
+                ? (string) filemtime($reviews_js_path)
+                : HOM_VERSION,
+            true
+        );
+
+        wp_localize_script(
+            'hom-product-reviews',
+            'HOMProductReviews',
+            [
+                'ajaxUrl' => admin_url('admin-ajax.php'),
+                'nonce'   => wp_create_nonce('hom_product_reviews'),
+            ]
+        );
+
 
         wp_localize_script(
             'hom-owner-my-account',
