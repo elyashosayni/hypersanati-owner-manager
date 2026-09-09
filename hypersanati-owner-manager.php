@@ -5,7 +5,7 @@
  * Author URI: https://elyashosayni.com/
  * Plugin URI: https://olfatbearing.com
  * Description: Scalable frontend business management panel for HyperSanati WooCommerce.
- * Version: 0.5.0
+ * Version: 0.6.0
  * Text Domain: hypersanati-owner-manager
  * Requires PHP: 8.0
  * Requires Plugins: woocommerce, hsb-auth
@@ -26,6 +26,11 @@ require_once HOM_PATH . 'includes/class-hom-router.php';
 require_once HOM_PATH . 'includes/class-hom-auth.php';
 require_once HOM_PATH . 'includes/class-hom-products.php';
 require_once HOM_PATH . 'includes/class-hom-orders.php';
+require_once HOM_PATH . 'includes/class-hom-product-questions.php';
+require_once HOM_PATH . 'includes/class-hom-product-questions-actions.php';
+require_once HOM_PATH . 'includes/class-hom-product-questions-ajax.php';
+require_once HOM_PATH . 'includes/class-hom-product-reviews.php';
+require_once HOM_PATH . 'includes/class-hom-product-reviews-actions.php';
 require_once HOM_PATH . 'includes/class-hom-order-audit.php';
 require_once HOM_PATH . 'includes/class-hom-order-detail-view.php';
 require_once HOM_PATH . 'includes/class-hom-order-fulfillment-view.php';
@@ -37,6 +42,8 @@ require_once HOM_PATH . 'includes/class-hom-seller-settings.php';
 require_once HOM_PATH . 'includes/class-hom-seller-settings-view.php';
 require_once HOM_PATH . 'includes/class-hom-product-images.php';
 require_once HOM_PATH . 'includes/class-hom-my-account.php';
+require_once HOM_PATH . 'includes/class-hom-customer-center.php';
+require_once HOM_PATH . 'includes/class-hom-customer-center-view.php';
 require_once HOM_PATH . 'includes/class-hom-view.php';
 require_once HOM_PATH . 'includes/class-hom-activator.php';
 require_once HOM_PATH . 'includes/class-hom-plugin.php';

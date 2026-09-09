@@ -12745,3 +12745,851 @@ input[type="range"] {
         font-size: 13px;
     }
 }
+
+
+/* Customer Center */
+.hom-customer-center-cards {
+    display: grid;
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 28px;
+}
+
+
+.hom-customer-center-card {
+    appearance: none;
+    width: 100%;
+    min-height: 160px;
+    text-align: right;
+    cursor: pointer;
+    background: var(--hom-surface);
+    border: 1px solid var(--hom-border);
+    border-radius: var(--hom-radius);
+    padding: 24px;
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        box-shadow .2s ease;
+}
+
+
+.hom-customer-center-card:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 8px 22px rgba(22,35,56,.08);
+}
+
+
+.hom-customer-center-card.is-active {
+    border-color: var(--hom-primary);
+    box-shadow:
+        0 0 0 2px rgba(159,133,97,.15);
+}
+
+
+.hom-customer-center-card h2 {
+    margin: 0 0 12px;
+    font-size: 20px;
+}
+
+
+.hom-customer-center-card p {
+    margin: 0;
+    color: var(--hom-muted);
+    font-size: 14px;
+}
+
+
+.hom-customer-center-panel {
+    margin-top: 24px;
+    background: var(--hom-surface);
+    border: 1px solid var(--hom-border);
+    border-radius: var(--hom-radius);
+    padding: 24px;
+}
+
+
+@media (max-width: 980px) {
+
+    .hom-customer-center-cards {
+        grid-template-columns:
+            1fr;
+    }
+
+}
+
+
+/* Customer center - product questions */
+
+.hom-customer-question-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    margin-top: 24px;
+}
+
+.hom-customer-question-item {
+    background: var(--hom-surface);
+    border: 1px solid var(--hom-border);
+    border-radius: var(--hom-radius);
+    padding: 20px;
+}
+
+.hom-customer-question-item strong {
+    display: block;
+    margin-bottom: 10px;
+    font-size: 15px;
+}
+
+.hom-customer-question-item p {
+    margin: 0 0 12px;
+    color: var(--hom-text);
+    line-height: 1.8;
+}
+
+.hom-customer-question-item small {
+    color: var(--hom-muted);
+    font-size: 12px;
+}
+
+
+
+/* Customer center - product questions */
+
+.hom-customer-question-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 20px;
+}
+
+
+.hom-customer-question-item {
+    background: var(--hom-surface);
+    border: 1px solid var(--hom-border);
+    border-radius: var(--hom-radius);
+    padding: 18px;
+}
+
+
+.hom-customer-question-item strong {
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+.hom-customer-question-item p {
+    margin: 0 0 12px;
+    color: var(--hom-muted);
+}
+
+
+.hom-question-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+
+.status-1 {
+    color: #15803d;
+    background: #dcfce7;
+}
+
+
+.status-0 {
+    color: #b45309;
+    background: #fef3c7;
+}
+
+
+.status-rejected {
+    color: #b91c1c;
+    background: #fee2e2;
+}
+
+
+.hom-question-actions {
+    margin-top: 16px;
+}
+
+
+.hom-question-actions form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+.hom-question-action {
+    border: 1px solid var(--hom-border);
+    background: transparent;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 13px;
+    cursor: pointer;
+}
+
+
+.hom-question-action.approve {
+    color: #15803d;
+}
+
+
+.hom-question-action.reject {
+    color: #b45309;
+}
+
+
+.hom-question-action.delete {
+    color: #b91c1c;
+}
+
+
+.hom-question-action.edit {
+    color: #2563eb;
+}
+
+
+
+
+/* =========================================================
+   Customer Center - Product Reviews Cards
+========================================================= */
+
+
+.hom-customer-review-list {
+    display: grid;
+    gap: 18px;
+    margin-top: 25px;
+}
+
+
+.hom-customer-review-item {
+    background: #ffffff;
+    border: 1px solid #e6e8ec;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+
+.hom-customer-review-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.09);
+}
+
+
+.hom-customer-review-item > strong {
+    display: block;
+    font-size: 17px;
+    color: #222;
+    margin-bottom: 14px;
+}
+
+
+.hom-customer-review-item p {
+    background: #f8f9fb;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 0 0 16px;
+    line-height: 1.9;
+    color: #444;
+}
+
+
+.hom-customer-review-item small {
+    display: block;
+    color: #666;
+    font-size: 13px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+
+.hom-review-actions {
+    margin-top: 18px;
+}
+
+
+.hom-review-actions form,
+.hom-question-actions form {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+
+.hom-review-actions button {
+    border: none;
+    border-radius: 10px;
+    padding: 9px 18px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 14px;
+}
+
+
+.hom-review-actions .approve {
+    background: #16a34a;
+    color: #fff;
+}
+
+
+.hom-review-actions .reject {
+    background: #f59e0b;
+    color: #fff;
+}
+
+
+.hom-review-actions .delete {
+    background: #dc2626;
+    color: #fff;
+}
+
+
+.hom-review-actions button:hover {
+    opacity: .85;
+}
+
+
+
+
+/* Smaller buttons for customer reviews */
+
+.hom-review-actions .hom-button,
+.hom-question-actions .hom-button {
+    padding: 5px 14px;
+    font-size: 13px;
+    min-height: auto;
+    line-height: 1.5;
+}
+
+
+.hom-review-actions form,
+.hom-question-actions form {
+    gap: 8px;
+}
+
+
+
+.hom-review-filters {
+    display:flex;
+    gap:12px;
+    margin:20px 0;
+}
+
+.hom-review-filter-card {
+    width:140px;
+    padding:12px;
+    background:#fff;
+    border:1px solid #e5e7eb;
+    border-radius:12px;
+    text-decoration:none;
+    color:#222;
+    text-align:center;
+}
+
+.hom-review-filter-card strong {
+    display:block;
+    font-size:14px;
+}
+
+.hom-review-filter-card span {
+    display:block;
+    font-size:24px;
+    font-weight:700;
+    margin:5px 0;
+}
+
+.hom-review-filter-card small {
+    color:#777;
+}
+
+.hom-review-filter-card:hover {
+    transform:translateY(-2px);
+}
+
+
+
+/* Customer center review filter cards */
+
+.hom-review-filters {
+    display: flex;
+    gap: 10px;
+    margin: 15px 0 20px;
+}
+
+
+.hom-review-filter-card {
+    width: 125px;
+    min-height: 65px;
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    transition: .2s ease;
+}
+
+
+.hom-review-filter-card strong {
+    font-size: 13px;
+    color: #374151;
+}
+
+
+.hom-review-filter-card span {
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+
+.hom-review-filter-card small {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+
+/* همه */
+.hom-review-filter-card:nth-child(1) span {
+    color: #2563eb;
+}
+
+
+/* تایید شده */
+.hom-review-filter-card:nth-child(2) span {
+    color: #16a34a;
+}
+
+
+/* در انتظار */
+.hom-review-filter-card:nth-child(3) span {
+    color: #f59e0b;
+}
+
+
+.hom-review-filter-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,.08);
+}
+
+
+/* active filter */
+
+.hom-review-filter-card.active {
+    border: 1.5px solid var(--hom-primary);
+    background: rgba(0,0,0,0.02);
+    box-shadow: 0 4px 14px rgba(0,0,0,.08);
+}
+
+
+.hom-review-filter-card.active {
+    border: 1.5px solid var(--hom-primary);
+}
+
+.hom-question-filter-card.active {
+    border: 1.5px solid var(--hom-primary);
+}
+
+
+
+/* Customer center - product reviews compact cards */
+
+.hom-customer-review-item {
+    background: var(--hom-surface);
+    border: 1px solid var(--hom-border);
+    border-radius: var(--hom-radius);
+    padding: 18px;
+}
+
+
+.hom-customer-review-item strong {
+    display: block;
+    margin-bottom: 10px;
+}
+
+
+.hom-customer-review-item p {
+    margin: 0 0 12px;
+    color: var(--hom-muted);
+    line-height: 1.8;
+}
+
+
+.hom-customer-review-item small {
+    color: var(--hom-muted);
+    font-size: 12px;
+}
+
+
+.hom-review-actions {
+    margin-top: 16px;
+}
+
+
+.hom-review-actions form {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+
+
+
+/* Match product questions cards with reviews style */
+
+.hom-customer-question-item {
+    background: #ffffff;
+    border: 1px solid #e6e8ec;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+
+.hom-customer-question-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.09);
+}
+
+
+.hom-customer-question-item > strong {
+    display: block;
+    font-size: 17px;
+    color: #222;
+    margin-bottom: 14px;
+}
+
+
+.hom-customer-question-item p {
+    background: #f8f9fb;
+    border-radius: 12px;
+    padding: 14px;
+    margin: 0 0 16px;
+    line-height: 1.9;
+    color: #444;
+}
+
+
+.hom-customer-question-item small {
+    display: block;
+    color: #666;
+    font-size: 13px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+}
+
+
+
+
+.hom-question-edit-field {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f8f9fb;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    resize: vertical;
+}
+
+
+
+
+.hom-review-edit-field {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f8f9fb;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    resize: vertical;
+}
+
+
+
+
+.hom-review-content {
+    position: relative;
+}
+
+
+.hom-review-edit-field {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f8f9fb;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    resize: vertical;
+}
+
+
+
+
+.hom-question-answer-field {
+    width: 100%;
+    box-sizing: border-box;
+    background: #f8f9fb;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    resize: vertical;
+}
+
+
+
+.hom-question-answer-item {
+    position: relative;
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid #dbeafe;
+    background: #f8fbff;
+    border-radius: 14px;
+}
+
+
+.hom-question-answer-item strong {
+    display: block;
+    margin-bottom: 10px;
+    color: #2563eb;
+    font-size: 14px;
+}
+
+
+.hom-question-answer-item p {
+    margin: 0;
+    line-height: 1.9;
+    color: #374151;
+}
+
+
+.hom-question-answer-edit-field {
+    width: 100%;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    padding: 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    resize: vertical;
+}
+
+
+
+
+.hom-question-answer-actions {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+}
+
+
+.hom-question-answer-actions .hom-button {
+    padding: 7px 12px;
+    font-size: 13px;
+}
+
+
+
+.hom-question-answer-edit-field {
+    width: 100%;
+    min-height: unset;
+    height: auto;
+    box-sizing: border-box;
+    background: #ffffff;
+    border: 1px solid #e6e8ec;
+    border-radius: 12px;
+    padding: 12px 14px;
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 1.8;
+    resize: none;
+    overflow: hidden;
+}
+
+
+.hom-question-answer-item {
+    padding-top: 48px;
+}
+
+
+
+.hom-question-answers {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #e5e7eb;
+}
+
+
+.hom-question-answer-item {
+    margin-top: 0;
+}
+
+
+.hom-question-answer-item + .hom-question-answer-item {
+    margin-top: 12px;
+}
+
+
+
+.hom-question-answers + small {
+    border-top: none;
+    padding-top: 14px;
+}
+
+
+.hom-question-answers {
+    margin-bottom: 18px;
+}
+
+
+
+
+.hom-customer-question-item {
+    position: relative;
+}
+
+
+.hom-question-edit-actions {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: flex;
+    gap: 6px;
+}
+
+
+.hom-question-edit-actions .hom-button {
+    padding: 7px 12px;
+    font-size: 13px;
+}
+
+
+
+/* Customer center help page styling */
+
+.hom-customer-center-help-page .hom-help-topic {
+    background: #fff;
+    border: 1px solid #eadfce;
+    border-radius: 18px;
+    padding: 24px;
+    margin-bottom: 22px;
+    box-shadow: 0 8px 24px rgba(0,0,0,.03);
+}
+
+.hom-customer-center-help-page .hom-help-topic__heading {
+    display:flex;
+    align-items:center;
+    gap:16px;
+    padding-bottom:16px;
+    margin-bottom:18px;
+    border-bottom:1px solid #eee3d3;
+}
+
+.hom-customer-center-help-page .hom-help-topic__icon {
+    width:48px;
+    height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:14px;
+    background:#f7eddb;
+    font-size:24px;
+}
+
+.hom-customer-center-help-page .hom-help-topic__eyebrow {
+    color:#b47713;
+    font-size:13px;
+    font-weight:700;
+}
+
+.hom-customer-center-help-page .hom-help-topic__heading h2 {
+    margin:4px 0 0;
+    font-size:22px;
+}
+
+
+.hom-customer-center-help-page .hom-help-tool,
+.hom-customer-center-help-page .hom-help-step {
+    background:#faf8f4;
+    border:1px solid #eadfce;
+    border-radius:14px;
+    padding:18px;
+    transition:.2s;
+}
+
+.hom-customer-center-help-page .hom-help-tool:hover,
+.hom-customer-center-help-page .hom-help-step:hover {
+    transform:translateY(-2px);
+}
+
+
+.hom-customer-center-help-page .hom-help-tool__icon {
+    background:#f6e8cd;
+    border-radius:12px;
+    width:42px;
+    height:42px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+
+.hom-customer-center-help-page .hom-help-warning {
+    border-radius:18px;
+    border:1px solid #e7c36a;
+    background:#fff8e8;
+    padding:22px;
+}
+
+
+.hom-customer-center-help-page .hom-help-steps {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+
+.hom-customer-center-help-page .hom-help-tools {
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+
+@media(max-width:900px){
+
+.hom-customer-center-help-page .hom-help-tools,
+.hom-customer-center-help-page .hom-help-steps {
+    grid-template-columns:1fr;
+}
+
+}
+

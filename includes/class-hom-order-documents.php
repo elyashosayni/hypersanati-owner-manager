@@ -164,6 +164,27 @@ final class HOM_Order_Documents {
             'address' =>
                 $data['address'],
 
+            'owner' =>
+                'جناب آقای امین الفت',
+
+            'owner_national_id' =>
+                '0015120661',
+
+            'email' =>
+                'info@olfatbearing.com',
+
+            'mobile' =>
+                '09394839596 - 09192491308',
+
+            'card_number' =>
+                '6104 3375 1128 5924',
+
+            'iban' =>
+                'IR360120020000009414142458',
+
+            'bank_owner' =>
+                'امین الفت علمی کامل تبریزی',
+
             'url' =>
                 home_url('/'),
         ];
@@ -278,12 +299,51 @@ final class HOM_Order_Documents {
         }
 
         .hom-print-header {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 24px;
-            padding-bottom: 18px;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 14px;
+            padding-bottom: 16px;
             border-bottom: 2px solid #111827;
+        }
+
+        .hom-print-seller-box {
+            padding: 14px;
+            border: 1px solid #cfd5dc;
+            border-radius: 12px;
+            background: #ffffff;
+        }
+
+        .hom-print-seller-kicker {
+            display: inline-block;
+            margin: 0 0 8px;
+            padding: 4px 10px;
+            border-radius: 999px;
+            background: #f3f3f3;
+            color: #333333;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .hom-print-seller-box > strong {
+            display: block;
+            margin-bottom: 12px;
+            font-size: 17px;
+            color: #493416;
+        }
+
+        .hom-print-seller-box > div:not(.hom-print-document-logo) {
+            display: inline-block;
+            vertical-align: top;
+            width: calc(33.333% - 10px);
+            margin: 5px;
+            padding: 8px 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            background: #ffffff;
+        }
+
+        .hom-print-seller-box span[dir="ltr"] {
+            font-weight: 700;
         }
 
         .hom-print-header h1 {
@@ -314,27 +374,87 @@ final class HOM_Order_Documents {
         }
 
         .hom-print-meta {
-            text-align: left;
-            white-space: nowrap;
+            display: flex;
+            gap: 10px;
+            text-align: right;
+            white-space: normal;
+        }
+
+        .hom-print-meta > div {
+            flex: 1;
+            padding: 10px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .hom-print-meta strong {
+            display: inline-block;
+            margin-right: 6px;
         }
 
         .hom-print-grid {
             display: grid;
             grid-template-columns:
-                repeat(2, minmax(0, 1fr));
-            gap: 14px;
-            margin: 20px 0;
+                repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            margin: 14px 0;
         }
 
         .hom-print-card {
             padding: 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 8px;
+            border: 1px solid #cfd3d8;
+            border-radius: 12px;
+            background: #ffffff;
         }
 
         .hom-print-card strong {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            padding-bottom: 7px;
+            border-bottom: 1px solid #d9dde2;
+            color: #111827;
+            font-size: 13px;
+        }
+
+        .hom-print-card div {
+            display: inline-block;
+            width: 32%;
+            vertical-align: top;
+            margin: 4px 0;
+            padding: 7px 9px;
+            border: 1px solid #e1e5ea;
+            border-radius: 8px;
+        }
+
+
+        .hom-print-legal-box {
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 14px;
+            padding: 12px;
+            border: 1px solid #cfd3d8;
+            border-radius: 12px;
+            background: #fff;
+        }
+
+        .hom-print-legal-box > div {
+            padding: 8px;
+            border: 1px solid #e1e5ea;
+            border-radius: 8px;
+            min-height: 48px;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .hom-print-legal-box strong {
+            border: 0;
+            margin: 0;
+            padding: 0;
         }
 
         table {
@@ -474,6 +594,23 @@ final class HOM_Order_Documents {
                 display: block;
             }
 
+            .hom-print-seller-box {
+                margin-bottom: 12px;
+            }
+
+            .hom-print-seller-box > div:not(.hom-print-document-logo) {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .hom-print-meta {
+                display: block;
+            }
+
+            .hom-print-meta > div {
+                margin-bottom: 8px;
+            }
+
             .hom-print-meta {
                 margin-top: 12px;
                 text-align: right;
@@ -504,7 +641,7 @@ final class HOM_Order_Documents {
 
     <header class="hom-print-header">
 
-        <div>
+        <div class="hom-print-seller-box">
 
             <?php if ($logo_url) : ?>
 
@@ -528,82 +665,61 @@ final class HOM_Order_Documents {
             <?php endif; ?>
 
 
-            <h1>
+            <h1 style="text-align:center">
                 <?php echo esc_html($title); ?>
             </h1>
 
             <strong>
-                <?php echo esc_html($seller['name']); ?>
+                شرکت صنعت گستران الفت
             </strong>
 
-            <?php if ($seller['address']) : ?>
+        </div>
+
+        <div class="hom-print-legal-box">
 
                 <div>
-                    <?php echo esc_html($seller['address']); ?>
+                    <strong>شهر:</strong>
+                    تهران
                 </div>
-
-            <?php endif; ?>
-
-
-            <?php if ($seller['phone']) : ?>
 
                 <div>
-                    تلفن:
-                    <span dir="ltr">
-                        <?php echo esc_html($seller['phone']); ?>
-                    </span>
+                    <strong>صاحب شرکت:</strong>
+                    جناب آقای امین الفت
                 </div>
-
-            <?php endif; ?>
-
-
-            <?php if ($seller['national_id']) : ?>
 
                 <div>
-                    شناسه ملی:
-                    <span dir="ltr">
-                        <?php
-                        echo esc_html(
-                            $seller['national_id']
-                        );
-                        ?>
-                    </span>
+                    <strong>کد ملی:</strong>
+                    <span dir="ltr">0015120661</span>
                 </div>
-
-            <?php endif; ?>
-
-
-            <?php if ($seller['economic_code']) : ?>
 
                 <div>
-                    کد اقتصادی:
-                    <span dir="ltr">
-                        <?php
-                        echo esc_html(
-                            $seller['economic_code']
-                        );
-                        ?>
-                    </span>
+                    <strong>ایمیل:</strong>
+                    <span dir="ltr">info@olfatbearing.com</span>
                 </div>
-
-            <?php endif; ?>
-
-
-            <?php if ($seller['registration_no']) : ?>
 
                 <div>
-                    شماره ثبت:
-                    <span dir="ltr">
-                        <?php
-                        echo esc_html(
-                            $seller['registration_no']
-                        );
-                        ?>
-                    </span>
+                    <strong>تلفن همراه:</strong>
+                    <span dir="ltr">09394839596 - 09192491308</span>
                 </div>
 
-            <?php endif; ?>
+                <div>
+                    <strong>کارت بانکی:</strong>
+                    <span dir="ltr">6104 3375 1128 5924</span>
+                </div>
 
+                <div>
+                    <strong>شماره شبا:</strong>
+                    <span dir="ltr">IR360120020000009414142458</span>
+                </div>
+
+                <div>
+                    <strong>صاحب حساب:</strong>
+                    امین الفت علمی کامل تبریزی
+                </div>
+
+            </div>
+
+        <div>
 
             <?php if ($seller['postcode']) : ?>
 
@@ -733,7 +849,7 @@ final class HOM_Order_Documents {
             );
 
         ?>
-        <section class="hom-print-grid">
+        <section class="hom-print-card hom-print-customer-full">
 
             <div class="hom-print-card">
 
@@ -818,8 +934,7 @@ final class HOM_Order_Documents {
         ?>
 
         <section
-            class="hom-print-card"
-            style="margin-top:14px"
+            class="hom-print-legal-box"
         >
 
             <strong>

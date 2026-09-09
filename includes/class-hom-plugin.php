@@ -43,6 +43,9 @@ final class HOM_Plugin {
         HOM_Order_Documents::register();
         HOM_Seller_Settings::register();
         HOM_My_Account::register();
+        HOM_Customer_Center::register();
+        HOM_Product_Questions_Actions::register();
+        HOM_Product_Reviews_Actions::register();
 
         /**
          * Fires after Owner Manager dependencies
