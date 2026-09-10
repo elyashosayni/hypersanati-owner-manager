@@ -11289,14 +11289,15 @@ input[type="range"] {
 
     .hom-dashboard-recent-row {
         grid-template-columns:
-            90px
-            minmax(0, 1fr)
-            20px;
+            70px
+            minmax(0, 1fr);
+
+        gap: 8px;
+        padding: 12px;
     }
 
 
-    .hom-dashboard-recent-status,
-    .hom-dashboard-recent-total {
+    .hom-dashboard-recent-arrow {
         display: none;
     }
 }
@@ -13733,4 +13734,10 @@ input[type="range"] {
     }
 
 }
+
+
+
+
+
+
 
